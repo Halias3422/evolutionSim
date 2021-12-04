@@ -21,7 +21,6 @@ class ApplicationGUI:
         self.mapFrame.pack(side=tk.LEFT)
 
     def createMap(self):
-        print(self.mapFrame.winfo_width)
         self.map = tk.Canvas(self.mapFrame, bg="white",
                              width=self.frameLength,
                              height=self.frameHeight)
@@ -58,7 +57,7 @@ class ApplicationGUI:
                                       startY,
                                       startX + self.XCellSize,
                                       startY + self.YCellSize,
-                                      fill="red")
+                                      fill="green")
 
 
 def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):

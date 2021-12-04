@@ -1,20 +1,24 @@
 from gui.guiWindow import initGUIApplication
-from population.population import initFirstGeneration
+from population.population import spawnNewGeneration
+from population.population import runCurrentGenerationLife
 
-populationNb = 10
+populationNb = 11
 winWidth = 1500
 winHeight = 750
 mapSizeX = 10
-mapSizeY = 15
+mapSizeY = 5
+generationLifeSpan = 100
 
 # Initiate GUI components
 applicationGUI = initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY)
 
-populationList = initFirstGeneration(populationNb, applicationGUI.mapSizeX,
-                                     applicationGUI.mapSizeY)
-for individual in populationList:
-    print(individual.mapPosition)
-applicationGUI.printPopulationOnMap(populationList)
+# init first Generation
+populationList = spawnNewGeneration(populationNb, applicationGUI.mapSizeX,
+                                    applicationGUI.mapSizeY, None)
+
+runCurrentGenerationLife(populationList, generationLifeSpan,
+                         mapSizeX, mapSizeY)
 
 
+# applicationGUI.printPopulationOnMap(populationList)
 applicationGUI.runApplicationGUI()
