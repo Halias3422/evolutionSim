@@ -6,11 +6,11 @@ from debug.print import *
 from environment.mapRepresentation import *
 from dataCollection.dataCollection import DataCollection
 
-populationNb = 1000
+populationNb = 10
 winWidth = 1500
 winHeight = 750
-mapSizeX = 100
-mapSizeY = 100
+mapSizeX = 5
+mapSizeY = 5
 generationLifeSpan = 100
 foodNb = populationNb / 2
 foodVariation = 0
@@ -25,9 +25,11 @@ populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY, None)
 mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                          mapRepresentation)
 
-foodList = spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
-                               applicationGUI.mapSizeY, mapRepresentation)
-mapRepresentation = addFoodListToMapRepresentation(foodList, mapRepresentation)
+foodList = []
+foodList.append(spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
+                               applicationGUI.mapSizeY, mapRepresentation))
+mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
+printMapRepresentation(mapRepresentation)
 
 populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
                                           mapRepresentation, foodList)

@@ -20,6 +20,12 @@ def printFoodListPositions(foodList):
     for food in foodList:
         print("foodPos = " + str(food))
 
+def printMapRepresentation(mapRepresentation):
+    sizeMapY = len(mapRepresentation)
+    index = 0
+    while (index < sizeMapY):
+        print(mapRepresentation[index])
+        index += 1
 
 def printDataCollectionForCurrentGeneration(dataCollection):
     print("Population Size = " + str(dataCollection.populationSize))

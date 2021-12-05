@@ -17,7 +17,9 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, parent):
 
 def runCurrentGenerationLife(populationList, generationLifeSpan,
                              mapRepresentation, foodList):
-    while (generationLifeSpan > 0):
+    loopIndex = 0
+    while (loopIndex < generationLifeSpan):
+        initialFoodList = foodList[loopIndex][:]
         for individual in populationList:
             if (individual.currentGoal == "none"):
                 individual = setIndividualCurrentGoal(individual,
@@ -30,8 +32,10 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
                 individual = individualMoveToCurrentGoal(individual,
                                                          mapRepresentation)
             individual = checkSurroundingsAndAct(individual, mapRepresentation,
-                                                 foodList, populationList)
-        generationLifeSpan -= 1
+                                                 initialFoodList,
+                                                 populationList)
+        foodList.append(initialFoodList)
+        loopIndex += 1
     return populationList
 
 
@@ -41,6 +45,7 @@ def checkSurroundingsAndAct(individual, mapRepresentation, foodList,
         targetAcquired = scanAdjacentTilesForTarget(individual.currMapPosition,
                                                     "food", mapRepresentation)
         if (targetAcquired and foodIsStillThere(targetAcquired, foodList)):
+            print("eating")
             individual.eats()
             foodList.remove(targetAcquired)
             individual.currentGoal = "none"

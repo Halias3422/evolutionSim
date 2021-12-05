@@ -80,7 +80,7 @@ class ApplicationGUI:
             self.map.delete("all")
             # self.__createMapGrid()
             self.printPopulationOnMap(populationList, loopIndex)
-            self.printFoodOnMap(foodList)
+            self.printFoodOnMap(foodList[loopIndex])
             self.map.pack()
             loopIndex += 1
             self.mainWindow.update()
