@@ -5,13 +5,13 @@ from environment.food import spawnGenerationFood
 from debug.print import *
 from environment.mapRepresentation import *
 
-populationNb = 5
+populationNb = 5000
 winWidth = 1500
 winHeight = 750
-mapSizeX = 5
-mapSizeY = 7
-generationLifeSpan = 1
-foodNb = populationNb
+mapSizeX = 200
+mapSizeY = 200
+generationLifeSpan = 100
+foodNb = populationNb / 2
 foodVariation = 0
 
 # Initiate GUI components
@@ -28,12 +28,8 @@ foodList = spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
 mapRepresentation = addFoodListToMapRepresentation(foodList, mapRepresentation)
 
 populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
-                         mapSizeX, mapSizeY, mapRepresentation)
+                                          mapRepresentation)
 
-printPopulationListPositions(populationList)
-printFoodListPositions(foodList)
-printPopulationListCurrentGoal(populationList)
-
-applicationGUI.printPopulationOnMap(populationList)
-applicationGUI.printFoodOnMap(foodList)
+applicationGUI.printGenerationLifeSpanFrameByFrame(populationList, foodList,
+                                    generationLifeSpan)
 applicationGUI.runApplicationGUI()

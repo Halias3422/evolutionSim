@@ -11,10 +11,11 @@ class GenePool:
                   ["fertility", 1]]
 
     # avalaible Genes :
-    #     movement(starts with one of the first four) - 8 directions
-    #     dangerRadar(starts between 0 and 1) - from 0 to 10
-    #     foodRadar(starts between 0 and 1) - from 0 to 10
-    #     reproductionRadar(starts between 0 and 1) - from 0 to 10
+    #     movement(starts with one of the first four + no movement)
+    #            - 8 directions + no movement
+    #     dangerRadar(starts between 1 and 2) - from 1 to 10
+    #     foodRadar(starts between 1 and 2) - from 1 to 10
+    #     reproductionRadar(starts between 1 and 2) - from 1 to 10
     #     fertility(starts between 1 and 2) - from 1 to 7
     #     preference - from 0 (food) to 10 (reproduction)
     #     fear - from -10 to 10
@@ -40,19 +41,21 @@ class GenePool:
 
     def __initMovementGene(self, parent):
         if (parent is None):
-            self.movement = self.directions[random.randint(0, 3)]
+            self.movement = []
+            self.movement.append(self.directions[random.randint(0, 3)])
+            self.movement.append("none")
 
     def __initDangerRadarGene(self, parent):
         if (parent is None):
-            self.dangerRadar = random.randint(0, 1)
+            self.dangerRadar = random.randint(1, 2)
 
     def __initFoodRadarGene(self, parent):
         if (parent is None):
-            self.foodRadar = random.randint(0, 1)
+            self.foodRadar = random.randint(1, 2)
 
     def __initReproductionRadarGene(self, parent):
         if (parent is None):
-            self.reproductionRadar = random.randint(0, 1)
+            self.reproductionRadar = random.randint(1, 2)
 
     def __initFertilityGene(self, parent):
         if (parent is None):

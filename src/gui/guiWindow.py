@@ -1,4 +1,5 @@
 import tkinter as tk
+from debug.print import *
 
 class ApplicationGUI:
 
@@ -26,7 +27,10 @@ class ApplicationGUI:
                              height=self.frameHeight)
         self.XCellSize = self.frameLength / self.mapSizeX
         self.YCellSize = self.frameHeight / self.mapSizeY
+        # self.__createMapGrid()
+        self.map.pack()
 
+    def __createMapGrid(self):
         currPosY = self.frameHeight
         while (currPosY >= 0):
             self.map.create_line(0,
@@ -44,15 +48,14 @@ class ApplicationGUI:
                                  self.frameHeight,
                                  fill="black")
             currPosX -= self.XCellSize
-        self.map.pack()
 
     def runApplicationGUI(self):
         self.mainWindow.mainloop()
 
-    def printPopulationOnMap(self, populationList):
+    def printPopulationOnMap(self, populationList, loopIndex):
         for individual in populationList:
-            startX = individual.mapPosition[1] * self.XCellSize
-            startY = individual.mapPosition[0] * self.YCellSize
+            startX = individual.mapPosition[loopIndex][1] * self.XCellSize
+            startY = individual.mapPosition[loopIndex][0] * self.YCellSize
             self.map.create_rectangle(startX,
                                       startY,
                                       startX + self.XCellSize,
@@ -68,6 +71,21 @@ class ApplicationGUI:
                                       startX + self.XCellSize,
                                       startY + self.YCellSize,
                                       fill="green")
+
+    def printGenerationLifeSpanFrameByFrame(self, populationList, foodList,
+                                            generationLifeSpan):
+        input("BEGIN")
+        loopIndex = 0
+        while (loopIndex < generationLifeSpan):
+            self.map.delete("all")
+            # self.__createMapGrid()
+            self.printPopulationOnMap(populationList, loopIndex)
+            self.printFoodOnMap(foodList)
+            self.map.pack()
+            loopIndex += 1
+            self.mainWindow.update()
+            input("Press ENTER (loop " + str(loopIndex) + ")")
+
 
 def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):
     applicationGUI = ApplicationGUI(winWidth, winHeight, mapSizeX, mapSizeY)

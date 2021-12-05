@@ -6,15 +6,14 @@ def printIndividualGenePool(individual):
     print("fertility = " + str(individual.genePool.fertility))
 
 
-def printPopulationListPositions(populationList):
+def printPopulationListPositions(populationList, loopIndex):
     for individual in populationList:
-        print("individualPos = " + str(individual.mapPosition))
+        print("individualPos = " + str(individual.mapPosition[loopIndex]))
 
 
 def printPopulationListCurrentGoal(populationList):
     for individual in populationList:
-        print("individualCurrentGoal = " + individual.currentGoal + " at pos ")
-              # + str(individual.currGoalPos))
+        print("individualCurrentGoal = " + individual.currentGoal)
 
 
 def printFoodListPositions(foodList):

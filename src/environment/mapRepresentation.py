@@ -4,7 +4,7 @@ def createMapRepresentation(mapSizeX, mapSizeY):
 
 def addPopulationListToMapRepresentation(populationList, mapRepresentation):
     for individual in populationList:
-        mapRepresentation[individual.mapPosition[0]][individual.mapPosition[1]] = 1
+        mapRepresentation[individual.currMapPosition[0]][individual.currMapPosition[1]] = 1
     return mapRepresentation
 
 def addFoodListToMapRepresentation(foodList, mapRepresentation):
