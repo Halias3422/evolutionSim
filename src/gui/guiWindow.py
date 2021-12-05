@@ -51,14 +51,23 @@ class ApplicationGUI:
 
     def printPopulationOnMap(self, populationList):
         for individual in populationList:
-            startX = individual.mapPosition[0] * self.XCellSize
-            startY = individual.mapPosition[1] * self.YCellSize
+            startX = individual.mapPosition[1] * self.XCellSize
+            startY = individual.mapPosition[0] * self.YCellSize
+            self.map.create_rectangle(startX,
+                                      startY,
+                                      startX + self.XCellSize,
+                                      startY + self.YCellSize,
+                                      fill="red")
+
+    def printFoodOnMap(self, foodList):
+        for food in foodList:
+            startX = food[1] * self.XCellSize
+            startY = food[0] * self.YCellSize
             self.map.create_rectangle(startX,
                                       startY,
                                       startX + self.XCellSize,
                                       startY + self.YCellSize,
                                       fill="green")
-
 
 def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):
     applicationGUI = ApplicationGUI(winWidth, winHeight, mapSizeX, mapSizeY)

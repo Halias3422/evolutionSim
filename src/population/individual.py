@@ -12,7 +12,7 @@ class Individual:
             self.genePool = GenePool(None)
         self.hasEaten = False
         self.hasReproduced = False
-        self.currentGoal = ""
+        self.currentGoal = "none"
 
     def eats(self):
         self.hasEaten = True
@@ -21,5 +21,6 @@ class Individual:
         self.hasReproduced = True
         self.reproductionPartner = partner
 
-    def setCurrentGoal(self, currentGoal):
+    def setCurrentGoal(self, currentGoal, goalPos):
         self.currentGoal = currentGoal
+        self.currGoalPos = goalPos
