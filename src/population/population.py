@@ -16,24 +16,84 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, parent):
 
 
 def runCurrentGenerationLife(populationList, generationLifeSpan,
-                             mapRepresentation):
+                             mapRepresentation, foodList):
     while (generationLifeSpan > 0):
         for individual in populationList:
             if (individual.currentGoal == "none"):
                 individual = setIndividualCurrentGoal(individual,
-                                                      mapRepresentation)
+                                                      mapRepresentation,
+                                                      populationList)
             if (individual.currentGoal == "none"):
                 individual = individualExecuteRandomMovement(individual,
-                                                           mapRepresentation)
+                                                             mapRepresentation)
             else:
                 individual = individualMoveToCurrentGoal(individual,
                                                          mapRepresentation)
-            checkSurroundingsAndAct(individual, mapRepresentation)
+            individual = checkSurroundingsAndAct(individual, mapRepresentation,
+                                                 foodList, populationList)
         generationLifeSpan -= 1
     return populationList
 
-# def checkSurroundingsAndAct(individual, mapRepresentation):
-#     if (individual.currentGoal == "food")
+
+def checkSurroundingsAndAct(individual, mapRepresentation, foodList,
+                            populationList):
+    if (individual.currentGoal == "food"):
+        targetAcquired = scanAdjacentTilesForTarget(individual.currMapPosition,
+                                                    "food", mapRepresentation)
+        if (targetAcquired and foodIsStillThere(targetAcquired, foodList)):
+            individual.eats()
+            foodList.remove(targetAcquired)
+            individual.currentGoal = "none"
+            mapRepresentation[targetAcquired[0]][targetAcquired[1]] == "empty"
+    elif (individual.currentGoal == "reproduction"):
+        targetAcquired = scanAdjacentTilesForTarget(individual.currMapPosition,
+                                                    "reproduction",
+                                                    mapRepresentation)
+        if (targetAcquired):
+            reproductionPartner = identifyReproductionPartner(individual,
+                                                              targetAcquired,
+                                                              populationList)
+            individual.reproduces(reproductionPartner)
+            individual.currentGoal = "none"
+    return individual
+
+
+def foodIsStillThere(targetAcquired, foodList):
+    if (targetAcquired in foodList):
+        return True
+    return False
+
+
+def identifyReproductionPartner(individual, targetCoord, populationList):
+    for partner in populationList:
+        if (partner.currMapPos is targetCoord):
+            partner.reproduces(individual)
+            if (partner.currentGoal == "reproduction"):
+                partner.currentGoal = "none"
+            return partner
+
+
+def scanAdjacentTilesForTarget(currPosition, targetName, mapRepresentation):
+    mapSizeY = len(mapRepresentation)
+    mapSizeX = len(mapRepresentation[0])
+    if (currPosition[0] - 1 >= 0
+        and mapRepresentation[currPosition[0] - 1][currPosition[1]]
+            == targetName):
+        return ([currPosition[0] - 1, currPosition[1]])
+    elif (currPosition[0] + 1 < mapSizeY
+          and mapRepresentation[currPosition[0] + 1][currPosition[1]]
+          == targetName):
+        return ([currPosition[0] + 1, currPosition[1]])
+    elif (currPosition[1] - 1 >= 0
+          and mapRepresentation[currPosition[0]][currPosition[1] - 1]
+          == targetName):
+        return ([currPosition[0], currPosition[1] - 1])
+    elif (currPosition[1] + 1 < mapSizeX
+          and mapRepresentation[currPosition[0]][currPosition[1] + 1]
+          == targetName):
+        return ([currPosition[0], currPosition[1] + 1])
+    else:
+        return None
 
 
 def individualMoveToCurrentGoal(individual, mapRepresentation):
@@ -51,6 +111,7 @@ def individualMoveToCurrentGoal(individual, mapRepresentation):
     elif ("right" in movementPool and targetPos[1] > currPos[1]):
         newMovement = "right"
     individual.setCurrentMovement(newMovement, mapRepresentation)
+    return individual
 
 
 def individualExecuteRandomMovement(individual, mapRepresentation):
@@ -61,25 +122,28 @@ def individualExecuteRandomMovement(individual, mapRepresentation):
     return individual
 
 
-def setIndividualCurrentGoal(individual, mapRepresentation):
-    reproductionTargetPos = scanForTargetOnMap(individual,
-                                               individual.genePool.reproductionRadar,
-                                               1,
-                                               mapRepresentation)
-    foodTargetPos = scanForTargetOnMap(individual,
-                                       individual.genePool.foodRadar,
-                                       2,
-                                       mapRepresentation)
+def setIndividualCurrentGoal(individual, mapRepresentation, populationList):
+    reproductionTargetPos = None
+    foodTargetPos = None
+    if (individual.hasReproduced is False):
+        reproductionTargetPos = scanForTargetOnMap(individual,
+                                                   individual.genePool.reproductionRadar,
+                                                   "individual",
+                                                   mapRepresentation,
+                                                   populationList)
+    if (individual.hasEaten is False):
+        foodTargetPos = scanForTargetOnMap(individual,
+                                           individual.genePool.foodRadar,
+                                           "food",
+                                           mapRepresentation,
+                                           populationList)
     individual = chooseCurrentGoal(individual,
                                    reproductionTargetPos,
                                    foodTargetPos)
-
     return individual
-        # RESUME WORK HERE NEED TO ADD NEXT TARGETS RECOGNITION
 
 
-def chooseCurrentGoal(individual, foodTargetPos,
-                      reproductionTargetPos):
+def chooseCurrentGoal(individual, reproductionTargetPos, foodTargetPos):
     if (reproductionTargetPos is None and foodTargetPos is not None):
         individual.setCurrentGoal("food", foodTargetPos)
     elif (foodTargetPos is None and reproductionTargetPos is not None):
@@ -110,7 +174,8 @@ def usePreferenceToChooseCurrentGoal(individual, foodTargetPos,
     return individual
 
 
-def scanForTargetOnMap(individual, geneRadar, targetCode, mapRepresentation):
+def scanForTargetOnMap(individual, geneRadar, targetCode, mapRepresentation,
+                       populationList):
     if (geneRadar > 0):
         for distance in range(1, geneRadar + 1):
             for coordX in range(-distance, distance + 1):
@@ -119,9 +184,20 @@ def scanForTargetOnMap(individual, geneRadar, targetCode, mapRepresentation):
                                                      coordY, mapRepresentation)):
                         if (mapRepresentation[individual.currMapPosition[0] + coordY]
                                 [individual.currMapPosition[1] + coordX] == targetCode):
-                            return ([individual.currMapPosition[0] + coordY,
-                                    individual.currMapPosition[1] + coordX])
+                            if (targetCode != "individual"
+                                or checkIfTargetHasReproduced([individual.currMapPosition[0] + coordY,
+                                    individual.currMapPosition[1] + coordX],
+                                    populationList)):
+                                return ([individual.currMapPosition[0] + coordY,
+                                        individual.currMapPosition[1] + coordX])
     return None
+
+def checkIfTargetHasReproduced(targetCoord, populationList):
+    for target in populationList:
+        if (target.currMapPosition == targetCoord):
+            if (target.hasReproduced is False):
+                return True
+    return False
 
 
 def checkIfTargetPositionIsValid(individual, coordX, coordY,

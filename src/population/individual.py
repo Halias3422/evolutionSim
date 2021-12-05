@@ -49,7 +49,7 @@ class Individual:
         if (currPosition == self.currMapPosition
             or (currPosition[0] <= mapSizeY and currPosition[1] <= mapSizeX
                 and currPosition[0] >= 0 and currPosition[1] >= 0
-                and mapRepresentation[currPosition[0]][currPosition[1]] == 0)):
+                and mapRepresentation[currPosition[0]][currPosition[1]] == "empty")):
             self.mapPosition.append(currPosition[:])
             self.currMapPosition = currPosition
         else:

@@ -19,3 +19,13 @@ def printPopulationListCurrentGoal(populationList):
 def printFoodListPositions(foodList):
     for food in foodList:
         print("foodPos = " + str(food))
+
+
+def printDataCollectionForCurrentGeneration(dataCollection):
+    print("Population Size = " + str(dataCollection.populationSize))
+    print("Individuals that have reproduced = "
+          + str(dataCollection.hasReproducedNb))
+    print("Individuals that have eaten = "
+          + str(dataCollection.hasEatenNb))
+    print("Individuals that have both reproduced and eaten = "
+          + str(dataCollection.hasReproducedAndEatenNb))
