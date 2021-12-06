@@ -4,7 +4,8 @@ from .genePool import GenePool
 
 class Individual:
 
-    def __init__(self, mapSizeX, mapSizeY, generation):
+    def __init__(self, mapSizeX, mapSizeY, generation, generationLifeSpan,
+                 populationNb):
         self.mapPosition = []
         self.mapPosition.append([random.randint(0, mapSizeY - 1),
                                 random.randint(0, mapSizeX - 1)])
@@ -14,16 +15,21 @@ class Individual:
         if (generation == 0):
             self.genePool = GenePool(None)
         self.hasEaten = False
+        self.hasEatenLoop = generationLifeSpan + 1
         self.hasReproduced = False
+        self.hasReproducedLoop = generationLifeSpan + 1
         self.currentGoal = "none"
         self.movementHistory = []
+        self.name = str(generation) + "-" + str(populationNb)
 
-    def eats(self):
+    def eats(self, currentLoop):
         self.hasEaten = True
+        self.hasEatenLoop = currentLoop
         self.setCurrentGoal("none", None)
 
-    def reproduces(self, partner):
+    def reproduces(self, partner, currentLoop):
         self.hasReproduced = True
+        self.hasReproducedLoop = currentLoop
         self.reproductionPartner = partner
 
     def setCurrentGoal(self, currentGoal, goalPos):

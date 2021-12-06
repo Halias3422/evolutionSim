@@ -1,4 +1,5 @@
 import tkinter as tk
+import keyboard
 from debug.print import *
 
 class ApplicationGUI:
@@ -56,11 +57,23 @@ class ApplicationGUI:
         for individual in populationList:
             startX = individual.mapPosition[loopIndex][1] * self.XCellSize
             startY = individual.mapPosition[loopIndex][0] * self.YCellSize
+            color = "black"
+            if (individual.hasEaten is True
+                and individual.hasEatenLoop <= loopIndex
+                and individual.hasReproduced is True
+                and individual.hasReproducedLoop <= loopIndex):
+                color = "yellow"
+            elif (individual.hasEaten is True
+                  and individual.hasEatenLoop <= loopIndex):
+                color = "red"
+            elif (individual.hasReproduced is True
+                  and individual.hasReproducedLoop <= loopIndex):
+                color = "pink"
             self.map.create_rectangle(startX,
                                       startY,
                                       startX + self.XCellSize,
                                       startY + self.YCellSize,
-                                      fill="red")
+                                      fill=color)
 
     def printFoodOnMap(self, foodList):
         for food in foodList:
@@ -74,7 +87,6 @@ class ApplicationGUI:
 
     def printGenerationLifeSpanFrameByFrame(self, populationList, foodList,
                                             generationLifeSpan):
-        input("BEGIN")
         loopIndex = 0
         while (loopIndex < generationLifeSpan):
             self.map.delete("all")
@@ -82,9 +94,30 @@ class ApplicationGUI:
             self.printPopulationOnMap(populationList, loopIndex)
             self.printFoodOnMap(foodList[loopIndex])
             self.map.pack()
-            loopIndex += 1
             self.mainWindow.update()
-            input("Press ENTER (loop " + str(loopIndex) + ")")
+            print("loop " + str(loopIndex) + " : press l to go forward or h to go backward")
+            while True:
+                event = keyboard.read_event()
+                if (event.event_type == keyboard.KEY_DOWN):
+                    if (event.name == 'l' and loopIndex < generationLifeSpan - 1):
+                        loopIndex += 1
+                        break
+                    elif (event.name == 'h'and loopIndex > 0):
+                        loopIndex -= 1
+                        break
+                    elif (event.name == "esc"):
+                        exit()
+        #     print ("Press l to continue or h to go back (loop + " + str(loopIndex) + ")")
+        #     while (True):
+        #         toto = keyboard.on_press("l")
+        #         print(str(toto))
+        #         key = keyboard.read_key()
+        #         if (key == "l" and loopIndex < generationLifeSpan - 1):
+        #             loopIndex += 1
+        #             break
+        #         elif (key == "h" and loopIndex > 0):
+        #             loopIndex -= 1
+        #             break
 
 
 def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):

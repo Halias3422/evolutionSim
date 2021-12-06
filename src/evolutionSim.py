@@ -6,13 +6,13 @@ from debug.print import *
 from environment.mapRepresentation import *
 from dataCollection.dataCollection import DataCollection
 
-populationNb = 10
+populationNb = 400
 winWidth = 1500
 winHeight = 750
-mapSizeX = 5
-mapSizeY = 5
-generationLifeSpan = 100
-foodNb = populationNb / 2
+mapSizeX = 100
+mapSizeY = 100
+generationLifeSpan = 200
+foodNb = populationNb
 foodVariation = 0
 
 dataCollection = []
@@ -21,7 +21,8 @@ applicationGUI = initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY)
 
 mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
 # init first Generation
-populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY, None)
+populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
+                                    generationLifeSpan, None)
 mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                          mapRepresentation)
 

@@ -2,12 +2,14 @@ from .individual import Individual
 import random
 
 
-def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, parent):
+def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
+                       parent):
     populationList = []
     while (populationNb > 0):
         if (parent is None):
             while True:
-                individual = Individual(mapSizeX, mapSizeY, 0)
+                individual = Individual(mapSizeX, mapSizeY, 0,
+                                        generationLifeSpan, populationNb)
                 if individual.currMapPosition not in populationList:
                     populationList.append(individual)
                     populationNb -= 1
@@ -33,32 +35,35 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
                                                          mapRepresentation)
             individual = checkSurroundingsAndAct(individual, mapRepresentation,
                                                  initialFoodList,
-                                                 populationList)
+                                                 populationList,
+                                                 loopIndex)
         foodList.append(initialFoodList)
         loopIndex += 1
     return populationList
 
 
 def checkSurroundingsAndAct(individual, mapRepresentation, foodList,
-                            populationList):
+                            populationList, loopIndex):
     if (individual.currentGoal == "food"):
         targetAcquired = scanAdjacentTilesForTarget(individual.currMapPosition,
                                                     "food", mapRepresentation)
         if (targetAcquired and foodIsStillThere(targetAcquired, foodList)):
-            print("eating")
-            individual.eats()
+            individual.eats(loopIndex)
             foodList.remove(targetAcquired)
             individual.currentGoal = "none"
             mapRepresentation[targetAcquired[0]][targetAcquired[1]] == "empty"
     elif (individual.currentGoal == "reproduction"):
         targetAcquired = scanAdjacentTilesForTarget(individual.currMapPosition,
-                                                    "reproduction",
+                                                    "individual",
                                                     mapRepresentation)
         if (targetAcquired):
             reproductionPartner = identifyReproductionPartner(individual,
                                                               targetAcquired,
-                                                              populationList)
-            individual.reproduces(reproductionPartner)
+                                                              populationList,
+                                                              loopIndex)
+
+            print("reproduces")
+            individual.reproduces(reproductionPartner, loopIndex)
             individual.currentGoal = "none"
     return individual
 
@@ -69,10 +74,11 @@ def foodIsStillThere(targetAcquired, foodList):
     return False
 
 
-def identifyReproductionPartner(individual, targetCoord, populationList):
+def identifyReproductionPartner(individual, targetCoord, populationList,
+                                loopIndex):
     for partner in populationList:
-        if (partner.currMapPos is targetCoord):
-            partner.reproduces(individual)
+        if (partner.currMapPosition == targetCoord):
+            partner.reproduces(individual, loopIndex)
             if (partner.currentGoal == "reproduction"):
                 partner.currentGoal = "none"
             return partner
