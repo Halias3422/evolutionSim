@@ -1,3 +1,18 @@
+def updateMapRepresentation(mapRepresentation, populationList, foodList,
+                            loopIndex):
+    mapSizeY = len(mapRepresentation) - 1
+    while (mapSizeY >= 0):
+        mapSizeX = len(mapRepresentation[0]) - 1
+        while (mapSizeX >= 0):
+            mapRepresentation[mapSizeY][mapSizeX] = "empty"
+            mapSizeX -= 1
+        mapSizeY -= 1
+    mapRepresentation = addPopulationListToMapRepresentation(populationList,
+                                                             mapRepresentation)
+    mapRepresentation = addFoodListToMapRepresentation(foodList[loopIndex],
+                                                       mapRepresentation)
+    return mapRepresentation
+
 def createMapRepresentation(mapSizeX, mapSizeY):
     mapRepresentation = [["empty" for x in range(mapSizeX)] for y in range(mapSizeY)]
     return mapRepresentation

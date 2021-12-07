@@ -36,11 +36,19 @@ class Individual:
         self.currentGoal = currentGoal
         self.currGoalPos = goalPos
 
-    def setCurrentMovement(self, direction, mapRepresentation):
+    def setCurrentMovement(self, direction, mapRepresentation, populationList):
         self.movementHistory.append(direction)
-        self.__checkCoordIsAvailable(mapRepresentation, direction)
+        self.__checkCoordIsAvailable(mapRepresentation, direction,
+                                     populationList)
 
-    def __checkCoordIsAvailable(self, mapRepresentation, direction):
+    def checkPopulationListNoCoordDoublon(self, populationList, currPosition):
+        for individual in populationList:
+            if (individual.currMapPosition == currPosition):
+                return False
+        return True
+
+    def __checkCoordIsAvailable(self, mapRepresentation, direction,
+                                populationList):
         currPosition = self.currMapPosition[:]
         if (direction == "up"):
             currPosition[0] -= 1
@@ -55,7 +63,9 @@ class Individual:
         if (currPosition == self.currMapPosition
             or (currPosition[0] <= mapSizeY and currPosition[1] <= mapSizeX
                 and currPosition[0] >= 0 and currPosition[1] >= 0
-                and mapRepresentation[currPosition[0]][currPosition[1]] == "empty")):
+                and mapRepresentation[currPosition[0]][currPosition[1]] == "empty"
+                and self.checkPopulationListNoCoordDoublon(populationList,
+                                                           currPosition))):
             self.mapPosition.append(currPosition[:])
             self.currMapPosition = currPosition
         else:

@@ -1,4 +1,5 @@
 from .individual import Individual
+from environment.mapRepresentation import updateMapRepresentation
 import random
 
 
@@ -22,22 +23,28 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
     loopIndex = 0
     while (loopIndex < generationLifeSpan):
         initialFoodList = foodList[loopIndex][:]
-        for individual in populationList:
-            if (individual.currentGoal == "none"):
-                individual = setIndividualCurrentGoal(individual,
-                                                      mapRepresentation,
-                                                      populationList)
-            if (individual.currentGoal == "none"):
-                individual = individualExecuteRandomMovement(individual,
-                                                             mapRepresentation)
-            else:
-                individual = individualMoveToCurrentGoal(individual,
-                                                         mapRepresentation)
-            individual = checkSurroundingsAndAct(individual, mapRepresentation,
-                                                 initialFoodList,
-                                                 populationList,
-                                                 loopIndex)
+        if (loopIndex > 0):
+            for individual in populationList:
+                if (individual.currentGoal == "none"):
+                    individual = setIndividualCurrentGoal(individual,
+                                                          mapRepresentation,
+                                                          populationList)
+                if (individual.currentGoal == "none"):
+                    individual = individualExecuteRandomMovement(individual,
+                                                                 mapRepresentation,
+                                                                 populationList)
+                else:
+                    individual = individualMoveToCurrentGoal(individual,
+                                                             mapRepresentation,
+                                                             populationList)
+                individual = checkSurroundingsAndAct(individual, mapRepresentation,
+                                                     initialFoodList,
+                                                     populationList,
+                                                     loopIndex)
         foodList.append(initialFoodList)
+        mapRepresentation = updateMapRepresentation(mapRepresentation,
+                                                    populationList, foodList,
+                                                    loopIndex)
         loopIndex += 1
     return populationList
 
@@ -61,10 +68,9 @@ def checkSurroundingsAndAct(individual, mapRepresentation, foodList,
                                                               targetAcquired,
                                                               populationList,
                                                               loopIndex)
-
-            print("reproduces")
-            individual.reproduces(reproductionPartner, loopIndex)
-            individual.currentGoal = "none"
+            if (reproductionPartner):
+                individual.reproduces(reproductionPartner, loopIndex)
+                individual.currentGoal = "none"
     return individual
 
 
@@ -107,7 +113,7 @@ def scanAdjacentTilesForTarget(currPosition, targetName, mapRepresentation):
         return None
 
 
-def individualMoveToCurrentGoal(individual, mapRepresentation):
+def individualMoveToCurrentGoal(individual, mapRepresentation, populationList):
     # set diagonal movements
     targetPos = individual.currGoalPos
     currPos = individual.currMapPosition
@@ -121,15 +127,17 @@ def individualMoveToCurrentGoal(individual, mapRepresentation):
         newMovement = "left"
     elif ("right" in movementPool and targetPos[1] > currPos[1]):
         newMovement = "right"
-    individual.setCurrentMovement(newMovement, mapRepresentation)
+    individual.setCurrentMovement(newMovement, mapRepresentation,
+                                  populationList)
     return individual
 
 
-def individualExecuteRandomMovement(individual, mapRepresentation):
+def individualExecuteRandomMovement(individual, mapRepresentation,
+                                    populationList):
     movementOptions = len(individual.genePool.movement)
     movementPick = random.randint(0, movementOptions - 1)
     individual.setCurrentMovement(individual.genePool.movement[movementPick],
-                                  mapRepresentation)
+                                  mapRepresentation, populationList)
     return individual
 
 
@@ -221,3 +229,11 @@ def checkIfTargetPositionIsValid(individual, coordX, coordY,
             or individual.currMapPosition[1] + coordX > maxCoordX):
         return False
     return True
+
+def removeAllUnsuccessfullIndividuals(populationList):
+    successfullPopulationList = []
+    for individual in populationList:
+        if (individual.hasEaten is True and individual.hasReproduced is True):
+            successfullPopulationList.append(individual)
+    print("success = " + str(len(successfullPopulationList)))
+    return successfullPopulationList

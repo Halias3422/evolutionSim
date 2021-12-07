@@ -85,21 +85,45 @@ class ApplicationGUI:
                                       startY + self.YCellSize,
                                       fill="green")
 
+    def printSurvivingIndividuals(self, populationList):
+        for individual in populationList:
+            if (individual.hasEaten is True
+                and individual.hasReproduced is True):
+                startX = individual.currMapPosition[1] * self.XCellSize
+                startY = individual.currMapPosition[0] * self.YCellSize
+                self.map.create_rectangle(startX,
+                                          startY,
+                                          startX + self.XCellSize,
+                                          startY + self.YCellSize,
+                                          fill="yellow")
+
+
+
+    def addContentForCurrentFrameToMap(self, populationList, foodList,
+                                       loopIndex, generationLifeSpan):
+        self.map.delete("all")
+        # self.__createMapGrid()
+        if (loopIndex < generationLifeSpan):
+            self.printPopulationOnMap(populationList, loopIndex)
+            self.printFoodOnMap(foodList[loopIndex])
+        else:
+            self.printSurvivingIndividuals(populationList)
+        self.map.pack()
+        self.mainWindow.update()
+
+
     def printGenerationLifeSpanFrameByFrame(self, populationList, foodList,
                                             generationLifeSpan):
         loopIndex = 0
-        while (loopIndex < generationLifeSpan):
-            self.map.delete("all")
-            # self.__createMapGrid()
-            self.printPopulationOnMap(populationList, loopIndex)
-            self.printFoodOnMap(foodList[loopIndex])
-            self.map.pack()
-            self.mainWindow.update()
-            print("loop " + str(loopIndex) + " : press l to go forward or h to go backward")
+        print("press l to go forward, h to go backward or enter to quit")
+        while (loopIndex <= generationLifeSpan):
+            self.addContentForCurrentFrameToMap(populationList, foodList,
+                                                loopIndex, generationLifeSpan)
+            print("loop " + str(loopIndex))
             while True:
                 event = keyboard.read_event()
                 if (event.event_type == keyboard.KEY_DOWN):
-                    if (event.name == 'l' and loopIndex < generationLifeSpan - 1):
+                    if (event.name == 'l' and loopIndex < generationLifeSpan):
                         loopIndex += 1
                         break
                     elif (event.name == 'h'and loopIndex > 0):
@@ -107,17 +131,9 @@ class ApplicationGUI:
                         break
                     elif (event.name == "esc"):
                         exit()
-        #     print ("Press l to continue or h to go back (loop + " + str(loopIndex) + ")")
-        #     while (True):
-        #         toto = keyboard.on_press("l")
-        #         print(str(toto))
-        #         key = keyboard.read_key()
-        #         if (key == "l" and loopIndex < generationLifeSpan - 1):
-        #             loopIndex += 1
-        #             break
-        #         elif (key == "h" and loopIndex > 0):
-        #             loopIndex -= 1
-        #             break
+                    elif (event.name == "enter"):
+                        loopIndex = generationLifeSpan
+                        break
 
 
 def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):

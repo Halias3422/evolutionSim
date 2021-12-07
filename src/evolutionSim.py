@@ -1,6 +1,7 @@
 from gui.guiWindow import initGUIApplication
 from population.population import spawnNewGeneration
 from population.population import runCurrentGenerationLife
+from population.population import removeAllUnsuccessfullIndividuals
 from environment.food import spawnGenerationFood
 from debug.print import *
 from environment.mapRepresentation import *
@@ -30,7 +31,6 @@ foodList = []
 foodList.append(spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
                                applicationGUI.mapSizeY, mapRepresentation))
 mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
-printMapRepresentation(mapRepresentation)
 
 populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
                                           mapRepresentation, foodList)
@@ -40,4 +40,5 @@ printDataCollectionForCurrentGeneration(dataCollection[0])
 
 applicationGUI.printGenerationLifeSpanFrameByFrame(populationList, foodList,
                                     generationLifeSpan)
+populationList = removeAllUnsuccessfullIndividuals(populationList)
 applicationGUI.runApplicationGUI()
