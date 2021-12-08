@@ -6,7 +6,6 @@ import random
 def checkIfCoordinateNotOccupied(populationList, individual):
     for other in populationList:
         if (other.currMapPosition == individual.currMapPosition):
-            print("return False pos = " + str(individual.currMapPosition))
             return False
     return True
 
@@ -19,7 +18,6 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
                 individual = Individual(mapSizeX, mapSizeY, 0,
                                         generationLifeSpan, populationNb)
                 if (checkIfCoordinateNotOccupied(populationList, individual)):
-                    print("INIT POS = " + str(individual.currMapPosition))
                     populationList.append(individual)
                     populationNb -= 1
                     break
@@ -92,7 +90,9 @@ def foodIsStillThere(targetAcquired, foodList):
 def identifyReproductionPartner(individual, targetCoord, populationList,
                                 loopIndex):
     for partner in populationList:
-        if (partner.currMapPosition == targetCoord):
+        if (partner.currMapPosition == targetCoord
+            and checkIfTargetHasReproduced(partner.currMapPosition,
+                                           populationList)):
             partner.reproduces(individual, loopIndex)
             if (partner.currentGoal == "reproduction"):
                 partner.currentGoal = "none"

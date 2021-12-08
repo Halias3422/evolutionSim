@@ -2,6 +2,9 @@ import tkinter as tk
 import keyboard
 from debug.print import *
 
+mouseXClick = -1
+mouseYClick = -1
+
 class ApplicationGUI:
 
     def __init__(self, winWidth, winHeight, mapSizeX, mapSizeY):
@@ -57,10 +60,19 @@ class ApplicationGUI:
     def runApplicationGUI(self):
         self.mainWindow.mainloop()
 
-    def printPopulationOnMap(self, populationList, loopIndex):
+    def printPopulationOnMap(self, populationList, loopIndex, mapContent):
         for individual in populationList:
             startX = individual.mapPosition[loopIndex][1] * self.XCellSize
             startY = individual.mapPosition[loopIndex][0] * self.YCellSize
+            mapContent.append({
+                "type": "individual",
+                "name": individual.name,
+                "startX": startX,
+                "startY": startY,
+                "endX": startX + self.XCellSize,
+                "endY": startY + self.YCellSize,
+                "hasReproduced": individual.hasReproduced,
+                "hasEaten": individual.hasEaten})
             color = "black"
             if (individual.hasEaten is True
                 and individual.hasEatenLoop <= loopIndex
@@ -79,10 +91,16 @@ class ApplicationGUI:
                                       startY + self.YCellSize,
                                       fill=color)
 
-    def printFoodOnMap(self, foodList):
+    def printFoodOnMap(self, foodList, mapContent):
         for food in foodList:
             startX = food[1] * self.XCellSize
             startY = food[0] * self.YCellSize
+            mapContent.append({
+                "type": "food",
+                "startX": startX,
+                "startY": startY,
+                "endX": startX + self.XCellSize,
+                "endY": startY + self.YCellSize})
             self.map.create_rectangle(startX,
                                       startY,
                                       startX + self.XCellSize,
@@ -104,27 +122,51 @@ class ApplicationGUI:
 
 
     def addContentForCurrentFrameToMap(self, populationList, foodList,
-                                       loopIndex, generationLifeSpan):
+                                       loopIndex, generationLifeSpan, mapContent):
         self.map.delete("all")
         # self.__createMapGrid()
         if (loopIndex < generationLifeSpan):
-            self.printPopulationOnMap(populationList, loopIndex)
-            self.printFoodOnMap(foodList[loopIndex])
+            self.printPopulationOnMap(populationList, loopIndex, mapContent)
+            self.printFoodOnMap(foodList[loopIndex], mapContent)
         else:
             self.printSurvivingIndividuals(populationList)
         self.map.pack()
         self.mainWindow.update()
 
 
+    def checkWhatIsUnderClickPosition(self, mapContent,
+                                      mouseXClick, mouseYClick):
+        for content in mapContent:
+            if (content["startX"] <= mouseXClick and content["endX"] >= mouseXClick
+                and content["startY"] <= mouseYClick and content["endY"] >= mouseYClick):
+                    if (content["type"] == "individual"):
+                        print("click on individual")
+                    elif (content["type"] == "food"):
+                        print("click on food")
+
+
+
     def printGenerationLifeSpanFrameByFrame(self, populationList, foodList,
                                             generationLifeSpan):
         loopIndex = 0
         print("press l to go forward, h to go backward or enter to quit")
+        self.map.bind("<Button-1>", mouseClick)
+        prevMouseXClick = mouseXClick
+        prevMouseYClick = mouseYClick
         while (loopIndex <= generationLifeSpan):
+            self.currDisplayedLoop = loopIndex
+            mapContent = []
             self.addContentForCurrentFrameToMap(populationList, foodList,
-                                                loopIndex, generationLifeSpan)
+                                                loopIndex, generationLifeSpan,
+                                                mapContent)
             print("loop " + str(loopIndex))
             while True:
+                if(prevMouseXClick != mouseXClick or
+                   prevMouseYClick != mouseYClick):
+                    self.checkWhatIsUnderClickPosition(mapContent, mouseXClick,
+                                                       mouseYClick)
+                print("MouseX = " + str(mouseXClick))
+                print("MouseY = " + str(mouseYClick))
                 event = keyboard.read_event()
                 if (event.event_type == keyboard.KEY_DOWN):
                     if (event.name == 'l' and loopIndex < generationLifeSpan):
@@ -140,9 +182,18 @@ class ApplicationGUI:
                         break
 
 
+def mouseClick(event):
+    global mouseXClick
+    global mouseYClick
+    mouseXClick = event.x
+    mouseYClick = event.y
+    return (event.x)
+
+
 def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):
     applicationGUI = ApplicationGUI(winWidth, winHeight, mapSizeX, mapSizeY)
     applicationGUI.createApplicationWindow()
     applicationGUI.createMapFrame()
     applicationGUI.createMap()
     return applicationGUI
+

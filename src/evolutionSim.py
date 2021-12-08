@@ -26,7 +26,6 @@ populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
                                     generationLifeSpan, None)
 mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                          mapRepresentation)
-printMapRepresentation(mapRepresentation)
 
 foodList = []
 foodList.append(spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
@@ -42,4 +41,4 @@ printDataCollectionForCurrentGeneration(dataCollection[0])
 applicationGUI.printGenerationLifeSpanFrameByFrame(populationList, foodList,
                                     generationLifeSpan)
 populationList = removeAllUnsuccessfullIndividuals(populationList)
-applicationGUI.runApplicationGUI()
+# applicationGUI.runApplicationGUI()
