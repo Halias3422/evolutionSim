@@ -7,11 +7,11 @@ from debug.print import *
 from environment.mapRepresentation import *
 from dataCollection.dataCollection import DataCollection
 
-populationNb = 400
+populationNb = 2000
 winWidth = 1500
 winHeight = 750
-mapSizeX = 100
-mapSizeY = 100
+mapSizeX = 200
+mapSizeY = 200
 generationLifeSpan = 200
 foodNb = populationNb
 foodVariation = 0

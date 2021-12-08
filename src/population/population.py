@@ -21,7 +21,6 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
                     populationList.append(individual)
                     populationNb -= 1
                     break
-    print("len = " + str(len(populationList)))
     return populationList
 
 

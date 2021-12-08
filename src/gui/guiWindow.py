@@ -1,4 +1,5 @@
 import tkinter as tk
+import threading
 import keyboard
 from debug.print import *
 
@@ -139,55 +140,100 @@ class ApplicationGUI:
         for content in mapContent:
             if (content["startX"] <= mouseXClick and content["endX"] >= mouseXClick
                 and content["startY"] <= mouseYClick and content["endY"] >= mouseYClick):
-                    if (content["type"] == "individual"):
-                        print("click on individual")
-                    elif (content["type"] == "food"):
-                        print("click on food")
+                    return content
+        return None
 
+    def updateSelectedObjectDescriptionFrameContent(self, clickedOnObject):
+        for widget in self.selectedObjectDescriptionFrame.winfo_children():
+            widget.destroy()
+        if (clickedOnObject["type"] == "individual"):
+            lblName = tk.Label(self.selectedObjectDescriptionFrame,
+                               text="Object = Individual " + clickedOnObject["name"])
+            lblHasReproduced = tk.Label(self.selectedObjectDescriptionFrame,
+                    text="Has reproduced : " + str(clickedOnObject["hasReproduced"]))
+            lblHasEaten = tk.Label(self.selectedObjectDescriptionFrame,
+                    text="Has eaten : " + str(clickedOnObject["hasEaten"]))
+        else:
+            lblName = tk.Label(self.selectedObjectDescriptionFrame,
+                               text="Object = Food")
+        lblCoord = tk.Label(self.selectedObjectDescriptionFrame,
+                text="Position : [" + str(clickedOnObject["startX"] / self.XCellSize)
+                            + ", " + str(clickedOnObject["startY"] / self.YCellSize)
+                            + "]")
+        lblName.place(x=70,y=90)
+        lblCoord.place(x=70,y=120)
+        if (clickedOnObject["type"] == "individual"):
+            lblHasReproduced.place(x=70,y=150)
+            lblHasEaten.place(x=70,y=180)
+        self.selectedObjectDescriptionFrame.pack()
+        self.mainWindow.update()
+        self.mainWindow.update_idletasks()
 
+    def mouseClick(self, event):
+        global mouseXClick
+        global mouseYClick
+        mouseXClick = event.x
+        mouseYClick = event.y
+
+    def keyPressedDuringReplay(self, event):
+        if (event.keysym == "h"):
+            self.loopIndex -= 1
+        elif (event.keysym == "l"):
+            self.loopIndex += 1
+        elif (event.keysym == "Escape"):
+            self.loopIndex = "exit"
+        elif (event.keysym == "Return"):
+            self.loopIndex = "end"
 
     def printGenerationLifeSpanFrameByFrame(self, populationList, foodList,
                                             generationLifeSpan):
-        loopIndex = 0
+        self.loopIndex = 0
         print("press l to go forward, h to go backward or enter to quit")
-        self.map.bind("<Button-1>", mouseClick)
+        self.map.bind("<Button-1>", self.mouseClick)
         prevMouseXClick = mouseXClick
         prevMouseYClick = mouseYClick
-        while (loopIndex <= generationLifeSpan):
-            self.currDisplayedLoop = loopIndex
-            mapContent = []
-            self.addContentForCurrentFrameToMap(populationList, foodList,
-                                                loopIndex, generationLifeSpan,
-                                                mapContent)
-            print("loop " + str(loopIndex))
-            while True:
-                if(prevMouseXClick != mouseXClick or
-                   prevMouseYClick != mouseYClick):
-                    self.checkWhatIsUnderClickPosition(mapContent, mouseXClick,
-                                                       mouseYClick)
-                print("MouseX = " + str(mouseXClick))
-                print("MouseY = " + str(mouseYClick))
-                event = keyboard.read_event()
-                if (event.event_type == keyboard.KEY_DOWN):
-                    if (event.name == 'l' and loopIndex < generationLifeSpan):
-                        loopIndex += 1
-                        break
-                    elif (event.name == 'h'and loopIndex > 0):
-                        loopIndex -= 1
-                        break
-                    elif (event.name == "esc"):
-                        exit()
-                    elif (event.name == "enter"):
-                        loopIndex = generationLifeSpan
-                        break
+
+        self.createSelectedObjectDescriptionFrame()
+
+        prevLoopIndex = self.loopIndex
+        self.mainWindow.bind("<Key>", self.keyPressedDuringReplay)
+        while True:
+            if (prevLoopIndex != self.loopIndex):
+                prevLoopIndex = self.loopIndex
+                if (self.loopIndex == "exit"):
+                    exit()
+                elif (self.loopIndex == "end"):
+                    self.loopIndex = generationLifeSpan
+                elif (self.loopIndex < 0):
+                    self.loopIndex = 0
+                elif (self.loopIndex > generationLifeSpan):
+                    self.loopIndex = generationLifeSpan
+                mapContent = []
+                self.addContentForCurrentFrameToMap(populationList, foodList,
+                                                    self.loopIndex, generationLifeSpan,
+                                                    mapContent)
+                print("loop " + str(self.loopIndex))
+            if (prevMouseXClick != mouseXClick or
+                prevMouseYClick != mouseYClick):
+                clickedOnObject = self.checkWhatIsUnderClickPosition(mapContent,
+                                                                     mouseXClick,
+                                                                     mouseYClick)
+                if (clickedOnObject):
+                    self.updateSelectedObjectDescriptionFrameContent(clickedOnObject)
+                prevMouseXClick = mouseXClick
+                prevMouseYClick = mouseYClick
+            self.mainWindow.update()
 
 
-def mouseClick(event):
-    global mouseXClick
-    global mouseYClick
-    mouseXClick = event.x
-    mouseYClick = event.y
-    return (event.x)
+    def createSelectedObjectDescriptionFrame(self):
+        self.selectedObjectDescriptionFrame = tk.Frame(self.mainWindow,
+                                                       width=self.frameLength,
+                                                       height=self.frameHeight)
+        self.selectedObjectDescriptionFrame.pack(side=tk.RIGHT)
+        self.mainWindow.update_idletasks()
+
+
+
 
 
 def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):
