@@ -26,6 +26,7 @@ populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
                                     generationLifeSpan, None)
 mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                          mapRepresentation)
+printMapRepresentation(mapRepresentation)
 
 foodList = []
 foodList.append(spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,

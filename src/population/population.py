@@ -3,6 +3,13 @@ from environment.mapRepresentation import updateMapRepresentation
 import random
 
 
+def checkIfCoordinateNotOccupied(populationList, individual):
+    for other in populationList:
+        if (other.currMapPosition == individual.currMapPosition):
+            print("return False pos = " + str(individual.currMapPosition))
+            return False
+    return True
+
 def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
                        parent):
     populationList = []
@@ -11,10 +18,12 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
             while True:
                 individual = Individual(mapSizeX, mapSizeY, 0,
                                         generationLifeSpan, populationNb)
-                if individual.currMapPosition not in populationList:
+                if (checkIfCoordinateNotOccupied(populationList, individual)):
+                    print("INIT POS = " + str(individual.currMapPosition))
                     populationList.append(individual)
                     populationNb -= 1
                     break
+    print("len = " + str(len(populationList)))
     return populationList
 
 

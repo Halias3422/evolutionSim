@@ -20,6 +20,7 @@ def createMapRepresentation(mapSizeX, mapSizeY):
 
 def addPopulationListToMapRepresentation(populationList, mapRepresentation):
     for individual in populationList:
+        print("POS = " + str(individual.currMapPosition))
         mapRepresentation[individual.currMapPosition[0]][individual.currMapPosition[1]] = "individual"
     return mapRepresentation
 

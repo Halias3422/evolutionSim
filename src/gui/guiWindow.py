@@ -21,11 +21,15 @@ class ApplicationGUI:
         self.mapFrame = tk.Frame(self.mainWindow, width=self.frameLength,
                                  height=self.frameHeight, bg="blue")
         self.mapFrame.pack(side=tk.LEFT)
+        self.mainWindow.update_idletasks()
 
     def createMap(self):
+        # self.map = tk.Canvas(self.mapFrame, bg="white",
+        #                      width=self.frameLength,
+        #                      height=self.frameHeight)
         self.map = tk.Canvas(self.mapFrame, bg="white",
-                             width=self.frameLength,
-                             height=self.frameHeight)
+                             width=self.mapFrame.winfo_width(),
+                             height=self.mapFrame.winfo_height())
         self.XCellSize = self.frameLength / self.mapSizeX
         self.YCellSize = self.frameHeight / self.mapSizeY
         # self.__createMapGrid()
