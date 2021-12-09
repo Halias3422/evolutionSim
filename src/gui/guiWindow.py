@@ -90,7 +90,10 @@ class ApplicationGUI:
 
         runButton = tk.Button(self.optionsTab, text=" Run ", font=("Arial", 16),
                               command=runGenerationsLife)
+        runButton.bind("<Return>", runGenerationsLife)
         runButton.pack()
+        runButton.focus_set()
+
 
 
     def createMap(self, mapSizeX, mapSizeY):
@@ -246,7 +249,7 @@ class ApplicationGUI:
         if (clickedOnObject["type"] == "individual"):
             lblHasReproduced.pack()
             lblHasEaten.pack()
-            self.selectedItemTab.pack_propagate(0)
+        self.selectedItemTab.pack_propagate(0)
         self.optionsNotebook.select(self.selectedItemTab)
 
     def mouseClick(self, event):

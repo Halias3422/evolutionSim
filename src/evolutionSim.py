@@ -17,7 +17,7 @@ winHeight = 750
 # foodNb = populationNb
 # foodVariation = 0
 
-def runGenerationsLife():
+def runGenerationsLife(event=None):
     #init Run Variables
     dataCollection = []
     populationNb = int(applicationGUI.txtPopulationSize.get())
