@@ -43,43 +43,53 @@ class ApplicationGUI:
         self.optionsNotebook.add(self.selectedItemTab, text="Selected Item Infos")
 
     def fillRunOptionsTab(self, runGenerationsLife):
-        lblPopulationSize = tk.Label(self.optionsTab, text="Population Size: ")
+        lblPopulationSize = tk.Label(self.optionsTab,
+                                     font=("Arial", 16),
+                                     text="Population Size: ")
         lblPopulationSize.pack()
-        self.txtPopulationSize = tk.Entry(self.optionsTab)
+        self.txtPopulationSize = tk.Entry(self.optionsTab, font=("Arial", 16))
         self.txtPopulationSize.insert(0, "100")
         self.txtPopulationSize.pack()
 
-        lblFoodNb = tk.Label(self.optionsTab, text="Food Units Available : ")
+        lblFoodNb = tk.Label(self.optionsTab,
+                             font=("Arial", 16),
+                             text="Food Units Available : ")
         lblFoodNb.pack()
-        self.txtFoodNb = tk.Entry(self.optionsTab)
+        self.txtFoodNb = tk.Entry(self.optionsTab, font=("Arial", 16))
         self.txtFoodNb.insert(0, self.txtPopulationSize.get())
         self.txtFoodNb.pack()
 
-        lblFoodVariation = tk.Label(self.optionsTab, text="Food Variation (%) : ")
+        lblFoodVariation = tk.Label(self.optionsTab,
+                                    font=("Arial", 16),
+                                    text="Food Variation (%) : ")
         lblFoodVariation.pack()
-        self.txtFoodVariation = tk.Entry(self.optionsTab)
+        self.txtFoodVariation = tk.Entry(self.optionsTab, font=("Arial", 16))
         self.txtFoodVariation.insert(0, "0")
         self.txtFoodVariation.pack()
 
-        lblMapSize = tk.Label(self.optionsTab, text="Map Size (X and Y): ")
+        lblMapSize = tk.Label(self.optionsTab, font=("Arial", 16),
+                              text="Map Size (X and Y): ")
         lblMapSize.pack()
-        self.txtMapSize = tk.Entry(self.optionsTab)
+        self.txtMapSize = tk.Entry(self.optionsTab, font=("Arial", 16))
         self.txtMapSize.insert(0, "50")
         self.txtMapSize.pack()
 
-        lblGenerationLifeSpan = tk.Label(self.optionsTab, text="Generation Life Span : ")
+        lblGenerationLifeSpan = tk.Label(self.optionsTab, font=("Arial", 16),
+                                         text="Generation Life Span : ")
         lblGenerationLifeSpan.pack()
-        self.txtGenerationLifeSpan = tk.Entry(self.optionsTab)
+        self.txtGenerationLifeSpan = tk.Entry(self.optionsTab, font=("Arial", 16))
         self.txtGenerationLifeSpan.insert(0, "100")
         self.txtGenerationLifeSpan.pack()
 
-        lblGenerationNb = tk.Label(self.optionsTab, text="Generations Number : ")
+        lblGenerationNb = tk.Label(self.optionsTab, font=("Arial", 16),
+                                   text="Generations Number : ")
         lblGenerationNb.pack()
-        self.txtGenerationNb = tk.Entry(self.optionsTab)
+        self.txtGenerationNb = tk.Entry(self.optionsTab, font=("Arial", 16))
         self.txtGenerationNb.insert(0, "50")
         self.txtGenerationNb.pack()
 
-        runButton = tk.Button(self.optionsTab, text=" Run ", command=runGenerationsLife)
+        runButton = tk.Button(self.optionsTab, text=" Run ", font=("Arial", 16),
+                              command=runGenerationsLife)
         runButton.pack()
 
 
@@ -204,31 +214,39 @@ class ApplicationGUI:
             widget.destroy()
         if (clickedOnObject["type"] == "individual"):
             lblName = tk.Label(self.selectedItemTab,
+                               font=("Arial", 16),
                                text="Object = Individual " + clickedOnObject["name"])
             if (loopIndex >= clickedOnObject["hasReproducedLoop"]):
                 lblHasReproduced = tk.Label(self.selectedItemTab,
+                                            font=("Arial", 16),
                     text="Has reproduced : " + str(clickedOnObject["hasReproduced"]))
             else:
                 lblHasReproduced = tk.Label(self.selectedItemTab,
+                                            font=("Arial", 16),
                         text="Has reproduced : False")
             if (loopIndex >= clickedOnObject["hasEatenLoop"]):
                 lblHasEaten = tk.Label(self.selectedItemTab,
+                                       font=("Arial", 16),
                     text="Has eaten : " + str(clickedOnObject["hasEaten"]))
             else:
                 lblHasEaten = tk.Label(self.selectedItemTab,
+                                       font=("Arial", 16),
                         text="Has eaten : False")
         else:
             lblName = tk.Label(self.selectedItemTab,
+                               font=("Arial", 16),
                                text="Object = Food")
         lblCoord = tk.Label(self.selectedItemTab,
+                            font=("Arial", 16),
                 text="Position : [" + str(clickedOnObject["startX"] / self.XCellSize)
                             + ", " + str(clickedOnObject["startY"] / self.YCellSize)
                             + "]")
-        lblName.place(x=70,y=90)
-        lblCoord.place(x=70,y=120)
+        lblName.pack()
+        lblCoord.pack()
         if (clickedOnObject["type"] == "individual"):
-            lblHasReproduced.place(x=70,y=150)
-            lblHasEaten.place(x=70,y=180)
+            lblHasReproduced.pack()
+            lblHasEaten.pack()
+            self.selectedItemTab.pack_propagate(0)
         self.optionsNotebook.select(self.selectedItemTab)
 
     def mouseClick(self, event):
