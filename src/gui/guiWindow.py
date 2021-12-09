@@ -1,42 +1,96 @@
 import tkinter as tk
+from tkinter import ttk
 import threading
 import keyboard
-from debug.print import *
 
 mouseXClick = -1
 mouseYClick = -1
 
 class ApplicationGUI:
 
-    def __init__(self, winWidth, winHeight, mapSizeX, mapSizeY):
+    def __init__(self, winWidth, winHeight):
         self.winWidth = winWidth
         self.winHeight = winHeight
-        self.mapSizeX = mapSizeX
-        self.mapSizeY = mapSizeY
 
     def createApplicationWindow(self):
         self.mainWindow = tk.Tk()
         self.mainWindow.geometry(str(self.winWidth) + "x" +
                                  str(self.winHeight))
 
-    def createMapFrame(self):
+    def createMainFrames(self):
         self.frameLength = self.winWidth / 2
         self.frameHeight = self.winHeight
         self.mapFrame = tk.Frame(self.mainWindow, width=self.frameLength,
                                  height=self.frameHeight, bg="blue")
         self.mapFrame.pack(side=tk.LEFT)
+        self.optionsFrame = tk.Frame(self.mainWindow, width=self.frameLength,
+                                     height=self.frameHeight, bg="green")
+        self.optionsFrame.pack(side=tk.RIGHT)
         self.mainWindow.update_idletasks()
 
-    def createMap(self):
-        # self.map = tk.Canvas(self.mapFrame, bg="white",
-        #                      width=self.frameLength,
-        #                      height=self.frameHeight)
+    def createOptionsTab(self):
+        self.optionsNotebook = ttk.Notebook(self.optionsFrame)
+        self.optionsNotebook.pack()
+        self.optionsTab = tk.Frame(self.optionsNotebook,
+                                   width=self.optionsFrame.winfo_width(),
+                                   height=self.optionsFrame.winfo_height())
+        self.selectedItemTab = tk.Frame(self.optionsNotebook,
+                                        width=self.optionsFrame.winfo_width(),
+                                        height=self.optionsFrame.winfo_height())
+        self.optionsTab.pack()
+        self.selectedItemTab.pack()
+        self.optionsNotebook.add(self.optionsTab, text="Run Options")
+        self.optionsNotebook.add(self.selectedItemTab, text="Selected Item Infos")
+
+    def fillRunOptionsTab(self, runGenerationsLife):
+        lblPopulationSize = tk.Label(self.optionsTab, text="Population Size: ")
+        lblPopulationSize.pack()
+        self.txtPopulationSize = tk.Entry(self.optionsTab)
+        self.txtPopulationSize.insert(0, "100")
+        self.txtPopulationSize.pack()
+
+        lblFoodNb = tk.Label(self.optionsTab, text="Food Units Available : ")
+        lblFoodNb.pack()
+        self.txtFoodNb = tk.Entry(self.optionsTab)
+        self.txtFoodNb.insert(0, self.txtPopulationSize.get())
+        self.txtFoodNb.pack()
+
+        lblFoodVariation = tk.Label(self.optionsTab, text="Food Variation (%) : ")
+        lblFoodVariation.pack()
+        self.txtFoodVariation = tk.Entry(self.optionsTab)
+        self.txtFoodVariation.insert(0, "0")
+        self.txtFoodVariation.pack()
+
+        lblMapSize = tk.Label(self.optionsTab, text="Map Size (X and Y): ")
+        lblMapSize.pack()
+        self.txtMapSize = tk.Entry(self.optionsTab)
+        self.txtMapSize.insert(0, "50")
+        self.txtMapSize.pack()
+
+        lblGenerationLifeSpan = tk.Label(self.optionsTab, text="Generation Life Span : ")
+        lblGenerationLifeSpan.pack()
+        self.txtGenerationLifeSpan = tk.Entry(self.optionsTab)
+        self.txtGenerationLifeSpan.insert(0, "100")
+        self.txtGenerationLifeSpan.pack()
+
+        lblGenerationNb = tk.Label(self.optionsTab, text="Generations Number : ")
+        lblGenerationNb.pack()
+        self.txtGenerationNb = tk.Entry(self.optionsTab)
+        self.txtGenerationNb.insert(0, "50")
+        self.txtGenerationNb.pack()
+
+        runButton = tk.Button(self.optionsTab, text=" Run ", command=runGenerationsLife)
+        runButton.pack()
+
+
+    def createMap(self, mapSizeX, mapSizeY):
+        self.mapSizeX = mapSizeX
+        self.mapSizeY= mapSizeY
         self.map = tk.Canvas(self.mapFrame, bg="white",
                              width=self.mapFrame.winfo_width(),
                              height=self.mapFrame.winfo_height())
         self.XCellSize = self.frameLength / self.mapSizeX
         self.YCellSize = self.frameHeight / self.mapSizeY
-        # self.__createMapGrid()
         self.map.pack()
 
     def __createMapGrid(self):
@@ -73,7 +127,9 @@ class ApplicationGUI:
                 "endX": startX + self.XCellSize,
                 "endY": startY + self.YCellSize,
                 "hasReproduced": individual.hasReproduced,
-                "hasEaten": individual.hasEaten})
+                "hasReproducedLoop": individual.hasReproducedLoop,
+                "hasEaten": individual.hasEaten,
+                "hasEatenLoop": individual.hasEatenLoop})
             color = "black"
             if (individual.hasEaten is True
                 and individual.hasEatenLoop <= loopIndex
@@ -143,20 +199,28 @@ class ApplicationGUI:
                     return content
         return None
 
-    def updateSelectedObjectDescriptionFrameContent(self, clickedOnObject):
-        for widget in self.selectedObjectDescriptionFrame.winfo_children():
+    def updateSelectedObjectDescriptionFrameContent(self, clickedOnObject, loopIndex):
+        for widget in self.selectedItemTab.winfo_children():
             widget.destroy()
         if (clickedOnObject["type"] == "individual"):
-            lblName = tk.Label(self.selectedObjectDescriptionFrame,
+            lblName = tk.Label(self.selectedItemTab,
                                text="Object = Individual " + clickedOnObject["name"])
-            lblHasReproduced = tk.Label(self.selectedObjectDescriptionFrame,
+            if (loopIndex >= clickedOnObject["hasReproducedLoop"]):
+                lblHasReproduced = tk.Label(self.selectedItemTab,
                     text="Has reproduced : " + str(clickedOnObject["hasReproduced"]))
-            lblHasEaten = tk.Label(self.selectedObjectDescriptionFrame,
+            else:
+                lblHasReproduced = tk.Label(self.selectedItemTab,
+                        text="Has reproduced : False")
+            if (loopIndex >= clickedOnObject["hasEatenLoop"]):
+                lblHasEaten = tk.Label(self.selectedItemTab,
                     text="Has eaten : " + str(clickedOnObject["hasEaten"]))
+            else:
+                lblHasEaten = tk.Label(self.selectedItemTab,
+                        text="Has eaten : False")
         else:
-            lblName = tk.Label(self.selectedObjectDescriptionFrame,
+            lblName = tk.Label(self.selectedItemTab,
                                text="Object = Food")
-        lblCoord = tk.Label(self.selectedObjectDescriptionFrame,
+        lblCoord = tk.Label(self.selectedItemTab,
                 text="Position : [" + str(clickedOnObject["startX"] / self.XCellSize)
                             + ", " + str(clickedOnObject["startY"] / self.YCellSize)
                             + "]")
@@ -165,9 +229,7 @@ class ApplicationGUI:
         if (clickedOnObject["type"] == "individual"):
             lblHasReproduced.place(x=70,y=150)
             lblHasEaten.place(x=70,y=180)
-        self.selectedObjectDescriptionFrame.pack()
-        self.mainWindow.update()
-        self.mainWindow.update_idletasks()
+        self.optionsNotebook.select(self.selectedItemTab)
 
     def mouseClick(self, event):
         global mouseXClick
@@ -193,8 +255,6 @@ class ApplicationGUI:
         prevMouseXClick = mouseXClick
         prevMouseYClick = mouseYClick
 
-        self.createSelectedObjectDescriptionFrame()
-
         prevLoopIndex = self.loopIndex
         self.mainWindow.bind("<Key>", self.keyPressedDuringReplay)
         while True:
@@ -219,27 +279,20 @@ class ApplicationGUI:
                                                                      mouseXClick,
                                                                      mouseYClick)
                 if (clickedOnObject):
-                    self.updateSelectedObjectDescriptionFrameContent(clickedOnObject)
+                    self.updateSelectedObjectDescriptionFrameContent(clickedOnObject,
+                                                                     self.loopIndex)
                 prevMouseXClick = mouseXClick
                 prevMouseYClick = mouseYClick
             self.mainWindow.update()
 
 
-    def createSelectedObjectDescriptionFrame(self):
-        self.selectedObjectDescriptionFrame = tk.Frame(self.mainWindow,
-                                                       width=self.frameLength,
-                                                       height=self.frameHeight)
-        self.selectedObjectDescriptionFrame.pack(side=tk.RIGHT)
-        self.mainWindow.update_idletasks()
-
-
-
-
-
-def initGUIApplication(winWidth, winHeight, mapSizeX, mapSizeY):
-    applicationGUI = ApplicationGUI(winWidth, winHeight, mapSizeX, mapSizeY)
+def initGUIApplication(winWidth, winHeight, runGenerationsLife):
+    applicationGUI = ApplicationGUI(winWidth, winHeight)
     applicationGUI.createApplicationWindow()
-    applicationGUI.createMapFrame()
-    applicationGUI.createMap()
+    applicationGUI.createMainFrames()
+    applicationGUI.createOptionsTab()
+    applicationGUI.fillRunOptionsTab(runGenerationsLife)
     return applicationGUI
 
+def createGUImap(applicationGUI, mapSizeX, mapSizeY):
+    applicationGUI.createMap(mapSizeX, mapSizeY)
