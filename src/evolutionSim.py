@@ -28,26 +28,32 @@ def runGenerationsLife(event=None):
     foodNb = int(applicationGUI.txtFoodNb.get())
     foodVariation = int(applicationGUI.txtFoodVariation.get())
     createGUImap(applicationGUI, mapSizeX, mapSizeY)
+    parentGeneration = None
 
-    mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
-    populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
-                                        generationLifeSpan, None)
-    mapRepresentation = addPopulationListToMapRepresentation(populationList,
-                                                             mapRepresentation)
+    generationLoop = 0
+    while (generationLoop < generationsNb):
+        mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
+        populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
+                                            generationLifeSpan, parentGeneration,
+                                            generationLoop)
+        mapRepresentation = addPopulationListToMapRepresentation(populationList,
+                                                                 mapRepresentation)
 
-    foodList = []
-    foodList.append(spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
-                                   applicationGUI.mapSizeY, mapRepresentation))
-    mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
+        foodList = []
+        foodList.append(spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
+                                       applicationGUI.mapSizeY, mapRepresentation))
+        mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
 
-    populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
-                                              mapRepresentation, foodList)
+        populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
+                                                  mapRepresentation, foodList)
 
-    dataCollection.append(DataCollection(populationList))
-    printDataCollectionForCurrentGeneration(dataCollection[0])
-    applicationGUI.printGenerationLifeSpanFrameByFrame(populationList, foodList,
-                                        generationLifeSpan)
-    populationList = removeAllUnsuccessfullIndividuals(populationList)
+        dataCollection.append(DataCollection(populationList))
+        printDataCollectionForCurrentGeneration(dataCollection[generationLoop])
+        parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
+        generationLoop += 1
+    # applicationGUI.printGenerationLifeSpanFrameByFrame(populationList, foodList,
+    #                                         generationLifeSpan)
+
 
 
 # Initiate GUI components

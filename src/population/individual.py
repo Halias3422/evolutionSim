@@ -5,15 +5,19 @@ from .genePool import GenePool
 class Individual:
 
     def __init__(self, mapSizeX, mapSizeY, generation, generationLifeSpan,
-                 populationNb):
+            populationNb):
         self.mapPosition = []
         self.mapPosition.append([random.randint(0, mapSizeY - 1),
-                                random.randint(0, mapSizeX - 1)])
-        self.currMapPosition = self.mapPosition[len(self.mapPosition) - 1][:]
+            random.randint(0, mapSizeX - 1)])
+        self.genePool = GenePool(None, None)
+        self.parents = None
+        self.setStarterBasicAttributes(generation, generationLifeSpan, populationNb)
 
+
+    def setStarterBasicAttributes(self, generation, generationLifeSpan,
+            populationNb):
+        self.currMapPosition = self.mapPosition[len(self.mapPosition) - 1][:]
         self.generation = generation
-        if (generation == 0):
-            self.genePool = GenePool(None)
         self.hasEaten = False
         self.hasEatenLoop = generationLifeSpan + 1
         self.hasReproduced = False
@@ -39,7 +43,7 @@ class Individual:
     def setCurrentMovement(self, direction, mapRepresentation, populationList):
         self.movementHistory.append(direction)
         self.__checkCoordIsAvailable(mapRepresentation, direction,
-                                     populationList)
+                populationList)
 
     def checkPopulationListNoCoordDoublon(self, populationList, currPosition):
         for individual in populationList:
@@ -48,7 +52,7 @@ class Individual:
         return True
 
     def __checkCoordIsAvailable(self, mapRepresentation, direction,
-                                populationList):
+            populationList):
         currPosition = self.currMapPosition[:]
         if (direction == "up"):
             currPosition[0] -= 1
@@ -61,11 +65,11 @@ class Individual:
         mapSizeY = len(mapRepresentation) - 1
         mapSizeX = len(mapRepresentation[0]) - 1
         if (currPosition == self.currMapPosition
-            or (currPosition[0] <= mapSizeY and currPosition[1] <= mapSizeX
-                and currPosition[0] >= 0 and currPosition[1] >= 0
-                and mapRepresentation[currPosition[0]][currPosition[1]] == "empty"
-                and self.checkPopulationListNoCoordDoublon(populationList,
-                                                           currPosition))):
+                or (currPosition[0] <= mapSizeY and currPosition[1] <= mapSizeX
+                    and currPosition[0] >= 0 and currPosition[1] >= 0
+                    and mapRepresentation[currPosition[0]][currPosition[1]] == "empty"
+                    and self.checkPopulationListNoCoordDoublon(populationList,
+                        currPosition))):
             self.mapPosition.append(currPosition[:])
             self.currMapPosition = currPosition
         else:

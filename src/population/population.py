@@ -1,4 +1,5 @@
 from .individual import Individual
+from .child import Child
 from environment.mapRepresentation import updateMapRepresentation
 import random
 
@@ -10,10 +11,10 @@ def checkIfCoordinateNotOccupied(populationList, individual):
     return True
 
 def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
-                       parent):
+                       parentGeneration, currentGeneration):
     populationList = []
-    while (populationNb > 0):
-        if (parent is None):
+    if (parentGeneration is None):
+        while (populationNb > 0):
             while True:
                 individual = Individual(mapSizeX, mapSizeY, 0,
                                         generationLifeSpan, populationNb)
@@ -21,6 +22,33 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
                     populationList.append(individual)
                     populationNb -= 1
                     break
+    elif (parentGeneration is not None):
+        newPopulationNb = 0
+        alreadyReproduced = []
+        survivors = 0
+        while (survivors < len(parentGeneration)):
+            if (parentGeneration[survivors] not in alreadyReproduced):
+                birthParentNb = random.randint(0, 1)
+                if (birthParentNb == 0
+                    or parentGeneration[survivors].reproductionPartner not in parentGeneration):
+                    parent = parentGeneration[survivors]
+                    partner = parentGeneration[survivors].reproductionPartner
+                elif (birthParentNb == 1):
+                    parent = parentGeneration[survivors].reproductionPartner
+                    partner = parentGeneration[survivors]
+                childrenNb = parent.genePool.fertility
+                while (childrenNb > 0):
+                    individual = Child(parent, partner, mapSizeX, mapSizeY,
+                                       currentGeneration, generationLifeSpan,
+                                       newPopulationNb)
+                    if (checkIfCoordinateNotOccupied(populationList, individual)):
+                        populationList.append(individual)
+                        newPopulationNb += 1
+                        childrenNb -= 1
+                alreadyReproduced.append(parent)
+                alreadyReproduced.append(partner)
+            survivors += 1
+
     return populationList
 
 
