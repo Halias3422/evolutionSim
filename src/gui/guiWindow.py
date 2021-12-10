@@ -142,7 +142,9 @@ class ApplicationGUI:
                 "hasReproduced": individual.hasReproduced,
                 "hasReproducedLoop": individual.hasReproducedLoop,
                 "hasEaten": individual.hasEaten,
-                "hasEatenLoop": individual.hasEatenLoop})
+                "hasEatenLoop": individual.hasEatenLoop,
+                "genePool": individual.genePool
+                })
             color = "black"
             if (individual.hasEaten is True
                 and individual.hasEatenLoop <= loopIndex
@@ -177,7 +179,7 @@ class ApplicationGUI:
                                       startY + self.YCellSize,
                                       fill="green")
 
-    def printSurvivingIndividuals(self, populationList):
+    def printSurvivingIndividuals(self, populationList, mapContent):
         for individual in populationList:
             if (individual.hasEaten is True
                 and individual.hasReproduced is True):
@@ -188,7 +190,19 @@ class ApplicationGUI:
                                           startX + self.XCellSize,
                                           startY + self.YCellSize,
                                           fill="yellow")
-
+                mapContent.append({
+                    "type": "individual",
+                    "name": individual.name,
+                    "startX": startX,
+                    "startY": startY,
+                    "endX": startX + self.XCellSize,
+                    "endY": startY + self.YCellSize,
+                    "hasReproduced": individual.hasReproduced,
+                    "hasReproducedLoop": individual.hasReproducedLoop,
+                    "hasEaten": individual.hasEaten,
+                    "hasEatenLoop": individual.hasEatenLoop,
+                    "genePool": individual.genePool
+                    })
 
 
     def addContentForCurrentFrameToMap(self, populationList, foodList,
@@ -199,7 +213,7 @@ class ApplicationGUI:
             self.printPopulationOnMap(populationList, loopIndex, mapContent)
             self.printFoodOnMap(foodList[loopIndex], mapContent)
         else:
-            self.printSurvivingIndividuals(populationList)
+            self.printSurvivingIndividuals(populationList, mapContent)
         self.map.pack()
         self.mainWindow.update()
 
@@ -211,6 +225,43 @@ class ApplicationGUI:
                 and content["startY"] <= mouseYClick and content["endY"] >= mouseYClick):
                     return content
         return None
+
+    def printSelectedIndividualGenePool(self, genePool):
+        lblGenePool = tk.Label(self.selectedItemTab,
+                               font=("Arial", 16),
+                               text="Gene Pool : ")
+        lblMovement = tk.Label(self.selectedItemTab,
+                               font=("Arial", 16),
+                               text="Movement: " + str(genePool.movement))
+        lblDangerRadar = tk.Label(self.selectedItemTab,
+                                  font=("Arial", 16),
+                                  text="Danger Radar: " + str(genePool.dangerRadar))
+        lblFoodRadar = tk.Label(self.selectedItemTab,
+                                font=("Arial", 16),
+                                text="Food Radar: " + str(genePool.foodRadar))
+        lblReproductionRadar = tk.Label(self.selectedItemTab,
+                                        font=("Arial", 16),
+                                        text="Reproduction Radar: "
+                                        + str(genePool.reproductionRadar))
+        lblFertility = tk.Label(self.selectedItemTab,
+                                  font=("Arial", 16),
+                                  text="Fertility: " + str(genePool.fertility))
+        lblPreference = tk.Label(self.selectedItemTab,
+                                  font=("Arial", 16),
+                                  text="Preference: " + str(genePool.preference))
+        lblFear = tk.Label(self.selectedItemTab,
+                                  font=("Arial", 16),
+                                  text="Fear: " + str(genePool.fear))
+
+        lblGenePool.pack(pady=(10, 0))
+        lblMovement.pack()
+        lblDangerRadar.pack()
+        lblFoodRadar.pack()
+        lblReproductionRadar.pack()
+        lblFertility.pack()
+        lblPreference.pack()
+        lblFear.pack()
+
 
     def updateSelectedObjectDescriptionFrameContent(self, clickedOnObject, loopIndex):
         for widget in self.selectedItemTab.winfo_children():
@@ -249,6 +300,7 @@ class ApplicationGUI:
         if (clickedOnObject["type"] == "individual"):
             lblHasReproduced.pack()
             lblHasEaten.pack()
+            self.printSelectedIndividualGenePool(clickedOnObject["genePool"])
         self.selectedItemTab.pack_propagate(0)
         self.optionsNotebook.select(self.selectedItemTab)
 

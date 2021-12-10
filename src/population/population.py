@@ -243,5 +243,4 @@ def removeAllUnsuccessfullIndividuals(populationList):
     for individual in populationList:
         if (individual.hasEaten is True and individual.hasReproduced is True):
             successfullPopulationList.append(individual)
-    print("success = " + str(len(successfullPopulationList)))
     return successfullPopulationList

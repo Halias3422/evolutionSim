@@ -27,7 +27,6 @@ def runGenerationsLife(event=None):
     generationsNb = int(applicationGUI.txtGenerationNb.get())
     foodNb = int(applicationGUI.txtFoodNb.get())
     foodVariation = int(applicationGUI.txtFoodVariation.get())
-    print("toujours la")
     createGUImap(applicationGUI, mapSizeX, mapSizeY)
 
     mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
@@ -52,7 +51,5 @@ def runGenerationsLife(event=None):
 
 
 # Initiate GUI components
-print("init")
 applicationGUI = initGUIApplication(winWidth, winHeight, runGenerationsLife)
-print("apres init")
 applicationGUI.mainWindow.mainloop()
