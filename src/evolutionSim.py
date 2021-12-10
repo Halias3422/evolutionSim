@@ -31,6 +31,8 @@ def runGenerationsLife(event=None):
     parentGeneration = None
 
     generationLoop = 0
+    allGenerationsPopulationList = []
+    allGenerationsFoodList = []
     while (generationLoop < generationsNb):
         mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
         populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
@@ -46,13 +48,16 @@ def runGenerationsLife(event=None):
 
         populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
                                                   mapRepresentation, foodList)
-
+        allGenerationsPopulationList.append(populationList)
+        allGenerationsFoodList.append(foodList)
         dataCollection.append(DataCollection(populationList))
         printDataCollectionForCurrentGeneration(dataCollection[generationLoop])
         parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
         generationLoop += 1
-    # applicationGUI.printGenerationLifeSpanFrameByFrame(populationList, foodList,
-    #                                         generationLifeSpan)
+    applicationGUI.printGenerationsLifeSpanFrameByFrame(allGenerationsPopulationList,
+                                                        allGenerationsFoodList,
+                                                        generationLifeSpan,
+                                                        generationsNb)
 
 
 

@@ -320,9 +320,12 @@ class ApplicationGUI:
         elif (event.keysym == "Return"):
             self.loopIndex = "end"
 
-    def printGenerationLifeSpanFrameByFrame(self, populationList, foodList,
-                                            generationLifeSpan):
+    def printGenerationsLifeSpanFrameByFrame(self, allGenerationsPopulationList,
+                                             allGenerationsFoodList,
+                                            generationLifeSpan,
+                                            generationsNb):
         self.loopIndex = 0
+        self.currGeneration = 0
         print("press l to go forward, h to go backward or enter to quit")
         self.map.bind("<Button-1>", self.mouseClick)
         prevMouseXClick = mouseXClick
@@ -337,15 +340,25 @@ class ApplicationGUI:
                     exit()
                 elif (self.loopIndex == "end"):
                     self.loopIndex = generationLifeSpan
+                elif (self.loopIndex < 0 and self.currGeneration > 0):
+                    self.loopIndex = generationLifeSpan
+                    self.currGeneration -= 1
                 elif (self.loopIndex < 0):
                     self.loopIndex = 0
+                elif (self.loopIndex > generationLifeSpan
+                      and self.currGeneration < generationsNb - 1):
+                    self.loopIndex = 0
+                    self.currGeneration += 1
                 elif (self.loopIndex > generationLifeSpan):
                     self.loopIndex = generationLifeSpan
                 mapContent = []
-                self.addContentForCurrentFrameToMap(populationList, foodList,
-                                                    self.loopIndex, generationLifeSpan,
+                self.addContentForCurrentFrameToMap(allGenerationsPopulationList[self.currGeneration],
+                                                    allGenerationsFoodList[self.currGeneration],
+                                                    self.loopIndex,
+                                                    generationLifeSpan,
                                                     mapContent)
-                print("loop " + str(self.loopIndex))
+                print("Gen (" + str(self.currGeneration)
+                      + ") loop " + str(self.loopIndex))
             if (prevMouseXClick != mouseXClick or
                 prevMouseYClick != mouseYClick):
                 clickedOnObject = self.checkWhatIsUnderClickPosition(mapContent,
