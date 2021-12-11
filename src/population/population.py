@@ -11,7 +11,7 @@ def checkIfCoordinateNotOccupied(populationList, individual):
     return True
 
 def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
-                       parentGeneration, currentGeneration):
+                       parentGeneration, currentGeneration, mutationProb):
     populationList = []
     if (parentGeneration is None):
         while (populationNb > 0):
@@ -40,7 +40,7 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
                 while (childrenNb > 0):
                     individual = Child(parent, partner, mapSizeX, mapSizeY,
                                        currentGeneration, generationLifeSpan,
-                                       newPopulationNb)
+                                       newPopulationNb, mutationProb)
                     if (checkIfCoordinateNotOccupied(populationList, individual)):
                         populationList.append(individual)
                         newPopulationNb += 1

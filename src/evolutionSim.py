@@ -29,6 +29,7 @@ def runGenerationsLife(event=None):
     foodVariation = int(applicationGUI.txtFoodVariation.get())
     createGUImap(applicationGUI, mapSizeX, mapSizeY)
     parentGeneration = None
+    mutationProb = float(applicationGUI.txtMutationProb.get())
 
     generationLoop = 0
     allGenerationsPopulationList = []
@@ -37,7 +38,7 @@ def runGenerationsLife(event=None):
         mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
         populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
                                             generationLifeSpan, parentGeneration,
-                                            generationLoop)
+                                            generationLoop, mutationProb)
         mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                                  mapRepresentation)
 
@@ -54,6 +55,9 @@ def runGenerationsLife(event=None):
         printDataCollectionForCurrentGeneration(dataCollection[generationLoop])
         parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
         generationLoop += 1
+        if (len(parentGeneration) == 0):
+            print("No more individuals at Generation " + str(generationLoop) + ". Aborting...")
+            break
     applicationGUI.printGenerationsLifeSpanFrameByFrame(allGenerationsPopulationList,
                                                         allGenerationsFoodList,
                                                         generationLifeSpan,

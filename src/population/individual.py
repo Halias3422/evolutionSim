@@ -9,7 +9,7 @@ class Individual:
         self.mapPosition = []
         self.mapPosition.append([random.randint(0, mapSizeY - 1),
             random.randint(0, mapSizeX - 1)])
-        self.genePool = GenePool(None, None)
+        self.genePool = GenePool(None, None, None)
         self.parents = None
         self.setStarterBasicAttributes(generation, generationLifeSpan, populationNb)
 
@@ -54,13 +54,13 @@ class Individual:
     def __checkCoordIsAvailable(self, mapRepresentation, direction,
             populationList):
         currPosition = self.currMapPosition[:]
-        if (direction == "up"):
+        if (direction == "up" or "Up" in direction):
             currPosition[0] -= 1
-        elif (direction == "down"):
+        elif (direction == "down" or "Down" in direction):
             currPosition[0] += 1
-        if (direction == "left"):
+        if (direction == "left" or "Left" in direction):
             currPosition[1] -= 1
-        elif (direction == "right"):
+        elif (direction == "right" or "Right" in direction):
             currPosition[1] += 1
         mapSizeY = len(mapRepresentation) - 1
         mapSizeX = len(mapRepresentation[0]) - 1

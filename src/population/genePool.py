@@ -20,8 +20,8 @@ class GenePool:
     #     preference - from 0 (food) to 10 (reproduction)
     #     fear - from -10 to 10
 
-    def __init__(self, parent, parentPartner):
-        self.__initGeneLevels(parent, parentPartner)
+    def __init__(self, parent, parentPartner, mutationProb):
+        self.__initGeneLevels(parent, parentPartner, mutationProb)
         self.__initMovementGene(self.__randParent(parent, parentPartner))
         self.__initDangerRadarGene(self.__randParent(parent, parentPartner))
         self.__initFoodRadarGene(self.__randParent(parent, parentPartner))
@@ -35,7 +35,19 @@ class GenePool:
             return parent
         else: return parentPartner
 
-    def __initGeneLevels(self, parent, parentPartner):
+    def __checkForGeneMaxLevel(self):
+        if (self.geneLevels["movement"] > 8):
+            self.geneLevels["movement"] = 8
+        if (self.geneLevels["dangerRadar"] > 10):
+            self.geneLevels["dangerRadar"] = 10
+        if (self.geneLevels["foodRadar"] > 10):
+            self.geneLevels["foodRadar"] = 10
+        if (self.geneLevels["reproductionRadar"] > 10):
+            self.geneLevels["reproductionRadar"] = 10
+        if (self.geneLevels["fertility"] > 7):
+            self.geneLevels["fertility"] = 7
+
+    def __initGeneLevels(self, parent, parentPartner, mutationProb):
         if (parent is None):
             self.geneLevels = {
                     "movement": 1,
@@ -45,11 +57,22 @@ class GenePool:
                     "fertility": 1}
         else:
             self.geneLevels = {
-                    "movement": self.__randParent(parent, parentPartner).genePool.geneLevels["movement"],
-                    "dangerRadar": self.__randParent(parent, parentPartner).genePool.geneLevels["dangerRadar"],
-                    "foodRadar": self.__randParent(parent, parentPartner).genePool.geneLevels["foodRadar"],
-                    "reproductionRadar": self.__randParent(parent, parentPartner).genePool.geneLevels["reproductionRadar"],
-                    "fertility": self.__randParent(parent, parentPartner).genePool.geneLevels["fertility"]}
+                    "movement": int(self.__randParent(parent, parentPartner).genePool.geneLevels["movement"]),
+                    "dangerRadar": int(self.__randParent(parent, parentPartner).genePool.geneLevels["dangerRadar"]),
+                    "foodRadar": int(self.__randParent(parent, parentPartner).genePool.geneLevels["foodRadar"]),
+                    "reproductionRadar": int(self.__randParent(parent, parentPartner).genePool.geneLevels["reproductionRadar"]),
+                    "fertility": int(self.__randParent(parent, parentPartner).genePool.geneLevels["fertility"])}
+            if (mutationProb is not None and random.randint(0, 100) <= mutationProb):
+                self.geneLevels[random.choice(list(self.geneLevels))] += 1
+                print("mutated Gene level!!")
+                self.__checkForGeneMaxLevel()
+
+    def __mutationAddNewMovement(self):
+        while True:
+            newMovement = self.directions[random.randint(0, len(self.directions) - 1)]
+            if (newMovement not in self.movement):
+                self.movement.append(newMovement)
+                return
 
     def __initMovementGene(self, parent):
         self.movement = []
@@ -57,12 +80,17 @@ class GenePool:
             self.movement.append(self.directions[random.randint(0, 3)])
             self.movement.append("none")
         else:
-            movementLevel = (int)(self.geneLevels["movement"])
+            movementLevel = self.geneLevels["movement"]
             while (movementLevel > 0):
                 while True:
-                    newMovement = parent.genePool.movement[random.randint(0, len(parent.genePool.movement) - 2)]
-                    if (newMovement not in self.movement):
-                        self.movement.append(newMovement)
+                    if (len(self.movement) < len(parent.genePool.movement) - 1):
+                        newMovement = parent.genePool.movement[random.randint(0, len(parent.genePool.movement) - 2)]
+                        if (newMovement not in self.movement):
+                            self.movement.append(newMovement)
+                            movementLevel -= 1
+                            break
+                    else:
+                        self.__mutationAddNewMovement()
                         movementLevel -= 1
                         break
             self.movement.append("none")

@@ -6,6 +6,8 @@ import keyboard
 mouseXClick = -1
 mouseYClick = -1
 
+LABELFONT = ("Arial", 16)
+
 class ApplicationGUI:
 
     def __init__(self, winWidth, winHeight):
@@ -44,51 +46,58 @@ class ApplicationGUI:
 
     def fillRunOptionsTab(self, runGenerationsLife):
         lblPopulationSize = tk.Label(self.optionsTab,
-                                     font=("Arial", 16),
+                                     font=LABELFONT,
                                      text="Population Size: ")
         lblPopulationSize.pack()
-        self.txtPopulationSize = tk.Entry(self.optionsTab, font=("Arial", 16))
+        self.txtPopulationSize = tk.Entry(self.optionsTab, font=LABELFONT)
         self.txtPopulationSize.insert(0, "100")
         self.txtPopulationSize.pack()
 
         lblFoodNb = tk.Label(self.optionsTab,
-                             font=("Arial", 16),
+                             font=LABELFONT,
                              text="Food Units Available : ")
         lblFoodNb.pack()
-        self.txtFoodNb = tk.Entry(self.optionsTab, font=("Arial", 16))
+        self.txtFoodNb = tk.Entry(self.optionsTab, font=LABELFONT)
         self.txtFoodNb.insert(0, self.txtPopulationSize.get())
         self.txtFoodNb.pack()
 
         lblFoodVariation = tk.Label(self.optionsTab,
-                                    font=("Arial", 16),
+                                    font=LABELFONT,
                                     text="Food Variation (%) : ")
         lblFoodVariation.pack()
-        self.txtFoodVariation = tk.Entry(self.optionsTab, font=("Arial", 16))
+        self.txtFoodVariation = tk.Entry(self.optionsTab, font=LABELFONT)
         self.txtFoodVariation.insert(0, "0")
         self.txtFoodVariation.pack()
 
-        lblMapSize = tk.Label(self.optionsTab, font=("Arial", 16),
+        lblMapSize = tk.Label(self.optionsTab, font=LABELFONT,
                               text="Map Size (X and Y): ")
         lblMapSize.pack()
-        self.txtMapSize = tk.Entry(self.optionsTab, font=("Arial", 16))
+        self.txtMapSize = tk.Entry(self.optionsTab, font=LABELFONT)
         self.txtMapSize.insert(0, "50")
         self.txtMapSize.pack()
 
-        lblGenerationLifeSpan = tk.Label(self.optionsTab, font=("Arial", 16),
+        lblGenerationLifeSpan = tk.Label(self.optionsTab, font=LABELFONT,
                                          text="Generation Life Span : ")
         lblGenerationLifeSpan.pack()
-        self.txtGenerationLifeSpan = tk.Entry(self.optionsTab, font=("Arial", 16))
+        self.txtGenerationLifeSpan = tk.Entry(self.optionsTab, font=LABELFONT)
         self.txtGenerationLifeSpan.insert(0, "100")
         self.txtGenerationLifeSpan.pack()
 
-        lblGenerationNb = tk.Label(self.optionsTab, font=("Arial", 16),
+        lblGenerationNb = tk.Label(self.optionsTab, font=LABELFONT,
                                    text="Generations Number : ")
         lblGenerationNb.pack()
-        self.txtGenerationNb = tk.Entry(self.optionsTab, font=("Arial", 16))
+        self.txtGenerationNb = tk.Entry(self.optionsTab, font=LABELFONT)
         self.txtGenerationNb.insert(0, "50")
         self.txtGenerationNb.pack()
 
-        runButton = tk.Button(self.optionsTab, text=" Run ", font=("Arial", 16),
+        lblMutationProb = tk.Label(self.optionsTab, font=LABELFONT,
+                                    text="Mutation Probability (%) : ")
+        lblMutationProb.pack()
+        self.txtMutationProb = tk.Entry(self.optionsTab, font=LABELFONT)
+        self.txtMutationProb.insert(0, "5")
+        self.txtMutationProb.pack()
+
+        runButton = tk.Button(self.optionsTab, text=" Run ", font=LABELFONT,
                               command=runGenerationsLife)
         runButton.bind("<Return>", runGenerationsLife)
         runButton.pack()
@@ -228,29 +237,29 @@ class ApplicationGUI:
 
     def printSelectedIndividualGenePool(self, genePool):
         lblGenePool = tk.Label(self.selectedItemTab,
-                               font=("Arial", 16),
+                               font=LABELFONT,
                                text="Gene Pool : ")
         lblMovement = tk.Label(self.selectedItemTab,
-                               font=("Arial", 16),
+                               font=LABELFONT,
                                text="Movement: " + str(genePool.movement))
         lblDangerRadar = tk.Label(self.selectedItemTab,
-                                  font=("Arial", 16),
+                                  font=LABELFONT,
                                   text="Danger Radar: " + str(genePool.dangerRadar))
         lblFoodRadar = tk.Label(self.selectedItemTab,
-                                font=("Arial", 16),
+                                font=LABELFONT,
                                 text="Food Radar: " + str(genePool.foodRadar))
         lblReproductionRadar = tk.Label(self.selectedItemTab,
-                                        font=("Arial", 16),
+                                        font=LABELFONT,
                                         text="Reproduction Radar: "
                                         + str(genePool.reproductionRadar))
         lblFertility = tk.Label(self.selectedItemTab,
-                                  font=("Arial", 16),
+                                  font=LABELFONT,
                                   text="Fertility: " + str(genePool.fertility))
         lblPreference = tk.Label(self.selectedItemTab,
-                                  font=("Arial", 16),
+                                  font=LABELFONT,
                                   text="Preference: " + str(genePool.preference))
         lblFear = tk.Label(self.selectedItemTab,
-                                  font=("Arial", 16),
+                                  font=LABELFONT,
                                   text="Fear: " + str(genePool.fear))
 
         lblGenePool.pack(pady=(10, 0))
@@ -268,30 +277,30 @@ class ApplicationGUI:
             widget.destroy()
         if (clickedOnObject["type"] == "individual"):
             lblName = tk.Label(self.selectedItemTab,
-                               font=("Arial", 16),
+                               font=LABELFONT,
                                text="Object = Individual " + clickedOnObject["name"])
             if (loopIndex >= clickedOnObject["hasReproducedLoop"]):
                 lblHasReproduced = tk.Label(self.selectedItemTab,
-                                            font=("Arial", 16),
+                                            font=LABELFONT,
                     text="Has reproduced : " + str(clickedOnObject["hasReproduced"]))
             else:
                 lblHasReproduced = tk.Label(self.selectedItemTab,
-                                            font=("Arial", 16),
+                                            font=LABELFONT,
                         text="Has reproduced : False")
             if (loopIndex >= clickedOnObject["hasEatenLoop"]):
                 lblHasEaten = tk.Label(self.selectedItemTab,
-                                       font=("Arial", 16),
+                                       font=LABELFONT,
                     text="Has eaten : " + str(clickedOnObject["hasEaten"]))
             else:
                 lblHasEaten = tk.Label(self.selectedItemTab,
-                                       font=("Arial", 16),
+                                       font=LABELFONT,
                         text="Has eaten : False")
         else:
             lblName = tk.Label(self.selectedItemTab,
-                               font=("Arial", 16),
+                               font=LABELFONT,
                                text="Object = Food")
         lblCoord = tk.Label(self.selectedItemTab,
-                            font=("Arial", 16),
+                            font=LABELFONT,
                 text="Position : [" + str(clickedOnObject["startX"] / self.XCellSize)
                             + ", " + str(clickedOnObject["startY"] / self.YCellSize)
                             + "]")
@@ -357,8 +366,8 @@ class ApplicationGUI:
                                                     self.loopIndex,
                                                     generationLifeSpan,
                                                     mapContent)
-                print("Gen (" + str(self.currGeneration)
-                      + ") loop " + str(self.loopIndex))
+                print("\rGen (" + str(self.currGeneration)
+                      + ") loop " + str(self.loopIndex), end='\r')
             if (prevMouseXClick != mouseXClick or
                 prevMouseYClick != mouseYClick):
                 clickedOnObject = self.checkWhatIsUnderClickPosition(mapContent,

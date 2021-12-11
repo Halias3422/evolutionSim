@@ -6,7 +6,7 @@ class Child(Individual):
     pass
 
     def __init__(self, parent, parentPartner, mapSizeX, mapSizeY, generation,
-                   generationLifeSpan, populationNb):
+                   generationLifeSpan, populationNb, mutationProb):
         self.mapPosition = []
         if (parent.currMapPosition[1] - 1 >= 0):
             xOffsetLeft = 1
@@ -28,6 +28,6 @@ class Child(Individual):
             parent.currMapPosition[0] + yOffsetDown),
             random.randint(parent.currMapPosition[1] - xOffsetLeft,
                 parent.currMapPosition[1] + xOffsetRight)])
-        self.genePool = GenePool(parent, parentPartner)
+        self.genePool = GenePool(parent, parentPartner, mutationProb)
         self.parents = [parent, parentPartner]
         self.setStarterBasicAttributes(generation, generationLifeSpan, populationNb)
