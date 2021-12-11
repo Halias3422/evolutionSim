@@ -98,24 +98,38 @@ class GenePool:
     def __initDangerRadarGene(self, parent):
         if (parent is None):
             self.dangerRadar = random.randint(1, 2)
+        elif (parent.genePool.dangerRadar < 1 + self.geneLevels["dangerRadar"]):
+            self.dangerRadar = random.randint(parent.genePool.dangerRadar,
+                                              1 + self.geneLevels["dangerRadar"])
         else:
             self.dangerRadar = parent.genePool.dangerRadar
 
     def __initFoodRadarGene(self, parent):
         if (parent is None):
             self.foodRadar = random.randint(1, 2)
+        elif (parent.genePool.foodRadar < 1 + self.geneLevels["foodRadar"]):
+            self.foodRadar = random.randint(parent.genePool.foodRadar,
+                                            1 + self.geneLevels["foodRadar"])
         else:
             self.foodRadar = parent.genePool.foodRadar
 
     def __initReproductionRadarGene(self, parent):
         if (parent is None):
             self.reproductionRadar = random.randint(1, 2)
+        elif (parent.genePool.reproductionRadar <
+              1 + self.geneLevels["reproductionRadar"]):
+            self.reproductionRadar = random.randint(parent.genePool.reproductionRadar,
+                                                    1 + self.geneLevels["reproductionRadar"])
         else:
             self.reproductionRadar = parent.genePool.reproductionRadar
+
 
     def __initFertilityGene(self, parent):
         if (parent is None):
             self.fertility = random.randint(1, 2)
+        elif (parent.genePool.fertility < 1 + self.geneLevels["fertility"]):
+            self.fertility = random.randint(parent.genePool.fertility,
+                                            1 + self.geneLevels["fertility"])
         else:
             self.fertility = parent.genePool.fertility
 

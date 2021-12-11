@@ -75,6 +75,7 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
                                                      initialFoodList,
                                                      populationList,
                                                      loopIndex)
+                individual.registerCurrentGoalHistory(loopIndex)
         foodList.append(initialFoodList)
         mapRepresentation = updateMapRepresentation(mapRepresentation,
                                                     populationList, foodList,

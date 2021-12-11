@@ -152,7 +152,8 @@ class ApplicationGUI:
                 "hasReproducedLoop": individual.hasReproducedLoop,
                 "hasEaten": individual.hasEaten,
                 "hasEatenLoop": individual.hasEatenLoop,
-                "genePool": individual.genePool
+                "genePool": individual.genePool,
+                "currentGoal": individual.currentGoalHistory[loopIndex - 1]
                 })
             color = "black"
             if (individual.hasEaten is True
@@ -210,7 +211,8 @@ class ApplicationGUI:
                     "hasReproducedLoop": individual.hasReproducedLoop,
                     "hasEaten": individual.hasEaten,
                     "hasEatenLoop": individual.hasEatenLoop,
-                    "genePool": individual.genePool
+                    "genePool": individual.genePool,
+                    "currentGoal": "Give birth"
                     })
 
 
@@ -295,6 +297,10 @@ class ApplicationGUI:
                 lblHasEaten = tk.Label(self.selectedItemTab,
                                        font=LABELFONT,
                         text="Has eaten : False")
+            lblCurrentGoal = tk.Label(self.selectedItemTab,
+                                      font=LABELFONT,
+                                      text="Current Goal : "
+                                      + clickedOnObject["currentGoal"])
         else:
             lblName = tk.Label(self.selectedItemTab,
                                font=LABELFONT,
@@ -309,6 +315,7 @@ class ApplicationGUI:
         if (clickedOnObject["type"] == "individual"):
             lblHasReproduced.pack()
             lblHasEaten.pack()
+            lblCurrentGoal.pack()
             self.printSelectedIndividualGenePool(clickedOnObject["genePool"])
         self.selectedItemTab.pack_propagate(0)
         self.optionsNotebook.select(self.selectedItemTab)

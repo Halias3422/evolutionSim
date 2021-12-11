@@ -57,6 +57,7 @@ def runGenerationsLife(event=None):
         generationLoop += 1
         if (len(parentGeneration) == 0):
             print("No more individuals at Generation " + str(generationLoop) + ". Aborting...")
+            generationsNb = generationLoop
             break
     applicationGUI.printGenerationsLifeSpanFrameByFrame(allGenerationsPopulationList,
                                                         allGenerationsFoodList,
