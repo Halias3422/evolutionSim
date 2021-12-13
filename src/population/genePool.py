@@ -64,7 +64,6 @@ class GenePool:
                     "fertility": int(self.__randParent(parent, parentPartner).genePool.geneLevels["fertility"])}
             if (mutationProb is not None and random.randint(0, 100) <= mutationProb):
                 self.geneLevels[random.choice(list(self.geneLevels))] += 1
-                print("mutated Gene level!!")
                 self.__checkForGeneMaxLevel()
 
     def __mutationAddNewMovement(self):

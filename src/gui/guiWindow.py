@@ -153,7 +153,8 @@ class ApplicationGUI:
                 "hasEaten": individual.hasEaten,
                 "hasEatenLoop": individual.hasEatenLoop,
                 "genePool": individual.genePool,
-                "currentGoal": individual.currentGoalHistory[loopIndex - 1]
+                "currentGoal": individual.currentGoalHistory[loopIndex - 1],
+                "currentGoalPos": individual.currGoalPosHistory[loopIndex - 1]
                 })
             color = "black"
             if (individual.hasEaten is True
@@ -212,7 +213,8 @@ class ApplicationGUI:
                     "hasEaten": individual.hasEaten,
                     "hasEatenLoop": individual.hasEatenLoop,
                     "genePool": individual.genePool,
-                    "currentGoal": "Give birth"
+                    "currentGoal": "Give birth",
+                    "currentGoalPosHistory": "None"
                     })
 
 
@@ -301,22 +303,32 @@ class ApplicationGUI:
                                       font=LABELFONT,
                                       text="Current Goal : "
                                       + clickedOnObject["currentGoal"])
+            lblCurrentGoalPos = tk.Label(self.selectedItemTab,
+                                         font=LABELFONT,
+                                         text="Current Goal Pos : "
+                                         + str(clickedOnObject["currentGoalPos"]))
         else:
             lblName = tk.Label(self.selectedItemTab,
                                font=LABELFONT,
                                text="Object = Food")
         lblCoord = tk.Label(self.selectedItemTab,
                             font=LABELFONT,
-                text="Position : [" + str(clickedOnObject["startX"] / self.XCellSize)
-                            + ", " + str(clickedOnObject["startY"] / self.YCellSize)
+                text="Position : [" + str(clickedOnObject["startY"] / self.XCellSize)
+                            + ", " + str(clickedOnObject["startX"] / self.YCellSize)
                             + "]")
+        lblCurrentLoop = tk.Label(self.selectedItemTab,
+                                  font=LABELFONT,
+                                  text="Current Loop : "
+                                  + str(loopIndex))
         lblName.pack()
         lblCoord.pack()
         if (clickedOnObject["type"] == "individual"):
             lblHasReproduced.pack()
             lblHasEaten.pack()
             lblCurrentGoal.pack()
+            lblCurrentGoalPos.pack()
             self.printSelectedIndividualGenePool(clickedOnObject["genePool"])
+        lblCurrentLoop.pack()
         self.selectedItemTab.pack_propagate(0)
         self.optionsNotebook.select(self.selectedItemTab)
 
@@ -375,8 +387,8 @@ class ApplicationGUI:
                                                     mapContent)
                 print("\rGen (" + str(self.currGeneration)
                       + ") loop " + str(self.loopIndex), end='\r')
-            if (prevMouseXClick != mouseXClick or
-                prevMouseYClick != mouseYClick):
+            if ('mapContent' in locals() and (prevMouseXClick != mouseXClick or
+                prevMouseYClick != mouseYClick)):
                 clickedOnObject = self.checkWhatIsUnderClickPosition(mapContent,
                                                                      mouseXClick,
                                                                      mouseYClick)

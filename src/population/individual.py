@@ -23,7 +23,9 @@ class Individual:
         self.hasReproduced = False
         self.hasReproducedLoop = generationLifeSpan + 1
         self.currentGoal = "none"
+        self.currGoalPos = "none"
         self.currentGoalHistory = []
+        self.currGoalPosHistory = []
         self.movementHistory = []
         self.name = str(generation) + "-" + str(populationNb)
 
@@ -41,8 +43,9 @@ class Individual:
         self.currentGoal = currentGoal
         self.currGoalPos = goalPos
 
-    def registerCurrentGoalHistory(self, loopIndex):
+    def registerPrintingValuesHistory(self, loopIndex):
         self.currentGoalHistory.append(self.currentGoal)
+        self.currGoalPosHistory.append(self.currGoalPos)
 
     def setCurrentMovement(self, direction, mapRepresentation, populationList):
         self.movementHistory.append(direction)

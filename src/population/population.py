@@ -75,12 +75,13 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
                                                      initialFoodList,
                                                      populationList,
                                                      loopIndex)
-                individual.registerCurrentGoalHistory(loopIndex)
+                individual.registerPrintingValuesHistory(loopIndex)
         foodList.append(initialFoodList)
         mapRepresentation = updateMapRepresentation(mapRepresentation,
                                                     populationList, foodList,
                                                     loopIndex)
         loopIndex += 1
+        print()
     return populationList
 
 
@@ -126,29 +127,31 @@ def identifyReproductionPartner(individual, targetCoord, populationList,
                 partner.currentGoal = "none"
             return partner
 
-
 def scanAdjacentTilesForTarget(currPosition, targetName, mapRepresentation):
     mapSizeY = len(mapRepresentation)
     mapSizeX = len(mapRepresentation[0])
-    if (currPosition[0] - 1 >= 0
-        and mapRepresentation[currPosition[0] - 1][currPosition[1]]
-            == targetName):
-        return ([currPosition[0] - 1, currPosition[1]])
-    elif (currPosition[0] + 1 < mapSizeY
-          and mapRepresentation[currPosition[0] + 1][currPosition[1]]
-          == targetName):
-        return ([currPosition[0] + 1, currPosition[1]])
-    elif (currPosition[1] - 1 >= 0
-          and mapRepresentation[currPosition[0]][currPosition[1] - 1]
-          == targetName):
-        return ([currPosition[0], currPosition[1] - 1])
-    elif (currPosition[1] + 1 < mapSizeX
-          and mapRepresentation[currPosition[0]][currPosition[1] + 1]
-          == targetName):
-        return ([currPosition[0], currPosition[1] + 1])
-    else:
-        return None
 
+    startY = currPosition[0]
+    if (currPosition[0] - 1 >= 0):
+        startY = currPosition[0] - 1
+    endY = currPosition[0]
+    if (currPosition[0] + 1 < mapSizeY):
+        endY = currPosition[0] + 1
+    startX = currPosition[1]
+    if (currPosition[1] - 1 >= 0):
+        startX = currPosition[1] - 1
+    endX = currPosition[1]
+    if (currPosition[1] + 1 < mapSizeX):
+        endX = currPosition[1] + 1
+
+    while (startY <= endY):
+        loopStartX = startX
+        while (loopStartX <= endX):
+            if (mapRepresentation[startY][loopStartX] == targetName):
+                return ([startY, loopStartX])
+            loopStartX += 1
+        startY += 1
+    return None
 
 def individualMoveToCurrentGoal(individual, mapRepresentation, populationList):
     # set diagonal movements
@@ -156,7 +159,20 @@ def individualMoveToCurrentGoal(individual, mapRepresentation, populationList):
     currPos = individual.currMapPosition
     movementPool = individual.genePool.movement
     newMovement = "none"
-    if ("down" in movementPool and targetPos[0] > currPos[0]):
+    if ("diagUpLeft" in movementPool and targetPos[0] < currPos[0]
+            and targetPos[1] < currPos[1]):
+        newMovement = "diagUpLeft"
+    elif ("diagUpRight" in movementPool and targetPos[0] < currPos[0]
+            and targetPos[1] > currPos[1]):
+        newMovement = "diagUpRight"
+    elif ("diagDownLeft" in movementPool and targetPos[0] > currPos[0]
+            and targetPos[1] < currPos[1]):
+        newMovement = "diagDownLeft"
+    elif ("diagDownRight" in movementPool and targetPos[0] > currPos[0]
+            and targetPos[1] > currPos[1]):
+
+        newMovement = "diagDownRight"
+    elif ("down" in movementPool and targetPos[0] > currPos[0]):
         newMovement = "down"
     elif ("up" in movementPool and targetPos[0] < currPos[0]):
         newMovement = "up"
@@ -187,17 +203,45 @@ def setIndividualCurrentGoal(individual, mapRepresentation, populationList):
                                                    "individual",
                                                    mapRepresentation,
                                                    populationList)
+        reproductionTargetPos = checkIfTargetIsReachable(individual,
+                                                         reproductionTargetPos)
     if (individual.hasEaten is False):
         foodTargetPos = scanForTargetOnMap(individual,
                                            individual.genePool.foodRadar,
                                            "food",
                                            mapRepresentation,
                                            populationList)
+        foodTargetPos = checkIfTargetIsReachable(individual,foodTargetPos)
     individual = chooseCurrentGoal(individual,
                                    reproductionTargetPos,
                                    foodTargetPos)
     return individual
 
+def checkIfTargetIsReachable(individual, targetPos):
+    if (targetPos):
+        currPos = individual.currMapPosition
+        if (abs(targetPos[0] - currPos[0]) < 2
+                and abs(targetPos[1] - currPos[1]) < 2):
+            return targetPos
+        movementPool = individual.genePool.movement
+        if (targetPos[0] > currPos[0] and "diagDownLeft" not in movementPool
+                and "diagDownRight" not in movementPool
+                and "down" not in movementPool):
+            return None
+        if (targetPos[0] < currPos[0] and "diagUpLeft" not in movementPool
+                and "diagUpRight" not in movementPool
+                and "up" not in movementPool):
+            return None
+        if (targetPos[1] < currPos[1] and "diagUpLeft" not in movementPool
+                and "diagDownLeft" not in movementPool
+                and "left" not in movementPool):
+            return None
+        if (targetPos[1] > currPos[1] and "diagUpRight" not in movementPool
+                and "diagDownRight" not in movementPool
+                and "right" not in movementPool):
+            return None
+        return targetPos
+    return None
 
 def chooseCurrentGoal(individual, reproductionTargetPos, foodTargetPos):
     if (reproductionTargetPos is None and foodTargetPos is not None):
