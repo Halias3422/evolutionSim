@@ -1,18 +1,34 @@
 import random
 
 
+def createMapFreeSpaceListForFood(mapRepresentation, mapSizeX, mapSizeY):
+    mapFreeSpaceList = []
+    mapSizeY -= 1
+    while (mapSizeY >= 0):
+        tmpSizeX = mapSizeX - 1
+        while (tmpSizeX >= 0):
+            if (mapRepresentation[mapSizeY][tmpSizeX] == "empty"):
+                freePos = [mapSizeY, tmpSizeX]
+                mapFreeSpaceList.append(freePos)
+            tmpSizeX -= 1
+        mapSizeY -= 1
+    return mapFreeSpaceList
+
 def spawnGenerationFood(foodNb, foodVariation, mapSizeX, mapSizeY,
                         mapRepresentation):
     foodQuantity = random.randint(foodNb - foodNb * foodVariation / 100,
                                   foodNb + foodNb * foodVariation / 100)
     foodList = []
+    mapFreeSpaceList = createMapFreeSpaceListForFood(mapRepresentation,
+                                                     mapSizeX,
+                                                     mapSizeY)
     while (foodQuantity > 0):
-        while True:
-            foodPos = [random.randint(0, mapSizeY - 1),
-                       random.randint(0, mapSizeX - 1)]
-            if ((foodPos not in foodList)
-                    and (mapRepresentation[foodPos[0]][foodPos[1]] == "empty")):
-                foodList.append(foodPos)
-                foodQuantity -= 1
-                break
+        initFoodPos = random.choice(mapFreeSpaceList)
+        foodPos = [initFoodPos[0], initFoodPos[1]]
+        mapFreeSpaceList.remove(foodPos)
+        foodList.append(foodPos)
+        foodQuantity -= 1
+        if (len(mapFreeSpaceList) == 0):
+            print("No more space for food")
+            break
     return foodList

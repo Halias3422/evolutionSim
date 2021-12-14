@@ -8,6 +8,8 @@ from debug.print import *
 from environment.mapRepresentation import *
 from dataCollection.dataCollection import DataCollection
 
+import cProfile
+
 # populationNb = 100
 winWidth = 1500
 winHeight = 750
@@ -20,17 +22,26 @@ winHeight = 750
 def runGenerationsLife(event=None):
     #init Run Variables
     dataCollection = []
-    populationNb = int(applicationGUI.txtPopulationSize.get())
-    mapSizeX = int(applicationGUI.txtMapSize.get())
-    mapSizeY = int(applicationGUI.txtMapSize.get())
-    generationLifeSpan = int(applicationGUI.txtGenerationLifeSpan.get())
-    generationsNb = int(applicationGUI.txtGenerationNb.get())
-    foodNb = int(applicationGUI.txtFoodNb.get())
-    foodVariation = int(applicationGUI.txtFoodVariation.get())
-    createGUImap(applicationGUI, mapSizeX, mapSizeY)
+    populationNb = 500
+    mapSizeX = 50
+    mapSizeY = 50
+    generationLifeSpan = 100
+    generationsNb = 10
+    foodNb = 500
+    foodVariation = 0
     parentGeneration = None
-    mutationProb = float(applicationGUI.txtMutationProb.get())
+    mutationProb = 100
 
+    # populationNb = int(applicationGUI.txtPopulationSize.get())
+    # mapSizeX = int(applicationGUI.txtMapSize.get())
+    # mapSizeY = int(applicationGUI.txtMapSize.get())
+    # generationLifeSpan = int(applicationGUI.txtGenerationLifeSpan.get())
+    # generationsNb = int(applicationGUI.txtGenerationNb.get())
+    # foodNb = int(applicationGUI.txtFoodNb.get())
+    # foodVariation = int(applicationGUI.txtFoodVariation.get())
+    # createGUImap(applicationGUI, mapSizeX, mapSizeY)
+    # parentGeneration = None
+    # mutationProb = float(applicationGUI.txtMutationProb.get())
     generationLoop = 0
     allGenerationsPopulationList = []
     allGenerationsFoodList = []
@@ -40,11 +51,11 @@ def runGenerationsLife(event=None):
                                             generationLifeSpan, parentGeneration,
                                             generationLoop, mutationProb)
         mapRepresentation = addPopulationListToMapRepresentation(populationList,
-                                                                 mapRepresentation)
+                                                                  mapRepresentation)
 
         foodList = []
-        foodList.append(spawnGenerationFood(foodNb, foodVariation, applicationGUI.mapSizeX,
-                                       applicationGUI.mapSizeY, mapRepresentation))
+        foodList.append(spawnGenerationFood(foodNb, foodVariation, mapSizeX,
+                                            mapSizeY, mapRepresentation))
         mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
 
         populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
@@ -59,13 +70,14 @@ def runGenerationsLife(event=None):
             print("No more individuals at Generation " + str(generationLoop) + ". Aborting...")
             generationsNb = generationLoop
             break
-    applicationGUI.printGenerationsLifeSpanFrameByFrame(allGenerationsPopulationList,
-                                                        allGenerationsFoodList,
-                                                        generationLifeSpan,
-                                                        generationsNb)
+    # applicationGUI.printGenerationsLifeSpanFrameByFrame(allGenerationsPopulationList,
+    #                                                     allGenerationsFoodList,
+    #                                                     generationLifeSpan,
+    #                                                     generationsNb)
 
 
-
+cProfile.run('runGenerationsLife()', 'profile')
 # Initiate GUI components
-applicationGUI = initGUIApplication(winWidth, winHeight, runGenerationsLife)
-applicationGUI.mainWindow.mainloop()
+# applicationGUI = initGUIApplication(winWidth, winHeight, runGenerationsLife)
+# applicationGUI.mainWindow.mainloop()
+

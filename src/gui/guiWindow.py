@@ -7,6 +7,13 @@ mouseXClick = -1
 mouseYClick = -1
 
 LABELFONT = ("Arial", 16)
+DEFAULTPOPSIZE = 10
+DEFAULTFOODNB = 0
+DEFAULTFOODVARIATION = 0
+DEFAULTMAPSIZE=5
+DEFAULTGENLIFE=100
+DEFAULTGENNB=1
+DEFAULTMUTATION=100
 
 class ApplicationGUI:
 
@@ -50,7 +57,7 @@ class ApplicationGUI:
                                      text="Population Size: ")
         lblPopulationSize.pack()
         self.txtPopulationSize = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtPopulationSize.insert(0, "100")
+        self.txtPopulationSize.insert(0, DEFAULTPOPSIZE)
         self.txtPopulationSize.pack()
 
         lblFoodNb = tk.Label(self.optionsTab,
@@ -58,7 +65,7 @@ class ApplicationGUI:
                              text="Food Units Available : ")
         lblFoodNb.pack()
         self.txtFoodNb = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtFoodNb.insert(0, self.txtPopulationSize.get())
+        self.txtFoodNb.insert(0, DEFAULTFOODNB)
         self.txtFoodNb.pack()
 
         lblFoodVariation = tk.Label(self.optionsTab,
@@ -66,35 +73,35 @@ class ApplicationGUI:
                                     text="Food Variation (%) : ")
         lblFoodVariation.pack()
         self.txtFoodVariation = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtFoodVariation.insert(0, "0")
+        self.txtFoodVariation.insert(0, DEFAULTFOODVARIATION)
         self.txtFoodVariation.pack()
 
         lblMapSize = tk.Label(self.optionsTab, font=LABELFONT,
                               text="Map Size (X and Y): ")
         lblMapSize.pack()
         self.txtMapSize = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtMapSize.insert(0, "50")
+        self.txtMapSize.insert(0, DEFAULTMAPSIZE)
         self.txtMapSize.pack()
 
         lblGenerationLifeSpan = tk.Label(self.optionsTab, font=LABELFONT,
                                          text="Generation Life Span : ")
         lblGenerationLifeSpan.pack()
         self.txtGenerationLifeSpan = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtGenerationLifeSpan.insert(0, "100")
+        self.txtGenerationLifeSpan.insert(0, DEFAULTGENLIFE)
         self.txtGenerationLifeSpan.pack()
 
         lblGenerationNb = tk.Label(self.optionsTab, font=LABELFONT,
                                    text="Generations Number : ")
         lblGenerationNb.pack()
         self.txtGenerationNb = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtGenerationNb.insert(0, "50")
+        self.txtGenerationNb.insert(0, DEFAULTGENNB)
         self.txtGenerationNb.pack()
 
         lblMutationProb = tk.Label(self.optionsTab, font=LABELFONT,
                                     text="Mutation Probability (%) : ")
         lblMutationProb.pack()
         self.txtMutationProb = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtMutationProb.insert(0, "5")
+        self.txtMutationProb.insert(0, DEFAULTMUTATION)
         self.txtMutationProb.pack()
 
         runButton = tk.Button(self.optionsTab, text=" Run ", font=LABELFONT,
@@ -339,14 +346,14 @@ class ApplicationGUI:
         mouseYClick = event.y
 
     def keyPressedDuringReplay(self, event):
-        if (event.keysym == "h"):
+        if (event.keysym == "h" and self.loopIndex > 0):
             self.loopIndex -= 1
         elif (event.keysym == "l"):
             self.loopIndex += 1
         elif (event.keysym == "Escape"):
-            self.loopIndex = "exit"
+            self.loopIndex = -1
         elif (event.keysym == "Return"):
-            self.loopIndex = "end"
+            self.loopIndex = self.generationLifeSpan
 
     def printGenerationsLifeSpanFrameByFrame(self, allGenerationsPopulationList,
                                              allGenerationsFoodList,
@@ -354,6 +361,7 @@ class ApplicationGUI:
                                             generationsNb):
         self.loopIndex = 0
         self.currGeneration = 0
+        self.generationLifeSpan = generationLifeSpan
         print("press l to go forward, h to go backward or enter to quit")
         self.map.bind("<Button-1>", self.mouseClick)
         prevMouseXClick = mouseXClick
@@ -364,10 +372,8 @@ class ApplicationGUI:
         while True:
             if (prevLoopIndex != self.loopIndex):
                 prevLoopIndex = self.loopIndex
-                if (self.loopIndex == "exit"):
+                if (self.loopIndex == -1):
                     exit()
-                elif (self.loopIndex == "end"):
-                    self.loopIndex = generationLifeSpan
                 elif (self.loopIndex < 0 and self.currGeneration > 0):
                     self.loopIndex = generationLifeSpan
                     self.currGeneration -= 1

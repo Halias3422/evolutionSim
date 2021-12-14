@@ -5,10 +5,10 @@ from .genePool import GenePool
 class Individual:
 
     def __init__(self, mapSizeX, mapSizeY, generation, generationLifeSpan,
-            populationNb):
+            populationNb, mapFreeSpaceList):
         self.mapPosition = []
-        self.mapPosition.append([random.randint(0, mapSizeY - 1),
-            random.randint(0, mapSizeX - 1)])
+        initMapPos = random.choice(mapFreeSpaceList)
+        self.mapPosition.append([initMapPos[0], initMapPos[1]])
         self.genePool = GenePool(None, None, None)
         self.parents = None
         self.setStarterBasicAttributes(generation, generationLifeSpan, populationNb)

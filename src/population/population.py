@@ -10,18 +10,34 @@ def checkIfCoordinateNotOccupied(populationList, individual):
             return False
     return True
 
+def createMapFreeSpaceList(mapSizeX, mapSizeY):
+    mapFreeSpaceList = []
+    mapSizeY -= 1
+    while (mapSizeY >= 0):
+        tmpSizeX = mapSizeX - 1
+        while (tmpSizeX >= 0):
+            freePos = [mapSizeY, tmpSizeX]
+            mapFreeSpaceList.append(freePos)
+            tmpSizeX -= 1
+        mapSizeY -= 1
+    return mapFreeSpaceList
+
 def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
                        parentGeneration, currentGeneration, mutationProb):
     populationList = []
+    mapFreeSpaceList = createMapFreeSpaceList(mapSizeX, mapSizeY)
     if (parentGeneration is None):
         while (populationNb > 0):
             while True:
                 individual = Individual(mapSizeX, mapSizeY, 0,
-                                        generationLifeSpan, populationNb)
-                if (checkIfCoordinateNotOccupied(populationList, individual)):
-                    populationList.append(individual)
-                    populationNb -= 1
-                    break
+                                        generationLifeSpan, populationNb,
+                                        mapFreeSpaceList)
+                mapFreeSpaceList.remove(individual.mapPosition[0])
+                populationList.append(individual)
+                populationNb -= 1
+                if (len(mapFreeSpaceList) == 0):
+                    return populationList
+                break
     elif (parentGeneration is not None):
         newPopulationNb = 0
         alreadyReproduced = []
@@ -40,11 +56,15 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
                 while (childrenNb > 0):
                     individual = Child(parent, partner, mapSizeX, mapSizeY,
                                        currentGeneration, generationLifeSpan,
-                                       newPopulationNb, mutationProb)
-                    if (checkIfCoordinateNotOccupied(populationList, individual)):
-                        populationList.append(individual)
-                        newPopulationNb += 1
-                        childrenNb -= 1
+                                       newPopulationNb, mutationProb,
+                                       mapFreeSpaceList)
+                    mapFreeSpaceList.remove(individual.mapPosition[0])
+                    populationList.append(individual)
+                    newPopulationNb += 1
+                    childrenNb -= 1
+                    if (len(mapFreeSpaceList) == 0):
+                        print("return ici")
+                        return populationList
                 alreadyReproduced.append(parent)
                 alreadyReproduced.append(partner)
             survivors += 1
@@ -59,8 +79,12 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
         initialFoodList = foodList[loopIndex][:]
         if (loopIndex > 0):
             for individual in populationList:
-                if (individual.currentGoal == "none"):
-                    individual = setIndividualCurrentGoal(individual,
+                # if (individual.currentGoal != "none"):
+                #     individual.checkIfCurrentGoalIsStillValid(individual,
+                #                                               mapRepresentation,
+                #                                               populationList)
+                # if (individual.currentGoal == "none"):
+                individual = setIndividualCurrentGoal(individual,
                                                           mapRepresentation,
                                                           populationList)
                 if (individual.currentGoal == "none"):
@@ -81,7 +105,6 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
                                                     populationList, foodList,
                                                     loopIndex)
         loopIndex += 1
-        print()
     return populationList
 
 
@@ -147,7 +170,8 @@ def scanAdjacentTilesForTarget(currPosition, targetName, mapRepresentation):
     while (startY <= endY):
         loopStartX = startX
         while (loopStartX <= endX):
-            if (mapRepresentation[startY][loopStartX] == targetName):
+            if (mapRepresentation[startY][loopStartX] == targetName
+                and (loopStartX != currPosition[1] or startY != currPosition[0])):
                 return ([startY, loopStartX])
             loopStartX += 1
         startY += 1
@@ -158,7 +182,7 @@ def individualMoveToCurrentGoal(individual, mapRepresentation, populationList):
     targetPos = individual.currGoalPos
     currPos = individual.currMapPosition
     movementPool = individual.genePool.movement
-    newMovement = "none"
+    newMovement = random.choice(individual.genePool.movement)
     if ("diagUpLeft" in movementPool and targetPos[0] < currPos[0]
             and targetPos[1] < currPos[1]):
         newMovement = "diagUpLeft"
@@ -293,10 +317,13 @@ def scanForTargetOnMap(individual, geneRadar, targetCode, mapRepresentation,
     return None
 
 def checkIfTargetHasReproduced(targetCoord, populationList):
-    for target in populationList:
-        if (target.currMapPosition == targetCoord):
-            if (target.hasReproduced is False):
-                return True
+    target = [individual for individual in populationList if individual.currMapPosition == targetCoord]
+    if (target is not None):
+        return True
+    # for target in populationList:
+    #     if (target.currMapPosition == targetCoord):
+    #         if (target.hasReproduced is False):
+    #             return True
     return False
 
 

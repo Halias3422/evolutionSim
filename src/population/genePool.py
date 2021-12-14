@@ -31,9 +31,8 @@ class GenePool:
         self.__initFearGene(self.__randParent(parent, parentPartner))
 
     def __randParent(self, parent, parentPartner):
-        if (random.randint(0, 1) == 0):
-            return parent
-        else: return parentPartner
+        genitor = random.choice([parent, parentPartner])
+        return genitor
 
     def __checkForGeneMaxLevel(self):
         if (self.geneLevels["movement"] > 8):
