@@ -23,12 +23,13 @@ def spawnGenerationFood(foodNb, foodVariation, mapSizeX, mapSizeY,
                                                      mapSizeX,
                                                      mapSizeY)
     while (foodQuantity > 0):
-        initFoodPos = random.choice(mapFreeSpaceList)
-        foodPos = [initFoodPos[0], initFoodPos[1]]
-        mapFreeSpaceList.remove(foodPos)
-        foodList.append(foodPos)
-        foodQuantity -= 1
-        if (len(mapFreeSpaceList) == 0):
+        if (len(mapFreeSpaceList) > 0):
+            initFoodPos = random.choice(mapFreeSpaceList)
+            foodPos = [initFoodPos[0], initFoodPos[1]]
+            mapFreeSpaceList.remove(foodPos)
+            foodList.append(foodPos)
+            foodQuantity -= 1
+        else:
             print("No more space for food")
-            break
+            return foodList
     return foodList
