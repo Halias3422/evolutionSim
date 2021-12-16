@@ -11,8 +11,8 @@ from dataCollection.dataCollection import DataCollection
 import cProfile
 
 # populationNb = 100
-winWidth = 1500
-winHeight = 750
+winWidth = 1800
+winHeight = 1000
 # mapSizeX = 50
 # mapSizeY = 50
 # generationLifeSpan = 200

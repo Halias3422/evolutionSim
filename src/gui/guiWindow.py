@@ -113,14 +113,20 @@ class ApplicationGUI:
 
 
     def createMap(self, mapSizeX, mapSizeY):
-        self.mapSizeX = mapSizeX
-        self.mapSizeY= mapSizeY
+        # self.mapSizeX = mapSizeX
+        # self.mapSizeY= mapSizeY
         self.map = tk.Canvas(self.mapFrame, bg="white",
                              width=self.mapFrame.winfo_width(),
                              height=self.mapFrame.winfo_height())
+        # self.XCellSize = self.frameLength / self.mapSizeX
+        # self.YCellSize = self.frameHeight / self.mapSizeY
+        self.map.pack()
+
+    def defineMapSize(self, mapSizeX, mapSizeY):
+        self.mapSizeX = mapSizeX
+        self.mapSizeY = mapSizeY
         self.XCellSize = self.frameLength / self.mapSizeX
         self.YCellSize = self.frameHeight / self.mapSizeY
-        self.map.pack()
 
     def __createMapGrid(self):
         currPosY = self.frameHeight
@@ -367,7 +373,7 @@ class ApplicationGUI:
         prevMouseXClick = mouseXClick
         prevMouseYClick = mouseYClick
 
-        prevLoopIndex = self.loopIndex
+        prevLoopIndex = self.loopIndex - 1
         self.mainWindow.bind("<Key>", self.keyPressedDuringReplay)
         while True:
             if (prevLoopIndex != self.loopIndex):
@@ -410,9 +416,10 @@ def initGUIApplication(winWidth, winHeight, runGenerationsLife):
     applicationGUI = ApplicationGUI(winWidth, winHeight)
     applicationGUI.createApplicationWindow()
     applicationGUI.createMainFrames()
+    applicationGUI.createMap(0, 0)
     applicationGUI.createOptionsTab()
     applicationGUI.fillRunOptionsTab(runGenerationsLife)
     return applicationGUI
 
 def createGUImap(applicationGUI, mapSizeX, mapSizeY):
-    applicationGUI.createMap(mapSizeX, mapSizeY)
+    applicationGUI.defineMapSize(mapSizeX, mapSizeY)
