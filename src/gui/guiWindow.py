@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk
 import threading
 import keyboard
+from .mainMenu import MainMenu
+from .menus import Menus
 
 mouseXClick = -1
 mouseYClick = -1
@@ -26,90 +28,15 @@ class ApplicationGUI:
         self.mainWindow.geometry(str(self.winWidth) + "x" +
                                  str(self.winHeight))
 
-    def createMainFrames(self):
+    def createMainFrames(self, runGenerationsLife):
         self.frameLength = self.winWidth / 2
         self.frameHeight = self.winHeight
         self.mapFrame = tk.Frame(self.mainWindow, width=self.frameLength,
                                  height=self.frameHeight, bg="blue")
         self.mapFrame.pack(side=tk.LEFT)
-        self.optionsFrame = tk.Frame(self.mainWindow, width=self.frameLength,
-                                     height=self.frameHeight, bg="green")
-        self.optionsFrame.pack(side=tk.RIGHT)
+        self.menus = Menus(self.mainWindow, self.frameLength, self.frameHeight,
+                           runGenerationsLife, self)
         self.mainWindow.update_idletasks()
-
-    def createOptionsTab(self):
-        self.optionsNotebook = ttk.Notebook(self.optionsFrame)
-        self.optionsNotebook.pack()
-        self.optionsTab = tk.Frame(self.optionsNotebook,
-                                   width=self.optionsFrame.winfo_width(),
-                                   height=self.optionsFrame.winfo_height())
-        self.selectedItemTab = tk.Frame(self.optionsNotebook,
-                                        width=self.optionsFrame.winfo_width(),
-                                        height=self.optionsFrame.winfo_height())
-        self.optionsTab.pack()
-        self.selectedItemTab.pack()
-        self.optionsNotebook.add(self.optionsTab, text="Run Options")
-        self.optionsNotebook.add(self.selectedItemTab, text="Selected Item Infos")
-
-    def fillRunOptionsTab(self, runGenerationsLife):
-        lblPopulationSize = tk.Label(self.optionsTab,
-                                     font=LABELFONT,
-                                     text="Population Size: ")
-        lblPopulationSize.pack()
-        self.txtPopulationSize = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtPopulationSize.insert(0, DEFAULTPOPSIZE)
-        self.txtPopulationSize.pack()
-
-        lblFoodNb = tk.Label(self.optionsTab,
-                             font=LABELFONT,
-                             text="Food Units Available : ")
-        lblFoodNb.pack()
-        self.txtFoodNb = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtFoodNb.insert(0, DEFAULTFOODNB)
-        self.txtFoodNb.pack()
-
-        lblFoodVariation = tk.Label(self.optionsTab,
-                                    font=LABELFONT,
-                                    text="Food Variation (%) : ")
-        lblFoodVariation.pack()
-        self.txtFoodVariation = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtFoodVariation.insert(0, DEFAULTFOODVARIATION)
-        self.txtFoodVariation.pack()
-
-        lblMapSize = tk.Label(self.optionsTab, font=LABELFONT,
-                              text="Map Size (X and Y): ")
-        lblMapSize.pack()
-        self.txtMapSize = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtMapSize.insert(0, DEFAULTMAPSIZE)
-        self.txtMapSize.pack()
-
-        lblGenerationLifeSpan = tk.Label(self.optionsTab, font=LABELFONT,
-                                         text="Generation Life Span : ")
-        lblGenerationLifeSpan.pack()
-        self.txtGenerationLifeSpan = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtGenerationLifeSpan.insert(0, DEFAULTGENLIFE)
-        self.txtGenerationLifeSpan.pack()
-
-        lblGenerationNb = tk.Label(self.optionsTab, font=LABELFONT,
-                                   text="Generations Number : ")
-        lblGenerationNb.pack()
-        self.txtGenerationNb = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtGenerationNb.insert(0, DEFAULTGENNB)
-        self.txtGenerationNb.pack()
-
-        lblMutationProb = tk.Label(self.optionsTab, font=LABELFONT,
-                                    text="Mutation Probability (%) : ")
-        lblMutationProb.pack()
-        self.txtMutationProb = tk.Entry(self.optionsTab, font=LABELFONT)
-        self.txtMutationProb.insert(0, DEFAULTMUTATION)
-        self.txtMutationProb.pack()
-
-        runButton = tk.Button(self.optionsTab, text=" Run ", font=LABELFONT,
-                              command=lambda: runGenerationsLife(self))
-        runButton.bind("<Return>", lambda event,:  runGenerationsLife(self))
-        runButton.pack()
-        runButton.focus_set()
-
 
 
     def createMap(self, mapSizeX, mapSizeY):
@@ -253,29 +180,30 @@ class ApplicationGUI:
         return None
 
     def printSelectedIndividualGenePool(self, genePool):
-        lblGenePool = tk.Label(self.selectedItemTab,
+        infoMenu = self.menus.runInfoFrame.runInfoMenu
+        lblGenePool = tk.Label(infoMenu,
                                font=LABELFONT,
                                text="Gene Pool : ")
-        lblMovement = tk.Label(self.selectedItemTab,
+        lblMovement = tk.Label(infoMenu,
                                font=LABELFONT,
                                text="Movement: " + str(genePool.movement))
-        lblDangerRadar = tk.Label(self.selectedItemTab,
+        lblDangerRadar = tk.Label(infoMenu,
                                   font=LABELFONT,
                                   text="Danger Radar: " + str(genePool.dangerRadar))
-        lblFoodRadar = tk.Label(self.selectedItemTab,
+        lblFoodRadar = tk.Label(infoMenu,
                                 font=LABELFONT,
                                 text="Food Radar: " + str(genePool.foodRadar))
-        lblReproductionRadar = tk.Label(self.selectedItemTab,
+        lblReproductionRadar = tk.Label(infoMenu,
                                         font=LABELFONT,
                                         text="Reproduction Radar: "
                                         + str(genePool.reproductionRadar))
-        lblFertility = tk.Label(self.selectedItemTab,
+        lblFertility = tk.Label(infoMenu,
                                   font=LABELFONT,
                                   text="Fertility: " + str(genePool.fertility))
-        lblPreference = tk.Label(self.selectedItemTab,
+        lblPreference = tk.Label(infoMenu,
                                   font=LABELFONT,
                                   text="Preference: " + str(genePool.preference))
-        lblFear = tk.Label(self.selectedItemTab,
+        lblFear = tk.Label(infoMenu,
                                   font=LABELFONT,
                                   text="Fear: " + str(genePool.fear))
 
@@ -290,46 +218,48 @@ class ApplicationGUI:
 
 
     def updateSelectedObjectDescriptionFrameContent(self, clickedOnObject, loopIndex):
-        for widget in self.selectedItemTab.winfo_children():
+        # for widget in self.selectedItemTab.winfo_children():
+        infoMenu = self.menus.runInfoFrame.runInfoMenu
+        for widget in infoMenu.winfo_children():
             widget.destroy()
         if (clickedOnObject["type"] == "individual"):
-            lblName = tk.Label(self.selectedItemTab,
+            lblName = tk.Label(infoMenu,
                                font=LABELFONT,
                                text="Object = Individual " + clickedOnObject["name"])
             if (loopIndex >= clickedOnObject["hasReproducedLoop"]):
-                lblHasReproduced = tk.Label(self.selectedItemTab,
+                lblHasReproduced = tk.Label(infoMenu,
                                             font=LABELFONT,
                     text="Has reproduced : " + str(clickedOnObject["hasReproduced"]))
             else:
-                lblHasReproduced = tk.Label(self.selectedItemTab,
+                lblHasReproduced = tk.Label(infoMenu,
                                             font=LABELFONT,
                         text="Has reproduced : False")
             if (loopIndex >= clickedOnObject["hasEatenLoop"]):
-                lblHasEaten = tk.Label(self.selectedItemTab,
+                lblHasEaten = tk.Label(infoMenu,
                                        font=LABELFONT,
                     text="Has eaten : " + str(clickedOnObject["hasEaten"]))
             else:
-                lblHasEaten = tk.Label(self.selectedItemTab,
+                lblHasEaten = tk.Label(infoMenu,
                                        font=LABELFONT,
                         text="Has eaten : False")
-            lblCurrentGoal = tk.Label(self.selectedItemTab,
+            lblCurrentGoal = tk.Label(infoMenu,
                                       font=LABELFONT,
                                       text="Current Goal : "
                                       + clickedOnObject["currentGoal"])
-            lblCurrentGoalPos = tk.Label(self.selectedItemTab,
+            lblCurrentGoalPos = tk.Label(infoMenu,
                                          font=LABELFONT,
                                          text="Current Goal Pos : "
                                          + str(clickedOnObject["currentGoalPos"]))
         else:
-            lblName = tk.Label(self.selectedItemTab,
+            lblName = tk.Label(infoMenu,
                                font=LABELFONT,
                                text="Object = Food")
-        lblCoord = tk.Label(self.selectedItemTab,
+        lblCoord = tk.Label(infoMenu,
                             font=LABELFONT,
                 text="Position : [" + str(clickedOnObject["startY"] / self.XCellSize)
                             + ", " + str(clickedOnObject["startX"] / self.YCellSize)
                             + "]")
-        lblCurrentLoop = tk.Label(self.selectedItemTab,
+        lblCurrentLoop = tk.Label(infoMenu,
                                   font=LABELFONT,
                                   text="Current Loop : "
                                   + str(loopIndex))
@@ -342,8 +272,8 @@ class ApplicationGUI:
             lblCurrentGoalPos.pack()
             self.printSelectedIndividualGenePool(clickedOnObject["genePool"])
         lblCurrentLoop.pack()
-        self.selectedItemTab.pack_propagate(0)
-        self.optionsNotebook.select(self.selectedItemTab)
+        infoMenu.pack_propagate(0)
+        self.menus.menusTabs.select(infoMenu)
 
     def mouseClick(self, event):
         global mouseXClick
@@ -415,10 +345,8 @@ class ApplicationGUI:
 def initGUIApplication(winWidth, winHeight, runGenerationsLife):
     applicationGUI = ApplicationGUI(winWidth, winHeight)
     applicationGUI.createApplicationWindow()
-    applicationGUI.createMainFrames()
+    applicationGUI.createMainFrames(runGenerationsLife)
     applicationGUI.createMap(0, 0)
-    applicationGUI.createOptionsTab()
-    applicationGUI.fillRunOptionsTab(runGenerationsLife)
     return applicationGUI
 
 def createGUImap(applicationGUI, mapSizeX, mapSizeY):
