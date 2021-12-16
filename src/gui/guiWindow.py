@@ -105,8 +105,8 @@ class ApplicationGUI:
         self.txtMutationProb.pack()
 
         runButton = tk.Button(self.optionsTab, text=" Run ", font=LABELFONT,
-                              command=runGenerationsLife)
-        runButton.bind("<Return>", runGenerationsLife)
+                              command=lambda: runGenerationsLife(self))
+        runButton.bind("<Return>", lambda event,:  runGenerationsLife(self))
         runButton.pack()
         runButton.focus_set()
 

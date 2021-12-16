@@ -19,7 +19,7 @@ winHeight = 750
 # foodNb = populationNb
 # foodVariation = 0
 
-def runGenerationsLife(event=None):
+def runGenerationsLife(applicationGUI, event=None):
     #init Run Variables
     dataCollection = []
     # populationNb = 500
@@ -79,6 +79,12 @@ def runGenerationsLife(event=None):
 
 # cProfile.run('runGenerationsLife()', 'profile.prof')
 # Initiate GUI components
-applicationGUI = initGUIApplication(winWidth, winHeight, runGenerationsLife)
-applicationGUI.mainWindow.mainloop()
+def main():
+    print("TOTO")
+    applicationGUI = initGUIApplication(winWidth, winHeight, runGenerationsLife)
+    applicationGUI.mainWindow.mainloop()
+
+if (__name__ == "__main__"):
+    print("toto")
+    main()
 
