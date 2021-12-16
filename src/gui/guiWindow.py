@@ -221,7 +221,7 @@ class ApplicationGUI:
                     "hasEatenLoop": individual.hasEatenLoop,
                     "genePool": individual.genePool,
                     "currentGoal": "Give birth",
-                    "currentGoalPosHistory": "None"
+                    "currentGoalPos": "None"
                     })
 
 
