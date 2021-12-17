@@ -235,9 +235,19 @@ class MainMenu:
         self.menusFrame.grid_rowconfigure(1, weight=0)
         self.menusFrame.grid_rowconfigure(2, weight=0)
 
-    def printCurrentLoadingDatas(self, dataCollection, currentLoop, mainWindow):
-        print("je viens iciiii")
-        self.lblCurrentGeneration["text"] = "Current generation : " + str(currentLoop)
+    def printLoadingInit(self, mainWindow):
+        self.lblCurrentGeneration["text"] = "Initializing life creation..."
+        self.loadingInfoFrame.grid()
+        mainWindow.update()
+
+    def printCurrentLoadingDatas(self, dataCollection, currentLoop, mainWindow,
+                                 generationsNb):
+        if (dataCollection is None or currentLoop  + 1 >= generationsNb):
+            self.loadingInfoFrame.grid_remove()
+            return
+        self.lblCurrentGeneration["text"] = ("Generation "
+                                             + str(currentLoop + 1) + "/"
+                                             + str(generationsNb) + " Done")
         self.lblLoadingPopulationSize["text"] = ("Initial population size : "
                                                 + str(dataCollection.populationSize))
         self.lblLoadingHasReproduced["text"] = ("Individuals that have reproduced : "

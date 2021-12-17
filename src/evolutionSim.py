@@ -27,6 +27,7 @@ def runGenerationsLife(applicationGUI, event=None):
     generationLoop = 0
     allGenerationsPopulationList = []
     allGenerationsFoodList = []
+    applicationGUI.menus.mainMenu.printLoadingInit(applicationGUI.mainWindow)
 
     while (generationLoop < generationsNb):
         mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
@@ -49,11 +50,16 @@ def runGenerationsLife(applicationGUI, event=None):
         dataCollection.append(DataCollection(populationList))
         printDataCollectionForCurrentGeneration(dataCollection[generationLoop])
         parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
-        applicationGUI.menus.mainMenu.printCurrentLoadingDatas(dataCollection[generationLoop], generationLoop, applicationGUI.mainWindow)
+        applicationGUI.menus.mainMenu.printCurrentLoadingDatas(dataCollection[generationLoop],
+                                                            generationLoop,
+                                                            applicationGUI.mainWindow,
+                                                            generationsNb)
         generationLoop += 1
         if (len(parentGeneration) == 0):
             print("No more individuals at Generation " + str(generationLoop) + ". Aborting...")
             generationsNb = generationLoop
+            applicationGUI.menus.mainMenu.printCurrentLoadingDatas(None, 0, None,
+                                                                   0)
             break
     applicationGUI.printGenerationsLifeSpanFrameByFrame(allGenerationsPopulationList,
                                                         allGenerationsFoodList,
