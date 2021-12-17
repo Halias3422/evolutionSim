@@ -88,6 +88,8 @@ class ApplicationGUI:
                 "startY": startY,
                 "endX": startX + self.XCellSize,
                 "endY": startY + self.YCellSize,
+                "posX": startX / self.XCellSize,
+                "posY": startY / self.YCellSize,
                 "hasReproduced": individual.hasReproduced,
                 "hasReproducedLoop": individual.hasReproducedLoop,
                 "hasEaten": individual.hasEaten,
@@ -144,6 +146,8 @@ class ApplicationGUI:
                 mapContent.append({
                     "type": "individual",
                     "name": individual.name,
+                    "posX": startX / self.XCellSize,
+                    "posY": startY / self.YCellSize,
                     "startX": startX,
                     "startY": startY,
                     "endX": startX + self.XCellSize,
@@ -180,7 +184,7 @@ class ApplicationGUI:
         return None
 
     def printSelectedIndividualGenePool(self, genePool):
-        infoMenu = self.menus.runInfoFrame.runInfoMenu
+        infoMenu = self.menus.runInfoMenu.runInfoFrame
         lblGenePool = tk.Label(infoMenu,
                                font=LABELFONT,
                                text="Gene Pool : ")
@@ -218,62 +222,64 @@ class ApplicationGUI:
 
 
     def updateSelectedObjectDescriptionFrameContent(self, clickedOnObject, loopIndex):
+        self.menus.runInfoMenu.printCurrentlySelectedIndividualInfo(clickedOnObject,
+                                                                    self.menus.menusTabs)
         # for widget in self.selectedItemTab.winfo_children():
-        infoMenu = self.menus.runInfoFrame.runInfoMenu
-        for widget in infoMenu.winfo_children():
-            widget.destroy()
-        if (clickedOnObject["type"] == "individual"):
-            lblName = tk.Label(infoMenu,
-                               font=LABELFONT,
-                               text="Object = Individual " + clickedOnObject["name"])
-            if (loopIndex >= clickedOnObject["hasReproducedLoop"]):
-                lblHasReproduced = tk.Label(infoMenu,
-                                            font=LABELFONT,
-                    text="Has reproduced : " + str(clickedOnObject["hasReproduced"]))
-            else:
-                lblHasReproduced = tk.Label(infoMenu,
-                                            font=LABELFONT,
-                        text="Has reproduced : False")
-            if (loopIndex >= clickedOnObject["hasEatenLoop"]):
-                lblHasEaten = tk.Label(infoMenu,
-                                       font=LABELFONT,
-                    text="Has eaten : " + str(clickedOnObject["hasEaten"]))
-            else:
-                lblHasEaten = tk.Label(infoMenu,
-                                       font=LABELFONT,
-                        text="Has eaten : False")
-            lblCurrentGoal = tk.Label(infoMenu,
-                                      font=LABELFONT,
-                                      text="Current Goal : "
-                                      + clickedOnObject["currentGoal"])
-            lblCurrentGoalPos = tk.Label(infoMenu,
-                                         font=LABELFONT,
-                                         text="Current Goal Pos : "
-                                         + str(clickedOnObject["currentGoalPos"]))
-        else:
-            lblName = tk.Label(infoMenu,
-                               font=LABELFONT,
-                               text="Object = Food")
-        lblCoord = tk.Label(infoMenu,
-                            font=LABELFONT,
-                text="Position : [" + str(clickedOnObject["startY"] / self.XCellSize)
-                            + ", " + str(clickedOnObject["startX"] / self.YCellSize)
-                            + "]")
-        lblCurrentLoop = tk.Label(infoMenu,
-                                  font=LABELFONT,
-                                  text="Current Loop : "
-                                  + str(loopIndex))
-        lblName.pack()
-        lblCoord.pack()
-        if (clickedOnObject["type"] == "individual"):
-            lblHasReproduced.pack()
-            lblHasEaten.pack()
-            lblCurrentGoal.pack()
-            lblCurrentGoalPos.pack()
-            self.printSelectedIndividualGenePool(clickedOnObject["genePool"])
-        lblCurrentLoop.pack()
-        infoMenu.pack_propagate(0)
-        self.menus.menusTabs.select(infoMenu)
+        # infoMenu = self.menus.runInfoMenu.runInfoFrame
+        # for widget in infoMenu.winfo_children():
+        #     widget.destroy()
+        # if (clickedOnObject["type"] == "individual"):
+        #     lblName = tk.Label(infoMenu,
+        #                        font=LABELFONT,
+        #                        text="Object = Individual " + clickedOnObject["name"])
+        #     if (loopIndex >= clickedOnObject["hasReproducedLoop"]):
+        #         lblHasReproduced = tk.Label(infoMenu,
+        #                                     font=LABELFONT,
+        #             text="Has reproduced : " + str(clickedOnObject["hasReproduced"]))
+        #     else:
+        #         lblHasReproduced = tk.Label(infoMenu,
+        #                                     font=LABELFONT,
+        #                 text="Has reproduced : False")
+        #     if (loopIndex >= clickedOnObject["hasEatenLoop"]):
+        #         lblHasEaten = tk.Label(infoMenu,
+        #                                font=LABELFONT,
+        #             text="Has eaten : " + str(clickedOnObject["hasEaten"]))
+        #     else:
+        #         lblHasEaten = tk.Label(infoMenu,
+        #                                font=LABELFONT,
+        #                 text="Has eaten : False")
+        #     lblCurrentGoal = tk.Label(infoMenu,
+        #                               font=LABELFONT,
+        #                               text="Current Goal : "
+        #                               + clickedOnObject["currentGoal"])
+        #     lblCurrentGoalPos = tk.Label(infoMenu,
+        #                                  font=LABELFONT,
+        #                                  text="Current Goal Pos : "
+        #                                  + str(clickedOnObject["currentGoalPos"]))
+        # else:
+        #     lblName = tk.Label(infoMenu,
+        #                        font=LABELFONT,
+        #                        text="Object = Food")
+        # lblCoord = tk.Label(infoMenu,
+        #                     font=LABELFONT,
+        #         text="Position : [" + str(int(clickedOnObject["startY"] / self.XCellSize))
+        #                     + ", " + str(int(clickedOnObject["startX"] / self.YCellSize))
+        #                     + "]")
+        # lblCurrentLoop = tk.Label(infoMenu,
+        #                           font=LABELFONT,
+        #                           text="Current Loop : "
+        #                           + str(loopIndex))
+        # lblName.pack()
+        # lblCoord.pack()
+        # if (clickedOnObject["type"] == "individual"):
+        #     lblHasReproduced.pack()
+        #     lblHasEaten.pack()
+        #     lblCurrentGoal.pack()
+        #     lblCurrentGoalPos.pack()
+        #     self.printSelectedIndividualGenePool(clickedOnObject["genePool"])
+        # lblCurrentLoop.pack()
+        # infoMenu.pack_propagate(0)
+        # self.menus.menusTabs.select(infoMenu)
 
     def mouseClick(self, event):
         global mouseXClick
@@ -348,6 +354,3 @@ def initGUIApplication(winWidth, winHeight, runGenerationsLife):
     applicationGUI.createMainFrames(runGenerationsLife)
     applicationGUI.createMap(0, 0)
     return applicationGUI
-
-def createGUImap(applicationGUI, mapSizeX, mapSizeY):
-    applicationGUI.defineMapSize(mapSizeX, mapSizeY)

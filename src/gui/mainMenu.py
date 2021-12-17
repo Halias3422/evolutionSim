@@ -247,7 +247,7 @@ class MainMenu:
             return
         self.lblCurrentGeneration["text"] = ("Generation "
                                              + str(currentLoop + 1) + "/"
-                                             + str(generationsNb) + " Done")
+                                             + str(generationsNb) + " done")
         self.lblLoadingPopulationSize["text"] = ("Initial population size : "
                                                 + str(dataCollection.populationSize))
         self.lblLoadingHasReproduced["text"] = ("Individuals that have reproduced : "

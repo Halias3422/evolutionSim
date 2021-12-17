@@ -1,5 +1,4 @@
 from gui.guiWindow import initGUIApplication
-from gui.guiWindow import createGUImap
 from population.population import spawnNewGeneration
 from population.population import runCurrentGenerationLife
 from population.population import removeAllUnsuccessfullIndividuals
@@ -7,72 +6,88 @@ from environment.food import spawnGenerationFood
 from debug.print import *
 from environment.mapRepresentation import *
 from dataCollection.dataCollection import DataCollection
+from dataCollection.runMainDatas import RunMainDatas
 
 winWidth = 1800
 winHeight = 1000
 
 def runGenerationsLife(applicationGUI, event=None):
-    #init Run Variables
-    dataCollection = []
-    populationNb = int(applicationGUI.menus.mainMenu.txtPopulationSize.get())
-    mapSizeX = int(applicationGUI.menus.mainMenu.txtMapSize.get())
-    mapSizeY = int(applicationGUI.menus.mainMenu.txtMapSize.get())
-    generationLifeSpan = int(applicationGUI.menus.mainMenu.txtGenerationLifeSpan.get())
-    generationsNb = int(applicationGUI.menus.mainMenu.txtGenerationNb.get())
-    foodNb = int(applicationGUI.menus.mainMenu.txtFoodNb.get())
-    foodVariation = int(applicationGUI.menus.mainMenu.txtFoodVariation.get())
-    createGUImap(applicationGUI, mapSizeX, mapSizeY)
-    parentGeneration = None
-    mutationProb = float(applicationGUI.menus.mainMenu.txtMutationProb.get())
-    generationLoop = 0
-    allGenerationsPopulationList = []
-    allGenerationsFoodList = []
+    mainData = RunMainDatas(applicationGUI)
+    applicationGUI.defineMapSize(mainData.mapSizeX, mainData.mapSizeY)
     applicationGUI.menus.mainMenu.printLoadingInit(applicationGUI.mainWindow)
-
-    while (generationLoop < generationsNb):
-        mapRepresentation = createMapRepresentation(mapSizeX, mapSizeY)
-        populationList = spawnNewGeneration(populationNb, mapSizeX, mapSizeY,
-                                            generationLifeSpan, parentGeneration,
-                                            generationLoop, mutationProb)
+    while (mainData.generationLoop < mainData.generationsNb):
+        mapRepresentation = createMapRepresentation(mainData.mapSizeX, mainData.mapSizeY)
+        populationList = spawnCurrentLoopGeneration(mainData)
         mapRepresentation = addPopulationListToMapRepresentation(populationList,
-                                                                  mapRepresentation)
-
-        foodList = []
-        foodList.append(spawnGenerationFood(foodNb, foodVariation, mapSizeX,
-                                            mapSizeY, mapRepresentation))
+                                                                 mapRepresentation)
+        foodList = spawnCurrentLoopFood(mainData, mapRepresentation)
         mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
-
-        populationList = runCurrentGenerationLife(populationList, generationLifeSpan,
-                                                  mapRepresentation, foodList,
-                                                  mapSizeX, mapSizeY)
-        allGenerationsPopulationList.append(populationList)
-        allGenerationsFoodList.append(foodList)
-        dataCollection.append(DataCollection(populationList))
-        printDataCollectionForCurrentGeneration(dataCollection[generationLoop])
-        parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
-        applicationGUI.menus.mainMenu.printCurrentLoadingDatas(dataCollection[generationLoop],
-                                                            generationLoop,
-                                                            applicationGUI.mainWindow,
-                                                            generationsNb)
-        generationLoop += 1
-        if (len(parentGeneration) == 0):
-            print("No more individuals at Generation " + str(generationLoop) + ". Aborting...")
-            generationsNb = generationLoop
-            applicationGUI.menus.mainMenu.printCurrentLoadingDatas(None, 0, None,
-                                                                   0)
+        populationList = storeCurrentLoopData(populationList, foodList, mainData,
+                                              mapRepresentation)
+        printDataCollectionForCurrentGeneration(mainData.dataCollection[mainData.generationLoop])
+        mainData.parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
+        printLoadingStateToUI(mainData, applicationGUI, "running")
+        mainData.generationLoop += 1
+        if (checkIfThereAreSurvivors(mainData, mainData.parentGeneration, applicationGUI)
+                is False):
             break
-    applicationGUI.printGenerationsLifeSpanFrameByFrame(allGenerationsPopulationList,
-                                                        allGenerationsFoodList,
-                                                        generationLifeSpan,
-                                                        generationsNb)
+    applicationGUI.menus.enableRunInfoTab()
+    printRunResult(mainData, applicationGUI)
+
+
+def printRunResult(mainData, applicationGUI):
+    applicationGUI.menus.menusTabs.select(applicationGUI.menus.runInfoMenu.runInfoFrame)
+    applicationGUI.printGenerationsLifeSpanFrameByFrame(mainData.allGenerationsPopulationList,
+                                                        mainData.allGenerationsFoodList,
+                                                        mainData.generationLifeSpan,
+                                                        mainData.generationsNb)
+
+def checkIfThereAreSurvivors(mainData, parentGeneration, applicationGUI):
+    if (len(parentGeneration) == 0):
+        print("No more individuals at Generation " +
+                str(mainData.generationLoop) + ". Aborting...")
+        mainData.generationsNb = mainData.generationLoop
+        printLoadingStateToUI(mainData, applicationGUI, "done")
+        return False
+    return True
+
+def printLoadingStateToUI(mainData, applicationGUI, currentState):
+    if (currentState == "running"):
+        applicationGUI.menus.mainMenu.printCurrentLoadingDatas(mainData.dataCollection[mainData.generationLoop],
+                                                            mainData.generationLoop,
+                                                            applicationGUI.mainWindow,
+                                                            mainData.generationsNb)
+    else:
+        applicationGUI.menus.mainMenu.printCurrentLoadingDatas(None, 0, None, 0)
+
+def spawnCurrentLoopFood(mainData, mapRepresentation):
+    foodList = []
+    foodList.append(spawnGenerationFood(mainData.foodNb, mainData.foodVariation,
+                                        mainData.mapSizeX, mainData.mapSizeY,
+                                        mapRepresentation))
+    return foodList
+
+def spawnCurrentLoopGeneration(mainData):
+    populationList = spawnNewGeneration(mainData.populationNb, mainData.mapSizeX,
+                                        mainData.mapSizeY, mainData.generationLifeSpan,
+                                        mainData.parentGeneration, mainData.generationLoop,
+                                        mainData.mutationProb)
+    return populationList
+
+def storeCurrentLoopData(populationList, foodList, mainData, mapRepresentation):
+    populationList = runCurrentGenerationLife(populationList, mainData.generationLifeSpan,
+                                              mapRepresentation, foodList,
+                                              mainData.mapSizeX, mainData.mapSizeY)
+    mainData.allGenerationsPopulationList.append(populationList)
+    mainData.allGenerationsFoodList.append(foodList)
+    mainData.dataCollection.append(DataCollection(populationList))
+    return populationList
 
 
 def main():
-    print("TOTO")
     applicationGUI = initGUIApplication(winWidth, winHeight, runGenerationsLife)
     applicationGUI.mainWindow.mainloop()
 
 if (__name__ == "__main__"):
-    print("toto")
     main()
 

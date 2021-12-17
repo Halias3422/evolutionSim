@@ -32,3 +32,7 @@ class Menus:
         pass
         self.menusTabs.add(self.mainMenu.menusFrame, text="New Run")
         self.menusTabs.add(self.runInfoMenu.runInfoFrame, text="Run Info")
+        self.menusTabs.hide(self.runInfoMenu.runInfoFrame)
+
+    def enableRunInfoTab(self):
+        self.menusTabs.add(self.runInfoMenu.runInfoFrame)
