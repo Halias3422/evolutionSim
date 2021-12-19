@@ -79,11 +79,6 @@ def runCurrentGenerationLife(populationList, generationLifeSpan,
         initialFoodList = foodList[loopIndex][:]
         if (loopIndex > 0):
             for individual in populationList:
-                # if (individual.currentGoal != "none"):
-                #     individual.checkIfCurrentGoalIsStillValid(individual,
-                #                                               mapRepresentation,
-                #                                               populationList)
-                # if (individual.currentGoal == "none"):
                 if (individual.hasEaten == False
                         or individual.hasReproduced == False):
                     individual = setIndividualCurrentGoal(individual,

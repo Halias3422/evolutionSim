@@ -7,6 +7,7 @@ from debug.print import *
 from environment.mapRepresentation import *
 from dataCollection.dataCollection import DataCollection
 from dataCollection.runMainDatas import RunMainDatas
+from gui.runResultDisplay import PrintRunResult
 
 winWidth = 1800
 winHeight = 1000
@@ -31,16 +32,8 @@ def runGenerationsLife(applicationGUI, event=None):
         if (checkIfThereAreSurvivors(mainData, mainData.parentGeneration, applicationGUI)
                 is False):
             break
-    applicationGUI.menus.enableRunInfoTab()
-    printRunResult(mainData, applicationGUI)
+    PrintRunResult(mainData, applicationGUI)
 
-
-def printRunResult(mainData, applicationGUI):
-    applicationGUI.menus.menusTabs.select(applicationGUI.menus.runInfoMenu.runInfoFrame)
-    applicationGUI.printGenerationsLifeSpanFrameByFrame(mainData.allGenerationsPopulationList,
-                                                        mainData.allGenerationsFoodList,
-                                                        mainData.generationLifeSpan,
-                                                        mainData.generationsNb)
 
 def checkIfThereAreSurvivors(mainData, parentGeneration, applicationGUI):
     if (len(parentGeneration) == 0):
