@@ -68,9 +68,8 @@ def spawnCurrentLoopGeneration(mainData):
     return populationList
 
 def storeCurrentLoopData(populationList, foodList, mainData, mapRepresentation):
-    populationList = runCurrentGenerationLife(populationList, mainData.generationLifeSpan,
-                                              mapRepresentation, foodList,
-                                              mainData.mapSizeX, mainData.mapSizeY)
+    populationList = runCurrentGenerationLife(populationList, mainData,
+                                              mapRepresentation, foodList)
     mainData.allGenerationsPopulationList.append(populationList)
     mainData.allGenerationsFoodList.append(foodList)
     mainData.dataCollection.append(DataCollection(populationList))

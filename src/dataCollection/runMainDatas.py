@@ -14,4 +14,5 @@ class RunMainDatas:
         self.dataCollection = []
         self.allGenerationsPopulationList = []
         self.allGenerationsFoodList = []
+        self.populationInfoPerLoop = []
 

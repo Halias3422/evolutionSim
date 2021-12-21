@@ -71,41 +71,66 @@ def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
     return populationList
 
 
-def runCurrentGenerationLife(populationList, generationLifeSpan,
-                             mapRepresentation, foodList,
-                             mapSizeX, mapSizeY):
+def runCurrentGenerationLife(populationList, mainData, mapRepresentation,
+                             foodList):
+    generationLifeSpan = mainData.generationLifeSpan
+    mapSizeX = mainData.mapSizeX
+    mapSizeY = mainData.mapSizeY
     loopIndex = 0
+    currGenInfo = []
     while (loopIndex < generationLifeSpan):
         initialFoodList = foodList[loopIndex][:]
+        populationInfo = {
+                "hasEaten": 0,
+                "hasReproduced": 0,
+                "popNb": 0,
+                }
         if (loopIndex > 0):
             for individual in populationList:
-                if (individual.hasEaten == False
-                        or individual.hasReproduced == False):
-                    individual = setIndividualCurrentGoal(individual,
-                                                              mapRepresentation,
-                                                              populationList,
-                                                              mapSizeX,
-                                                              mapSizeY)
-                if (individual.currentGoal == "none"):
-                    individual = individualExecuteRandomMovement(individual,
-                                                                 mapRepresentation,
-                                                                 populationList)
-                else:
-                    individual = individualMoveToCurrentGoal(individual,
-                                                             mapRepresentation,
-                                                             populationList)
-                individual = checkSurroundingsAndAct(individual, mapRepresentation,
-                                                     initialFoodList,
-                                                     populationList,
-                                                     loopIndex)
-                individual.registerPrintingValuesHistory(loopIndex)
+                individual = decideIndividualCurrentAction(individual, mapRepresentation,
+                                              populationList, mapSizeX, mapSizeY,
+                                              loopIndex, initialFoodList)
+                populationInfo = fillPopulationInfo(individual, populationInfo)
         foodList.append(initialFoodList)
         mapRepresentation = updateMapRepresentation(mapRepresentation,
                                                     populationList, foodList,
                                                     loopIndex)
+        populationInfo["popNb"] = len(populationList)
+        currGenInfo.append(populationInfo)
         loopIndex += 1
+    mainData.populationInfoPerLoop.append(currGenInfo)
     return populationList
 
+def decideIndividualCurrentAction(individual, mapRepresentation, populationList,
+                                  mapSizeX, mapSizeY, loopIndex, initialFoodList):
+    if (individual.hasEaten == False
+            or individual.hasReproduced == False):
+        individual = setIndividualCurrentGoal(individual,
+                                                  mapRepresentation,
+                                                  populationList,
+                                                  mapSizeX,
+                                                  mapSizeY)
+    if (individual.currentGoal == "none"):
+        individual = individualExecuteRandomMovement(individual,
+                                                     mapRepresentation,
+                                                     populationList)
+    else:
+        individual = individualMoveToCurrentGoal(individual,
+                                                 mapRepresentation,
+                                                 populationList)
+    individual = checkSurroundingsAndAct(individual, mapRepresentation,
+                                         initialFoodList,
+                                         populationList,
+                                         loopIndex)
+    individual.registerPrintingValuesHistory(loopIndex)
+    return individual
+
+def fillPopulationInfo(individual, populationInfo):
+    if (individual.hasEaten):
+        populationInfo["hasEaten"] += 1
+    if (individual.hasReproduced):
+        populationInfo["hasReproduced"] += 1
+    return populationInfo
 
 def checkSurroundingsAndAct(individual, mapRepresentation, foodList,
                             populationList, loopIndex):

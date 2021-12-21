@@ -21,7 +21,7 @@ class PrintRunResult:
         applicationGUI.menus.runInfoMenu.progressBarsFrame.grid()
         applicationGUI.menus.runInfoMenu.setBarsRunValues(mainData)
 
-        self.__launchDisplayLoop(applicationGUI)
+        self.__launchDisplayLoop(applicationGUI, mainData)
 
     def __mouseClick(self, event):
         self.mouseXClick = event.x
@@ -192,11 +192,14 @@ class PrintRunResult:
                                                                    self.loopIndex)
             return True
 
-    def __launchDisplayLoop(self, applicationGUI):
+    def __launchDisplayLoop(self, applicationGUI, mainData):
         applicationGUI.mainWindow.bind("<Key>", self.__keyPressedDuringReplay)
         while True:
             if (self.__runInfoMenuBarsValuesUpdated(applicationGUI) is True):
                 self.prevLoopIndex = self.loopIndex
+                applicationGUI.menus.runInfoMenu.updatePopulationInfoFrame(mainData,
+                                                                self.loopIndex,
+                                                                self.currGeneration)
                 mapContent = []
                 print("self = " + str(self.loopIndex))
                 self.__addContentForCurrentFrameToMap(applicationGUI,
