@@ -76,12 +76,12 @@ class MainMenu:
         self.__createOptionsFrameContent()
 
     def __createRunButton(self, runGenerationsLife, applicationGUI):
-        runButton = tk.Button(self.menusFrame, text="\n    CREATE LIFE    \n",
+        self.runButton = tk.Button(self.menusFrame, text="\n    CREATE LIFE    \n",
                               font=("Arial", 32), bg="green", fg="white",
                               command=lambda: runGenerationsLife(applicationGUI))
-        runButton.bind("<Return>", lambda event,:  runGenerationsLife(applicationGUI))
-        runButton.grid(column=0, columnspan=2, row=1, pady=20)
-        runButton.focus_set()
+        self.runButton.bind("<Return>", lambda event,:  runGenerationsLife(applicationGUI))
+        self.runButton.grid(column=0, columnspan=2, row=1, pady=20)
+        self.runButton.focus_set()
 
     def __initMainMenuRunDataFrameContent(self):
         self.runDataFrame = tk.LabelFrame(self.menusFrame,
@@ -141,7 +141,7 @@ class MainMenu:
         self.cbxMutationToggle.select()
 
     def __createOptionsFramePopulationGen(self):
-        self.optionPopulationGen = "fixed"
+        self.optionPopulationGen = tk.StringVar(value="fixed")
         self.populationGenFrame = tk.LabelFrame(self.optionsFrame,
                                             font=H3TITLEFONT,
                                             text="Population number each Generation : ",
@@ -152,17 +152,17 @@ class MainMenu:
         self.populationGenFrame.pack(pady=10)
 
         self.rdbOptionFixedPopulationNb = tk.Radiobutton(self.populationGenFrame,
-                                                         text="Fixed",
-                                                         value="fixed",
-                                                         variable=self.optionPopulationGen,
-                                                         font=H4TITLEFONT)
+                                                 text="Fixed",
+                                                 value="fixed",
+                                                 variable=self.optionPopulationGen,
+                                                 font=H4TITLEFONT)
         self.rdbOptionFixedPopulationNb.pack(anchor=tk.W)
 
         self.rdbOptionChildrenPopulationNb = tk.Radiobutton(self.populationGenFrame,
-                                                            text="Survivors Children",
-                                                            value="children",
-                                                            variable=self.optionPopulationGen,
-                                                            font=H4TITLEFONT)
+                                                text="Survivors Children",
+                                                value="children",
+                                                variable=self.optionPopulationGen,
+                                                font=H4TITLEFONT)
         self.rdbOptionChildrenPopulationNb.pack(anchor=tk.W)
         self.rdbOptionFixedPopulationNb.select()
 

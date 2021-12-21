@@ -13,12 +13,14 @@ winWidth = 1800
 winHeight = 1000
 
 def runGenerationsLife(applicationGUI, event=None):
+    applicationGUI.map.bind("<Button-1>", applicationGUI.focusOnMap())
+    applicationGUI.mainWindow.focus_set()
     mainData = RunMainDatas(applicationGUI)
     applicationGUI.defineMapSize(mainData.mapSizeX, mainData.mapSizeY)
     applicationGUI.menus.mainMenu.printLoadingInit(applicationGUI.mainWindow)
     while (mainData.generationLoop < mainData.generationsNb):
         mapRepresentation = createMapRepresentation(mainData.mapSizeX, mainData.mapSizeY)
-        populationList = spawnCurrentLoopGeneration(mainData)
+        populationList = spawnCurrentLoopGeneration(applicationGUI, mainData)
         mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                                  mapRepresentation)
         foodList = spawnCurrentLoopFood(mainData, mapRepresentation)
@@ -60,11 +62,8 @@ def spawnCurrentLoopFood(mainData, mapRepresentation):
                                         mapRepresentation))
     return foodList
 
-def spawnCurrentLoopGeneration(mainData):
-    populationList = spawnNewGeneration(mainData.populationNb, mainData.mapSizeX,
-                                        mainData.mapSizeY, mainData.generationLifeSpan,
-                                        mainData.parentGeneration, mainData.generationLoop,
-                                        mainData.mutationProb)
+def spawnCurrentLoopGeneration(applicationGUI, mainData):
+    populationList = spawnNewGeneration(applicationGUI, mainData)
     return populationList
 
 def storeCurrentLoopData(populationList, foodList, mainData, mapRepresentation):

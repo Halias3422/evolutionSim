@@ -151,7 +151,6 @@ class PrintRunResult:
 
     def __checkLoopIndexNewValue(self, applicationGUI):
         if (self.loopIndex < 0 and self.currGeneration > 0):
-            print("JE SUIS BIEN LA")
             self.loopIndex = self.generationLifeSpan
             self.currGeneration -= 1
         elif (self.loopIndex < 0):
@@ -195,13 +194,14 @@ class PrintRunResult:
     def __launchDisplayLoop(self, applicationGUI, mainData):
         applicationGUI.mainWindow.bind("<Key>", self.__keyPressedDuringReplay)
         while True:
+            if (applicationGUI.exiting is True):
+                break
             if (self.__runInfoMenuBarsValuesUpdated(applicationGUI) is True):
                 self.prevLoopIndex = self.loopIndex
                 applicationGUI.menus.runInfoMenu.updatePopulationInfoFrame(mainData,
                                                                 self.loopIndex,
                                                                 self.currGeneration)
                 mapContent = []
-                print("self = " + str(self.loopIndex))
                 self.__addContentForCurrentFrameToMap(applicationGUI,
                             self.generationsPopulationList[self.currGeneration],
                             self.generationsFoodList[self.currGeneration],

@@ -1,6 +1,8 @@
 class RunMainDatas:
 
     def __init__(self, applicationGUI):
+        self.beginningPopulationNb = int(applicationGUI.menus.mainMenu.txtPopulationSize.get())
+
         self.populationNb = int(applicationGUI.menus.mainMenu.txtPopulationSize.get())
         self.mapSizeX = int(applicationGUI.menus.mainMenu.txtMapSize.get())
         self.mapSizeY = int(applicationGUI.menus.mainMenu.txtMapSize.get())

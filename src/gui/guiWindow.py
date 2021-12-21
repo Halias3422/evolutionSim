@@ -22,11 +22,17 @@ class ApplicationGUI:
     def __init__(self, winWidth, winHeight):
         self.winWidth = winWidth
         self.winHeight = winHeight
+        self.exiting = False
 
     def createApplicationWindow(self):
         self.mainWindow = tk.Tk()
+        self.mainWindow.bind("<Escape>", self.__quitApplication)
         self.mainWindow.geometry(str(self.winWidth) + "x" +
                                  str(self.winHeight))
+
+    def __quitApplication(self, event=None):
+        self.mainWindow.destroy()
+        self.exiting = True
 
     def createMainFrames(self, runGenerationsLife):
         self.frameLength = self.winWidth / 2
@@ -40,14 +46,13 @@ class ApplicationGUI:
 
 
     def createMap(self, mapSizeX, mapSizeY):
-        # self.mapSizeX = mapSizeX
-        # self.mapSizeY= mapSizeY
         self.map = tk.Canvas(self.mapFrame, bg="white",
                              width=self.mapFrame.winfo_width(),
                              height=self.mapFrame.winfo_height())
-        # self.XCellSize = self.frameLength / self.mapSizeX
-        # self.YCellSize = self.frameHeight / self.mapSizeY
         self.map.pack()
+
+    def focusOnMap(self):
+        self.map.focus_set()
 
     def defineMapSize(self, mapSizeX, mapSizeY):
         self.mapSizeX = mapSizeX

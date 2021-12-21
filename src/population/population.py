@@ -2,6 +2,8 @@ from .individual import Individual
 from .child import Child
 from environment.mapRepresentation import updateMapRepresentation
 import random
+from .newFixedGenerationAttributes import NewFixedGenerationAttributes
+from .fixedChild import FixedChild
 
 def checkIfCoordinateNotOccupied(populationList, individual):
     for other in populationList:
@@ -21,55 +23,76 @@ def createMapFreeSpaceList(mapSizeX, mapSizeY):
         mapSizeY -= 1
     return mapFreeSpaceList
 
-def spawnNewGeneration(populationNb, mapSizeX, mapSizeY, generationLifeSpan,
-                       parentGeneration, currentGeneration, mutationProb):
+def spawnNewGeneration(applicationGUI, mainData):
     populationList = []
-    mapFreeSpaceList = createMapFreeSpaceList(mapSizeX, mapSizeY)
-    if (parentGeneration is None):
-        while (populationNb > 0):
+    mapFreeSpaceList = createMapFreeSpaceList(mainData.mapSizeX, mainData.mapSizeY)
+    if (mainData.parentGeneration is None):
+        while (mainData.populationNb > 0):
             while True:
-                individual = Individual(mapSizeX, mapSizeY, 0,
-                                        generationLifeSpan, populationNb,
+                individual = Individual(mainData.mapSizeX, mainData.mapSizeY, 0,
+                                        mainData.generationLifeSpan, mainData.populationNb,
                                         mapFreeSpaceList)
                 mapFreeSpaceList.remove(individual.mapPosition[0])
                 populationList.append(individual)
-                populationNb -= 1
+                mainData.populationNb -= 1
                 if (len(mapFreeSpaceList) == 0):
                     return populationList
                 break
-    elif (parentGeneration is not None):
-        newPopulationNb = 0
-        alreadyReproduced = []
-        survivors = 0
-        while (survivors < len(parentGeneration)):
-            if (parentGeneration[survivors] not in alreadyReproduced):
-                birthParentNb = random.randint(0, 1)
-                if (birthParentNb == 0
-                    or parentGeneration[survivors].reproductionPartner not in parentGeneration):
-                    parent = parentGeneration[survivors]
-                    partner = parentGeneration[survivors].reproductionPartner
-                elif (birthParentNb == 1):
-                    parent = parentGeneration[survivors].reproductionPartner
-                    partner = parentGeneration[survivors]
-                childrenNb = parent.genePool.fertility
-                while (childrenNb > 0):
-                    individual = Child(parent, partner, mapSizeX, mapSizeY,
-                                       currentGeneration, generationLifeSpan,
-                                       newPopulationNb, mutationProb,
-                                       mapFreeSpaceList)
-                    mapFreeSpaceList.remove(individual.mapPosition[0])
-                    populationList.append(individual)
-                    newPopulationNb += 1
-                    childrenNb -= 1
-                    if (len(mapFreeSpaceList) == 0):
-                        print("return ici")
-                        return populationList
-                alreadyReproduced.append(parent)
-                alreadyReproduced.append(partner)
-            survivors += 1
+    elif (mainData.parentGeneration is not None
+            and applicationGUI.menus.mainMenu.optionPopulationGen.get() == "children"):
+        populationList = spawnNewGenerationChildrenRule(mainData, populationList,
+                                                        mapFreeSpaceList)
+    elif (mainData.parentGeneration is not None
+            and applicationGUI.menus.mainMenu.optionPopulationGen.get() == "fixed"):
+        populationList = spawnNewGenerationFixedRule(mainData, populationList,
+                                                     mapFreeSpaceList)
 
     return populationList
 
+def spawnNewGenerationFixedRule(mainData, populationList, mapFreeSpaceList):
+    newPopulationNb = 0
+    newGenerationAttributesList = NewFixedGenerationAttributes(mainData)
+    while (newPopulationNb < mainData.populationNb):
+        individual = FixedChild(mainData.generationLoop, mainData.generationLifeSpan,
+                                newPopulationNb, mainData.mutationProb,
+                                mapFreeSpaceList, newGenerationAttributesList)
+        mapFreeSpaceList.remove(individual.mapPosition[0])
+        populationList.append(individual)
+        newPopulationNb += 1
+        if (len(mapFreeSpaceList) == 0):
+            return populationList
+    return populationList
+
+
+def spawnNewGenerationChildrenRule(mainData, populationList, mapFreeSpaceList):
+    newPopulationNb = 0
+    alreadyReproduced = []
+    survivors = 0
+    while (survivors < len(mainData.parentGeneration)):
+        if (mainData.parentGeneration[survivors] not in alreadyReproduced):
+            birthParentNb = random.randint(0, 1)
+            if (birthParentNb == 0
+                or mainData.parentGeneration[survivors].reproductionPartner not in mainData.parentGeneration):
+                parent = mainData.parentGeneration[survivors]
+                partner = mainData.parentGeneration[survivors].reproductionPartner
+            elif (birthParentNb == 1):
+                parent = mainData.parentGeneration[survivors].reproductionPartner
+                partner = mainData.parentGeneration[survivors]
+            childrenNb = parent.genePool.fertility
+            while (childrenNb > 0):
+                individual = Child(parent, partner, mainData.generationLoop,
+                                   mainData.generationLifeSpan, newPopulationNb,
+                                   mainData.mutationProb, mapFreeSpaceList)
+                mapFreeSpaceList.remove(individual.mapPosition[0])
+                populationList.append(individual)
+                newPopulationNb += 1
+                childrenNb -= 1
+                if (len(mapFreeSpaceList) == 0):
+                    return populationList
+            alreadyReproduced.append(parent)
+            alreadyReproduced.append(partner)
+        survivors += 1
+    return populationList
 
 def runCurrentGenerationLife(populationList, mainData, mapRepresentation,
                              foodList):

@@ -331,9 +331,19 @@ class RunInfoMenu():
         self.currGeneration = currGeneration + 1
 
     def updatePopulationInfoFrame(self, mainData, loopIndex, currGeneration):
-        currInfo = mainData.populationInfoPerLoop[currGeneration][loopIndex]
-        self.totalPopulationInfo["text"] = "Total population: " + str(currInfo["popNb"])
-        self.populationHasEatenInfo["text"] = "Total that have eaten : "\
-                                                + str(currInfo["hasEaten"])
-        self.populationHasReproducedInfo["text"] = "Total that have reproduced: "\
-                                                    + str(currInfo["hasReproduced"])
+        if (loopIndex < mainData.generationLifeSpan):
+            currInfo = mainData.populationInfoPerLoop[currGeneration][loopIndex]
+            self.totalPopulationInfo["text"] = "Total population: " + str(currInfo["popNb"])
+            self.populationHasEatenInfo["text"] = "Total that have eaten : "\
+                                                    + str(currInfo["hasEaten"])
+            self.populationHasReproducedInfo["text"] = "Total that have reproduced: "\
+                                                        + str(currInfo["hasReproduced"])
+        else:
+            currInfo = mainData.dataCollection[currGeneration]
+            self.totalPopulationInfo["text"] = str(currInfo.hasReproducedAndEatenNb)\
+                                + " survivors for a population of "\
+                                + str(currInfo.populationSize)
+            self.populationHasEatenInfo["text"] = "Total that have eaten : "\
+                                        + str(currInfo.hasEatenNb)
+            self.populationHasReproducedInfo["text"] = "Total that have reproduced: "\
+                                        + str(currInfo.hasReproducedNb)

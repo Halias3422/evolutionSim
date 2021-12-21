@@ -3,9 +3,8 @@ from .genePool import GenePool
 import random
 
 class Child(Individual):
-    pass
 
-    def __init__(self, parent, parentPartner, mapSizeX, mapSizeY, generation,
+    def __init__(self, parent, parentPartner, generation,
                  generationLifeSpan, populationNb, mutationProb, mapFreeSpaceList):
         self.mapPosition = []
         initMapPos = random.choice(mapFreeSpaceList)
