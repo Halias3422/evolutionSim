@@ -52,7 +52,7 @@ def spawnNewGeneration(applicationGUI, mainData):
 def spawnNewGenerationFixedRule(mainData, populationList, mapFreeSpaceList):
     newPopulationNb = 0
     newGenerationAttributesList = NewFixedGenerationAttributes(mainData)
-    while (newPopulationNb < mainData.populationNb):
+    while (newPopulationNb < mainData.beginningPopulationNb):
         individual = FixedChild(mainData.generationLoop, mainData.generationLifeSpan,
                                 newPopulationNb, mainData.mutationProb,
                                 mapFreeSpaceList, newGenerationAttributesList)

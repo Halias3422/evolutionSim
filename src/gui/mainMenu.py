@@ -6,11 +6,11 @@ H2TITLEFONT = ("Arial", 18)
 H3TITLEFONT = ("Arial", 16)
 H4TITLEFONT = ("Arial", 14)
 DEFAULTPOPSIZE = 10
-DEFAULTFOODNB = 0
+DEFAULTFOODNB = 10
 DEFAULTFOODVARIATION = 0
 DEFAULTMAPSIZE=5
 DEFAULTGENLIFE=100
-DEFAULTGENNB=1
+DEFAULTGENNB=2
 DEFAULTMUTATION=100
 
 class MainMenu:
@@ -220,7 +220,6 @@ class MainMenu:
         self.txtMutationProb.pack()
 
     def __createNewLifeCycleFrame(self, frameLength, frameHeight, menusTabs):
-        print(frameLength)
         self.menusFrame = tk.LabelFrame(menusTabs,
                                    text="Create new Life Cycle : ",
                                    font=H1TITLEFONT,
