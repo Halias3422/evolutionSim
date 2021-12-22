@@ -67,6 +67,27 @@ class RunInfoMenu():
                                         font=H3TITLEFONT)
         self.placeHolderText.grid(column=0, columnspan=2, row=1, sticky=tk.N)
         self.__initShowingIndividualInfo()
+        self.__initShowingFoodInfo()
+
+    def __initShowingFoodInfo(self):
+        self.foodInfoFrame = tk.LabelFrame(self.objectInfoFrame,
+                                           labelanchor='n',
+                                           text=" Food ",
+                                           font=H2TITLEFONT,
+                                           width=self.objectInfoFrame.winfo_reqwidth() / 3,
+                                           height=self.objectInfoFrame.winfo_reqheight())
+        self.foodInfoFrame.grid_propagate(False)
+        self.foodInfoFrame.grid_columnconfigure(0, weight=1)
+        self.foodInfoFrame.grid_columnconfigure(1, weight=1)
+        self.foodInfoFrame.grid_columnconfigure(2, weight=1)
+        self.foodInfoFrame.grid_rowconfigure(0, weight=1)
+        self.foodInfoFrame.grid_rowconfigure(1, weight=1)
+        self.foodInfoFrame.grid_rowconfigure(2, weight=1)
+        self.foodInfoFrame.grid(column=0, columnspan=2, row=0)
+        self.lblFoodPosition = tk.Label(self.foodInfoFrame,
+                                        font=H3TITLEFONT)
+        self.lblFoodPosition.grid(column=1, row=1)
+
 
     def __initShowingIndividualInfo(self):
         self.individualInfoFrame = tk.LabelFrame(self.objectInfoFrame,
@@ -279,7 +300,17 @@ class RunInfoMenu():
         self.loopIndexSpb.set(self.loopIndexScl.get())
         self.loopIndex = self.loopIndexScl.get()
 
+    def printCurrentlySelectedFoodInfo(self, food, menusTab):
+        self.individualInfoFrame.grid_remove()
+        self.individualGenePoolFrame.grid_remove()
+        self.lblFoodPosition["text"] = "Position: [" + str(food["posX"])\
+                                       + ", " + str(food["posY"]) + "]"
+        self.foodInfoFrame.grid()
+        menusTab.select(self.runInfoFrame)
+
+
     def printCurrentlySelectedIndividualInfo(self, individual, menusTab):
+        self.foodInfoFrame.grid_remove()
         self.placeHolderText.grid_remove()
         self.individualInfoFrame["text"] = "Individual " + individual["name"]
         self.lblIndividualPos["text"] = "Position: [" + str(individual["posX"])\

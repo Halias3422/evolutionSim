@@ -91,6 +91,8 @@ class PrintRunResult:
                 "type": "food",
                 "startX": startX,
                 "startY": startY,
+                "posX": startX / applicationGUI.XCellSize,
+                "posY": startY / applicationGUI.YCellSize,
                 "endX": startX + applicationGUI.XCellSize,
                 "endY": startY + applicationGUI.YCellSize})
             applicationGUI.map.create_rectangle(startX,
@@ -211,8 +213,11 @@ class PrintRunResult:
             if ('mapContent' in locals() and (self.prevMouseXClick != self.mouseXClick
                 or self.prevMouseYClick != self.mouseYClick)):
                 clickedOnObject = self.__checkWhatIsUnderClickPosition(mapContent)
-                if (clickedOnObject):
+                if (clickedOnObject and clickedOnObject["type"] == "individual"):
                     applicationGUI.menus.runInfoMenu.printCurrentlySelectedIndividualInfo(clickedOnObject, applicationGUI.menus.menusTabs)
+                elif (clickedOnObject and clickedOnObject["type"] == "food"):
+                    applicationGUI.menus.runInfoMenu.printCurrentlySelectedFoodInfo(\
+                            clickedOnObject, applicationGUI.menus.menusTabs)
                 self.prevMouseXClick = self.mouseXClick
                 self.prevMouseYClick = self.mouseYClick
             applicationGUI.mainWindow.update()
