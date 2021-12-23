@@ -84,6 +84,7 @@ class RunInfoMenu():
         self.foodInfoFrame.grid_rowconfigure(1, weight=1)
         self.foodInfoFrame.grid_rowconfigure(2, weight=1)
         self.foodInfoFrame.grid(column=0, columnspan=2, row=0)
+        self.foodInfoFrame.grid_remove()
         self.lblFoodPosition = tk.Label(self.foodInfoFrame,
                                         font=H3TITLEFONT)
         self.lblFoodPosition.grid(column=1, row=1)

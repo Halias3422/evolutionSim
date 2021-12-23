@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from .dangerPaintingMode import enterDangerPaintingMode
 
 H1TITLEFONT = ("Arial", 20)
 H2TITLEFONT = ("Arial", 18)
@@ -25,7 +26,7 @@ class MainMenu:
 
     def __initMenusContent(self, runGenerationsLife, applicationGUI):
         self.__initMainMenuRunDataFrameContent()
-        self.__initMainMenuOptionsFrameContent()
+        self.__initMainMenuOptionsFrameContent(applicationGUI)
         self.__createRunButton(runGenerationsLife, applicationGUI)
         self.__createLoadingInfosDisplay()
 
@@ -64,7 +65,7 @@ class MainMenu:
 
 
 
-    def __initMainMenuOptionsFrameContent(self):
+    def __initMainMenuOptionsFrameContent(self, applicationGUI):
         self.optionsFrame = tk.LabelFrame(self.menusFrame,
                                     text="Options : ",
                                     font=H2TITLEFONT,
@@ -73,7 +74,7 @@ class MainMenu:
                                     height=self.menusFrame.winfo_reqheight() / 2)
         self.optionsFrame.pack_propagate(False)
         self.optionsFrame.grid(column=1, row=0, sticky='N')
-        self.__createOptionsFrameContent()
+        self.__createOptionsFrameContent(applicationGUI)
 
     def __createRunButton(self, runGenerationsLife, applicationGUI):
         self.runButton = tk.Button(self.menusFrame, text="\n    CREATE LIFE    \n",
@@ -94,9 +95,20 @@ class MainMenu:
         self.runDataFrame.grid(column=0, row=0, sticky='N')
         self.__createRunDataFrameContent()
 
-    def __createOptionsFrameContent(self):
+    def __createOptionsFrameContent(self, applicationGUI):
         self.__createOptionsFramePopulationGen()
         self.__createOptionsFrameToggles()
+        self.__createPaintDangerButton(applicationGUI)
+
+    def __createPaintDangerButton(self, applicationGUI):
+        self.paintDangerButton = tk.Button(self.optionsFrame,
+                                           font=H3TITLEFONT,
+                                           text="Paint danger zones",
+                                           bg="grey",
+                                           fg="white",
+                                           command=lambda: enterDangerPaintingMode(applicationGUI))
+        self.paintDangerButton.pack(pady=10)
+
 
     def __createOptionsFrameToggles(self):
         self.optionsToggles = tk.LabelFrame(self.optionsFrame,
@@ -104,7 +116,7 @@ class MainMenu:
                                             text="Toggle ON/OFF",
                                             labelanchor="n",
                                             width=self.menusFrame.winfo_reqwidth() / 2,
-                                            height=self.menusFrame.winfo_reqheight())
+                                            height=self.menusFrame.winfo_reqheight() / 6)
         self.optionsToggles.pack_propagate(False)
         self.optionsToggles.pack(pady=10)
 

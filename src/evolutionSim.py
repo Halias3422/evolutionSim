@@ -27,7 +27,6 @@ def runGenerationsLife(applicationGUI, event=None):
         mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
         populationList = storeCurrentLoopData(populationList, foodList, mainData,
                                               mapRepresentation)
-        printDataCollectionForCurrentGeneration(mainData.dataCollection[mainData.generationLoop])
         mainData.parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
         printLoadingStateToUI(mainData, applicationGUI, "running")
         mainData.generationLoop += 1
