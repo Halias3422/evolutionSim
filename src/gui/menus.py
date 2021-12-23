@@ -39,6 +39,10 @@ class Menus:
         self.menusTabs.add(self.runInfoMenu.runInfoFrame, text="Run Info")
         self.menusTabs.add(self.dangerPaintingMenu.dangerPaintingFrame, text="Painting")
         self.menusTabs.hide(self.runInfoMenu.runInfoFrame)
+        self.menusTabs.hide(self.dangerPaintingMenu.dangerPaintingFrame)
 
     def enableRunInfoTab(self):
-        self.menusTabs.add(self.runInfoMenu.runInfoFrame)
+        self.menusTabs.add(self.runInfoMenu.runInfoFrame, text="Run Info")
+
+    def enableDangerPaintingTab(self):
+        self.menusTabs.add(self.dangerPaintingMenu.dangerPaintingFrame, text="Painting")

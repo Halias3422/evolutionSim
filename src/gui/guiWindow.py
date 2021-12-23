@@ -60,7 +60,9 @@ class ApplicationGUI:
         self.XCellSize = self.frameLength / self.mapSizeX
         self.YCellSize = self.frameHeight / self.mapSizeY
 
-    def __createMapGrid(self):
+    def createMapGrid(self, mapSizeX, mapSizeY):
+        self.XCellSize = self.frameLength / mapSizeX
+        self.YCellSize = self.frameHeight / mapSizeY
         currPosY = self.frameHeight
         while (currPosY >= 0):
             self.map.create_line(0,

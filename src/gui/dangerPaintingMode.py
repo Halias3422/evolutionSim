@@ -1,4 +1,5 @@
 import tkinter as tk
+from PIL import Image, ImageTk
 
 H1TITLEFONT = ("Arial", 20)
 H2TITLEFONT = ("Arial", 18)
@@ -6,7 +7,6 @@ H3TITLEFONT = ("Arial", 16)
 H4TITLEFONT = ("Arial", 14)
 
 class DangerPaintingMenu:
-
     def __init__(self,applicationGUI, menusTabs, width, height):
         self.dangerPaintingFrame = tk.Frame(menusTabs,
                                             width=width,
@@ -18,6 +18,10 @@ class DangerPaintingMenu:
         self.__createBrushSelectionFrame()
         self.__createBrushSizeFrame(applicationGUI)
         self.__createDangerCoverageFrame()
+        self.mouseX = 0
+        self.mouseY = 0
+        self.currHoveringPosition = [0, 0]
+        self.prevHoveringPosition = [0, 0]
 
     def __createBrushSizeFrame(self, applicationGUI):
         self.brushSizeFrame = tk.LabelFrame(self.dangerPaintingFrame,
@@ -82,6 +86,18 @@ class DangerPaintingMenu:
                          font=H3TITLEFONT)
         self.lblPlaceHolderDangerCoverage.grid_propagate(False)
         self.lblPlaceHolderDangerCoverage.grid(column=1, row=0)
+        self.donePainting = False
+        self.btnDonePainting = tk.Button(self.dangerCoverageFrame,
+                                         text=" Done ",
+                                         font=("Arial", 32),
+                                         bg="green",
+                                         fg="white",
+                                         command=lambda: self.__donePaintingDangerZones())
+        self.btnDonePainting.grid(column=1, row=1)
+
+    def __donePaintingDangerZones(self, event=None):
+        print("LA")
+        self.donePainting = True
 
 
     def __createBrushSelectionFrame(self):
@@ -120,7 +136,7 @@ class DangerPaintingMenu:
         self.roundBrushCanvas.grid(row=0)
         self.rdbRoundBrush = tk.Radiobutton(self.roundBrushFrame,
                                             text="Round",
-                                            value="roundBrush",
+                                            value="round",
                                             variable=self.brushType,
                                              highlightthickness=0,
                                              width=self.brushCanvasSize,
@@ -192,6 +208,133 @@ class DangerPaintingMenu:
             brushCanvas.create_line(currPosX, 0, currPosX, height, fill="black")
             currPosX -= width / 10
 
+    def __drawBrushOnMapCursorPosition(self, applicationGUI, event):
+        self.mouseX = event.x
+        self.mouseY = event.y
+        self.currHoveringPosition = [int(event.y / applicationGUI.YCellSize),
+                int(event.x / applicationGUI.XCellSize)]
 
-def enterDangerPaintingMode(applicationGUI, event=None):
-    pass
+    def __retreiveFocusPointForHoveringBrush(self):
+
+        focusX = int(self.brushSizeX.get() / 2)
+        focusY = int(self.brushSizeY.get() / 2)
+        if (self.brushSizeX.get() % 2 != 0):
+            focusX += 1
+        if (self.brushSizeY.get() % 2 != 0):
+            focusY += 1
+        if (focusX == 0):
+            focusX = 1
+        if (focusY == 0):
+            focusY = 1
+        return focusX, focusY
+
+    def __retreiveHoveringRectangleExtremities(self, applicationGUI, focusX,
+                                               focusY, mainData):
+        self.brushStartX = self.currHoveringPosition[1] - (focusX - 1)
+        if (self.brushStartX < 0):
+            self.brushStartX = 0
+        self.brushStartX = self.brushStartX * applicationGUI.XCellSize
+
+        self.brushStartY = self.currHoveringPosition[0] - (focusY - 1)
+        if (self.brushStartY < 0):
+            self.brushStartY = 0
+        self.brushStartY = self.brushStartY * applicationGUI.YCellSize
+
+        self.brushEndX = self.brushStartX + self.brushSizeX.get() * applicationGUI.XCellSize
+        if (self.brushEndX > applicationGUI.frameLength):
+            self.brushEndX = applicationGUI.frameLength
+        self.brushEndY = self.brushStartY + self.brushSizeY.get() * applicationGUI.YCellSize
+        if (self.brushEndY > applicationGUI.frameHeight):
+            self.brushEndY = applicationGUI.frameHeight
+
+    def __createHoveringRectangleOnMap(self, applicationGUI, **options):
+        if ("alpha" in options):
+            alpha = int(options.pop("alpha") * 255)
+            fill = options.pop("fill")
+            fill = applicationGUI.mainWindow.winfo_rgb(fill) + (alpha,)
+            try:
+                image = Image.new("RGBA", (int(self.brushEndX) - int(self.brushStartX),
+                            int(self.brushEndY) - int(self.brushStartY)), fill)
+            except:
+                return
+            self.images.append(ImageTk.PhotoImage(image))
+            applicationGUI.map.create_image(self.brushStartX, self.brushStartY, image=self.images[-1], anchor='nw')
+            applicationGUI.map.create_rectangle(self.brushStartX, self.brushStartY,
+                                                self.brushEndX, self.brushEndY,
+                                                tag="hoveringBrush",
+                                                **options)
+
+    def __printHoveringLineBrushOnMap(self, applicationGUI, mainData):
+        focusX, focusY = self.__retreiveFocusPointForHoveringBrush()
+        self.__retreiveHoveringRectangleExtremities(applicationGUI, focusX,
+                                                    focusY, mainData)
+        self.images = []
+        self.__createHoveringRectangleOnMap(applicationGUI,fill="orange", alpha=.5)
+
+    def __printHoveringRoundBrushOnMap(self, applicationGUI, mainData):
+        pass
+        #RESUME HERE FOR CIRCLE
+
+
+    def __printHoveringBrushOnMap(self, applicationGUI, mainData):
+        applicationGUI.map.delete("hoveringBrush")
+        if (self.brushType.get() == "line"):
+            self.__printHoveringLineBrushOnMap(applicationGUI, mainData)
+        elif (self.brushType.get() == "round"):
+            self.__printHoveringRoundBrushOnMap(applicationGUI, mainData)
+
+    def __clickInsertBrushOnMap(self, applicationGUI, mainData):
+        newDangerZone = {
+                "startX": self.brushStartX,
+                "startY": self.brushStartY,
+                "endX": self.brushEndX,
+                "endY": self.brushEndY
+                }
+        self.addedDangerZones.append(newDangerZone)
+        applicationGUI.map.delete("all")
+        for rectangle in self.addedDangerZones:
+            applicationGUI.map.create_rectangle(rectangle["startX"],
+                                                rectangle["startY"],
+                                                rectangle["endX"],
+                                                rectangle["endY"],
+                                                fill="orange",
+                                                tag="dangerZone")
+        applicationGUI.createMapGrid(mainData.mapSizeX, mainData.mapSizeY)
+
+
+    def __triggerAddingBrushOnMap(self, event=None):
+        self.mouseButtonPressed = True
+
+    def __triggerStopAddingBrushOnMap(self, event=None):
+        self.mouseButtonPressed = False
+
+    def addDangerZonesToMap(self, applicationGUI, mainData):
+        self.mouseButtonPressed = False
+        self.dangerPaintingFrame.grid()
+        self.addedDangerZones = []
+        applicationGUI.menus.enableDangerPaintingTab()
+        applicationGUI.menus.menusTabs.select(self.dangerPaintingFrame)
+        self.spbBrushSizeY["to"] = mainData.mapSizeY
+        self.spbBrushSizeX["to"] = mainData.mapSizeX
+        applicationGUI.createMapGrid(mainData.mapSizeX, mainData.mapSizeY)
+        applicationGUI.mainWindow.update()
+        applicationGUI.map.bind("<Motion>",
+            lambda event, arg=applicationGUI: self.__drawBrushOnMapCursorPosition(arg, event))
+        applicationGUI.map.bind("<ButtonPress-1>",
+                self.__triggerAddingBrushOnMap)
+            # lambda event, arg=applicationGUI, arg2=mainData: self.__clickInsertBrushOnMap(arg, arg2, event))
+        applicationGUI.map.bind("<ButtonRelease-1>",
+                self.__triggerStopAddingBrushOnMap)
+        while (True):
+            if (self.mouseButtonPressed is True):
+                self.__clickInsertBrushOnMap(applicationGUI,mainData)
+            if (self.prevHoveringPosition != self.currHoveringPosition):
+                self.__printHoveringBrushOnMap(applicationGUI, mainData)
+                self.prevHoveringPosition = self.currHoveringPosition
+            if (self.donePainting is True):
+                print("breaaak")
+                break
+            applicationGUI.mainWindow.update()
+
+
+

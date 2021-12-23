@@ -13,9 +13,12 @@ winWidth = 1800
 winHeight = 1000
 
 def runGenerationsLife(applicationGUI, event=None):
+    mainData = RunMainDatas(applicationGUI)
+    if (applicationGUI.menus.mainMenu.dangerToggle.get() == 1):
+        applicationGUI.menus.dangerPaintingMenu.addDangerZonesToMap(applicationGUI,
+                                                                    mainData)
     applicationGUI.map.bind("<Button-1>", applicationGUI.focusOnMap())
     applicationGUI.mainWindow.focus_set()
-    mainData = RunMainDatas(applicationGUI)
     applicationGUI.defineMapSize(mainData.mapSizeX, mainData.mapSizeY)
     applicationGUI.menus.mainMenu.printLoadingInit(applicationGUI.mainWindow)
     while (mainData.generationLoop < mainData.generationsNb):
