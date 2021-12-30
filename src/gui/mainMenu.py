@@ -6,7 +6,6 @@ H3TITLEFONT = ("Arial", 16)
 H4TITLEFONT = ("Arial", 14)
 DEFAULTPOPSIZE = 10
 DEFAULTFOODNB = 10
-DEFAULTFOODVARIATION = 0
 DEFAULTMAPSIZE=5
 DEFAULTGENLIFE=100
 DEFAULTGENNB=2
@@ -70,7 +69,13 @@ class MainMenu:
                                     labelanchor="n",
                                     width=self.menusFrame.winfo_reqwidth() / 2,
                                     height=self.menusFrame.winfo_reqheight() / 2)
-        self.optionsFrame.pack_propagate(False)
+        self.optionsFrame.grid_propagate(False)
+        self.optionsFrame.grid_columnconfigure(0, weight=1)
+        self.optionsFrame.grid_rowconfigure(0, weight=1)
+        self.optionsFrame.grid_rowconfigure(1, weight=1)
+        self.optionsFrame.grid_rowconfigure(2, weight=1)
+        self.optionsFrame.grid_rowconfigure(3, weight=1)
+        self.optionsFrame.grid_rowconfigure(4, weight=1)
         self.optionsFrame.grid(column=1, row=0, sticky='N')
         self.__createOptionsFrameContent(applicationGUI)
 
@@ -94,76 +99,117 @@ class MainMenu:
         self.__createRunDataFrameContent()
 
     def __createOptionsFrameContent(self, applicationGUI):
-        self.__createOptionsFramePopulationGen()
-        self.__createOptionsFrameToggles()
+        self.populationGenFrame = self.__createOptionsSubFrames(" Population generation: ", 0, 4)
+        self.dangerGenFrame = self.__createOptionsSubFrames(" Danger zones generation: ", 1, 3)
+        self.foodGenFrame = self.__createOptionsSubFrames(" Food generation: ", 2, 4)
+        self.obstacleGenFrame = self.__createOptionsSubFrames(" Obstacles generation: ", 3, 3)
+        self.reproductionGenFrame = self.__createOptionsSubFrames(" Reproduction toggle: ", 4, 3)
+        self.__createOptionsPopulationNumber()
+        self.__createOptionsDangerGeneration()
+        self.__createOptionsFoodGeneration()
+        self.__createOptionsObstacleGeneration()
+        self.__createOptionsReproductionGeneration()
+
+    def __createOptionsSubFrames(self, frameText, frameRowPlace, frameColumnNb):
+        optionSubFrame = tk.LabelFrame(self.optionsFrame,
+                                       font=H3TITLEFONT,
+                                       text=frameText,
+                                       labelanchor='n',
+                                       width=self.optionsFrame.winfo_reqwidth(),
+                                       height=self.optionsFrame.winfo_reqheight() / 5)
+        optionSubFrame.grid_propagate(False)
+        optionSubFrame.grid_rowconfigure(0, weight=1)
+        currColumn = 0
+        while (currColumn < frameColumnNb):
+            optionSubFrame.grid_columnconfigure(currColumn, weight=1)
+            currColumn += 1
+        optionSubFrame.grid(column=0, row=frameRowPlace)
+        return optionSubFrame
+
+    def __createOptionsReproductionGeneration(self):
+        self.optionReproductionGen = tk.BooleanVar(value=False)
+        self.cbxOptionDisableReproduction = tk.Checkbutton(self.reproductionGenFrame,
+                                                           text="Disable",
+                                                           variable=self.optionReproductionGen,
+                                                           font=H4TITLEFONT)
+        self.cbxOptionDisableReproduction.grid(column=1, row=0)
+
+    def __createOptionsObstacleGeneration(self):
+        self.optionObstacleGen = tk.StringVar(value="random")
+        self.rdbOptionPaintObstacle = self.__addPaintRadioButton(self.obstacleGenFrame,
+                                                              self.optionObstacleGen)
+        self.rdbOptionFixedObstacle = self.__addFixedRadioButton(self.obstacleGenFrame,
+                                                             self.optionObstacleGen)
+        self.rdbOptionRandomObstacle = self.__addRandomRadioButton(self.obstacleGenFrame,
+                                                               self.optionFoodGen)
+
+    def __createOptionsFoodGeneration(self):
+        self.optionFoodGen = tk.StringVar(value="random")
+        self.rdbOptionPaintFood = self.__addPaintRadioButton(self.foodGenFrame,
+                                                              self.optionFoodGen)
+        self.rdbOptionFixedFood = self.__addFixedRadioButton(self.foodGenFrame,
+                                                             self.optionFoodGen)
+        self.rdbOptionRandomFood = self.__addRandomRadioButton(self.foodGenFrame,
+                                                               self.optionFoodGen)
+        self.rdbOptionDisableFood = tk.Radiobutton(self.foodGenFrame,
+                                                   text="Disable",
+                                                   value="disable",
+                                                   variable=self.optionFoodGen,
+                                                   font=H4TITLEFONT)
+        self.rdbOptionDisableFood.grid(column=3, row=0)
+
+    def __addRandomRadioButton(self, motherFrame, motherVariable):
+        rdbRandomOption = tk.Radiobutton(motherFrame,
+                                        text="Random",
+                                        value="random",
+                                        variable=motherVariable,
+                                        font=H4TITLEFONT)
+        rdbRandomOption.grid(column=2, row=0)
+        return rdbRandomOption
+    def __addFixedRadioButton(self, motherFrame, motherVariable):
+
+        rdbFixedOption = tk.Radiobutton(motherFrame,
+                                        text="Fixed",
+                                        value="fixed",
+                                        variable=motherVariable,
+                                        font=H4TITLEFONT)
+        rdbFixedOption.grid(column=1, row=0)
+        return rdbFixedOption
+
+    def __addPaintRadioButton(self, motherFrame, motherVariable):
+        rdbPaintOption = tk.Radiobutton(motherFrame,
+                                             text="Paint",
+                                             value="paint",
+                                             variable=motherVariable,
+                                             font=H4TITLEFONT)
+        rdbPaintOption.grid(column=0, row=0)
+        return rdbPaintOption
+
+    def __createOptionsDangerGeneration(self):
+        self.optionDangerGen = tk.StringVar(value="paint")
+        self.rdbOptionPaintDanger = self.__addPaintRadioButton(self.dangerGenFrame,
+                                                               self.optionDangerGen)
+        self.rdbOptionFixedDanger = self.__addFixedRadioButton(self.dangerGenFrame,
+                                                               self.optionDangerGen)
+        self.rdbOptionRandomDanger = self.__addRandomRadioButton(self.dangerGenFrame,
+                                                                 self.optionDangerGen)
 
 
-    def __createOptionsFrameToggles(self):
-        self.optionsToggles = tk.LabelFrame(self.optionsFrame,
-                                            font=H3TITLEFONT,
-                                            text="Toggle ON/OFF",
-                                            labelanchor="n",
-                                            width=self.menusFrame.winfo_reqwidth() / 2,
-                                            height=self.menusFrame.winfo_reqheight())
-        self.optionsToggles.pack_propagate(False)
-        self.optionsToggles.pack(pady=10)
-
-        self.dangerToggle = tk.IntVar()
-        self.cbxDangerToggle = tk.Checkbutton(self.optionsToggles,
-                                           font=H4TITLEFONT,
-                                           text="Danger",
-                                           variable=self.dangerToggle)
-        self.cbxDangerToggle.pack(anchor=tk.W)
-        self.cbxDangerToggle.select()
-
-        self.foodToggle = tk.IntVar()
-        self.cbxFoodToggle = tk.Checkbutton(self.optionsToggles,
-                                            font=H4TITLEFONT,
-                                            text="Food",
-                                            variable=self.foodToggle)
-        self.cbxFoodToggle.pack(anchor=tk.W)
-        self.cbxFoodToggle.select()
-
-        self.reproductionToggle = tk.IntVar()
-        self.cbxReproductionToggle = tk.Checkbutton(self.optionsToggles,
-                                            font=H4TITLEFONT,
-                                            text="Reproduction",
-                                            variable=self.reproductionToggle)
-        self.cbxReproductionToggle.pack(anchor=tk.W)
-        self.cbxReproductionToggle.select()
-
-        self.mutationToggle = tk.IntVar()
-        self.cbxMutationToggle = tk.Checkbutton(self.optionsToggles,
-                                            font=H4TITLEFONT,
-                                            text="mutation",
-                                            variable=self.mutationToggle)
-        self.cbxMutationToggle.pack(anchor=tk.W)
-        self.cbxMutationToggle.select()
-
-    def __createOptionsFramePopulationGen(self):
+    def __createOptionsPopulationNumber(self):
         self.optionPopulationGen = tk.StringVar(value="fixed")
-        self.populationGenFrame = tk.LabelFrame(self.optionsFrame,
-                                            font=H3TITLEFONT,
-                                            text="Population number each Generation : ",
-                                            labelanchor="n",
-                                            width=self.menusFrame.winfo_reqwidth() / 2,
-                                            height=self.menusFrame.winfo_reqheight() / 10)
-        self.populationGenFrame.pack_propagate(False)
-        self.populationGenFrame.pack(pady=10)
-
         self.rdbOptionFixedPopulationNb = tk.Radiobutton(self.populationGenFrame,
                                                  text="Fixed",
                                                  value="fixed",
                                                  variable=self.optionPopulationGen,
                                                  font=H4TITLEFONT)
-        self.rdbOptionFixedPopulationNb.pack(anchor=tk.W)
+        self.rdbOptionFixedPopulationNb.grid(column=1, row=0, sticky='w')
 
         self.rdbOptionChildrenPopulationNb = tk.Radiobutton(self.populationGenFrame,
                                                 text="Survivors Children",
                                                 value="children",
                                                 variable=self.optionPopulationGen,
                                                 font=H4TITLEFONT)
-        self.rdbOptionChildrenPopulationNb.pack(anchor=tk.W)
+        self.rdbOptionChildrenPopulationNb.grid(column=2, row=0, sticky='w')
         self.rdbOptionFixedPopulationNb.select()
 
     def __createRunDataFrameContent(self):
@@ -182,14 +228,6 @@ class MainMenu:
         self.txtFoodNb = tk.Entry(self.runDataFrame, font=H3TITLEFONT)
         self.txtFoodNb.insert(0, str(DEFAULTFOODNB))
         self.txtFoodNb.pack()
-
-        lblFoodVariation = tk.Label(self.runDataFrame,
-                                    font=H3TITLEFONT,
-                                    text="Food Variation (%) : ")
-        lblFoodVariation.pack()
-        self.txtFoodVariation = tk.Entry(self.runDataFrame, font=H3TITLEFONT)
-        self.txtFoodVariation.insert(0, str(DEFAULTFOODVARIATION))
-        self.txtFoodVariation.pack()
 
         lblMapSize = tk.Label(self.runDataFrame, font=H3TITLEFONT,
                               text="Map Size (X and Y): ")

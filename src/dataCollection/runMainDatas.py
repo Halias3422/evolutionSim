@@ -9,7 +9,6 @@ class RunMainDatas:
         self.generationLifeSpan = int(applicationGUI.menus.mainMenu.txtGenerationLifeSpan.get())
         self.generationsNb = int(applicationGUI.menus.mainMenu.txtGenerationNb.get())
         self.foodNb = int(applicationGUI.menus.mainMenu.txtFoodNb.get())
-        self.foodVariation = int(applicationGUI.menus.mainMenu.txtFoodVariation.get())
         self.parentGeneration = None
         self.mutationProb = float(applicationGUI.menus.mainMenu.txtMutationProb.get())
         self.generationLoop = 0

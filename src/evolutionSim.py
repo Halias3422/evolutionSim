@@ -14,7 +14,7 @@ winHeight = 1000
 
 def runGenerationsLife(applicationGUI, event=None):
     mainData = RunMainDatas(applicationGUI)
-    if (applicationGUI.menus.mainMenu.dangerToggle.get() == 1):
+    if (neededMapPainting(applicationGUI) is True):
         applicationGUI.menus.dangerPaintingMenu.addDangerZonesToMap(applicationGUI,
                                                                     mainData)
     applicationGUI.map.bind("<Button-1>", applicationGUI.focusOnMap())
@@ -38,6 +38,15 @@ def runGenerationsLife(applicationGUI, event=None):
             break
     PrintRunResult(mainData, applicationGUI)
 
+def neededMapPainting(applicationGUI):
+    menu = applicationGUI.menus.mainMenu
+    if (menu.optionDangerGen.get() == "paint"):
+        return True
+    elif (menu.optionFoodGen.get() == "paint"):
+        return True
+    elif (menu.optionObstacleGen.get() == "paint"):
+        return True
+    return False
 
 def checkIfThereAreSurvivors(mainData, parentGeneration, applicationGUI):
     if (len(parentGeneration) == 0):
@@ -59,7 +68,7 @@ def printLoadingStateToUI(mainData, applicationGUI, currentState):
 
 def spawnCurrentLoopFood(mainData, mapRepresentation):
     foodList = []
-    foodList.append(spawnGenerationFood(mainData.foodNb, mainData.foodVariation,
+    foodList.append(spawnGenerationFood(mainData.foodNb,
                                         mainData.mapSizeX, mainData.mapSizeY,
                                         mapRepresentation))
     return foodList

@@ -14,10 +14,9 @@ def createMapFreeSpaceListForFood(mapRepresentation, mapSizeX, mapSizeY):
         mapSizeY -= 1
     return mapFreeSpaceList
 
-def spawnGenerationFood(foodNb, foodVariation, mapSizeX, mapSizeY,
+def spawnGenerationFood(foodNb, mapSizeX, mapSizeY,
                         mapRepresentation):
-    foodQuantity = random.randint(foodNb - foodNb * foodVariation / 100,
-                                  foodNb + foodNb * foodVariation / 100)
+    foodQuantity = random.randint(foodNb - foodNb , foodNb + foodNb)
     foodList = []
     mapFreeSpaceList = createMapFreeSpaceListForFood(mapRepresentation,
                                                      mapSizeX,

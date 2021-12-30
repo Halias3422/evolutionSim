@@ -41,14 +41,35 @@ class DangerPaintingMenu:
         self.donePaintingFrame.grid_rowconfigure(0, weight=1)
         self.donePaintingFrame.grid_rowconfigure(1, weight=1)
         self.donePaintingFrame.grid_rowconfigure(2, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(3, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(4, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(5, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(6, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(7, weight=1)
         self.donePaintingFrame.grid(column=0, row=2)
+        lblTotalNumber = tk.Label(self.donePaintingFrame,
+                                  text="Total map number:",
+                                  font=H2TITLEFONT)
+        lblTotalNumber.grid(column=1, row=1)
+        self.lblTotalMapNumber = tk.Label(self.donePaintingFrame,
+                                          text="0",
+                                          font=H2TITLEFONT)
+        self.lblTotalMapNumber.grid(column=1, row=2)
+        lblTotalCoverage = tk.Label(self.donePaintingFrame,
+                                    text="Total map coverage:",
+                                    font=H2TITLEFONT)
+        lblTotalCoverage.grid(column=1, row=4)
+        self.lblTotalMapCoverage = tk.Label(self.donePaintingFrame,
+                                            text="0%",
+                                            font=H2TITLEFONT)
+        self.lblTotalMapCoverage.grid(column=1, row=5)
         self.btnDonePainting = tk.Button(self.donePaintingFrame,
                                          text="   Done   ",
                                          font=("Arial", 64),
                                          bg="green",
                                          fg="white",
                                          command=lambda: self.__donePaintingDangerZones())
-        self.btnDonePainting.grid(column=1, row=1)
+        self.btnDonePainting.grid(column=1, row=7)
 
     def __createMapCoverageFrame(self):
         self.mapCoverageFrame = tk.LabelFrame(self.dangerPaintingFrame,
@@ -66,13 +87,57 @@ class DangerPaintingMenu:
         self.mapCoverageFrame.grid(column=0, row=1)
         self.populationCoverageFrame = \
                 self.__createMapCoverageSubFrames(" Population ", 0)
+        self.__createPopulationCoverageContent()
         self.dangerCoverageFrame = \
                 self.__createMapCoverageSubFrames(" Danger ", 1)
+        self.__createDangerCoverageContent()
         self.obstacleCoverageFrame = \
                 self.__createMapCoverageSubFrames(" Obstacles ", 2)
+        self.__createObstacleCoverageContent()
         self.foodCoverageFrame = \
                 self.__createMapCoverageSubFrames(" Food ", 3)
+        self.__createFoodCoverageContent()
 
+    def __createFoodCoverageContent(self):
+        self.lblFoodNumber = tk.Label(self.foodCoverageFrame,
+                                        font=H3TITLEFONT,
+                                        text="0")
+        self.lblFoodNumber.grid(column=1, row=2)
+        self.lblFoodCoverage = tk.Label(self.foodCoverageFrame,
+                                          font=H3TITLEFONT,
+                                          text="0%")
+        self.lblFoodCoverage.grid(column=1, row=5)
+
+    def __createObstacleCoverageContent(self):
+        self.lblObstacleNumber = tk.Label(self.obstacleCoverageFrame,
+                                        font=H3TITLEFONT,
+                                        text="0")
+        self.lblObstacleNumber.grid(column=1, row=2)
+        self.lblObstacleCoverage = tk.Label(self.obstacleCoverageFrame,
+                                          font=H3TITLEFONT,
+                                          text="0%")
+        self.lblObstacleCoverage.grid(column=1, row=5)
+
+    def __createDangerCoverageContent(self):
+        self.lblDangerNumber = tk.Label(self.dangerCoverageFrame,
+                                        font=H3TITLEFONT,
+                                        text="0")
+        self.lblDangerNumber.grid(column=1, row=2)
+        self.lblDangerCoverage = tk.Label(self.dangerCoverageFrame,
+                                          font=H3TITLEFONT,
+                                          text="0%")
+        self.lblDangerCoverage.grid(column=1, row=5)
+
+
+    def __createPopulationCoverageContent(self):
+        self.lblPopulationNumber = tk.Label(self.populationCoverageFrame,
+                                            font=H3TITLEFONT,
+                                            text="0")
+        self.lblPopulationNumber.grid(column=1, row=2)
+        self.lblPopulationCoverage = tk.Label(self.populationCoverageFrame,
+                                              font=H3TITLEFONT,
+                                              text="0%")
+        self.lblPopulationCoverage.grid(column=1, row=5)
 
     def __createMapCoverageSubFrames(self, frameText, frameColumn):
         subFrame = tk.LabelFrame(self.mapCoverageFrame,
@@ -81,7 +146,22 @@ class DangerPaintingMenu:
                          labelanchor='n',
                          width=int(self.mapCoverageFrame.winfo_reqwidth() / 4),
                          height=self.mapCoverageFrame.winfo_reqheight())
+        subFrame.grid_propagate(False)
+        subFrame.grid_columnconfigure(0, weight=1)
+        subFrame.grid_columnconfigure(1, weight=1)
+        subFrame.grid_columnconfigure(2, weight=1)
+        subFrame.grid_rowconfigure(0, weight=1)
+        subFrame.grid_rowconfigure(1, weight=1)
+        subFrame.grid_rowconfigure(2, weight=1)
+        subFrame.grid_rowconfigure(3, weight=1)
+        subFrame.grid_rowconfigure(4, weight=1)
+        subFrame.grid_rowconfigure(5, weight=1)
+        subFrame.grid_rowconfigure(6, weight=1)
         subFrame.grid(column=frameColumn, row=0)
+        self.lblNumber = tk.Label(subFrame, text="Number:", font=H3TITLEFONT)
+        self.lblNumber.grid(column=1, row=1)
+        self.lblCoverage = tk.Label(subFrame, text="Coverage:", font=H3TITLEFONT)
+        self.lblCoverage.grid(column=1, row=4)
         return subFrame
 
     def __createBrushSelectionFrame(self):
@@ -488,6 +568,43 @@ class DangerPaintingMenu:
             self.__updateMapRepresentation(newZone, brushType, applicationGUI)
 
 
+    def __updateMapCoverageValues(self, mainData):
+        coverage = {
+                "population": 0,
+                "danger": 0,
+                "obstacle": 0,
+                "food": 0,
+                "total": 0
+                }
+        y = 0
+        while (y < mainData.mapSizeY):
+            x = 0
+            while (x < mainData.mapSizeX):
+                if (self.mapZonesRepresentation[y][x] == "population"):
+                    coverage["population"] += 1
+                if (self.mapZonesRepresentation[y][x] == "danger"):
+                    coverage["danger"] += 1
+                if (self.mapZonesRepresentation[y][x] == "obstacle"):
+                    coverage["obstacle"] += 1
+                if (self.mapZonesRepresentation[y][x] == "food"):
+                    coverage["food"] += 1
+                x += 1
+            y += 1
+        mapSize = mainData.mapSizeX * mainData.mapSizeY
+        self.lblPopulationNumber["text"] = coverage["population"]
+        self.lblPopulationCoverage["text"] = str(100 * coverage["population"] / mapSize) + "%"
+        self.lblDangerNumber["text"] = coverage["danger"]
+        self.lblDangerCoverage["text"] = str(100 * coverage["danger"] / mapSize) + "%"
+        self.lblObstacleNumber["text"] = coverage["obstacle"]
+        self.lblObstacleCoverage["text"] = str(100 * coverage["obstacle"] / mapSize) + "%"
+        self.lblFoodNumber["text"] = coverage["food"]
+        self.lblFoodCoverage["text"] = str(100 * coverage["food"] / mapSize) + "%"
+        coverage["total"] = coverage["population"] + coverage["danger"]\
+                + coverage["obstacle"] + coverage["food"]
+        print(coverage["total"])
+        self.lblTotalMapNumber["text"] = coverage["total"]
+        self.lblTotalMapCoverage["text"] = str(100 * coverage["total"] / mapSize) + "%"
+
     def __clickInsertBrushOnMap(self, applicationGUI, mainData):
         if (self.brushStyle.get() == "line"):
             self.__clickDrawRectangleZone(applicationGUI)
@@ -511,6 +628,7 @@ class DangerPaintingMenu:
                                                 fill=color,
                                                 tag=zone["type"] + "Zone")
         applicationGUI.createMapGrid(mainData.mapSizeX, mainData.mapSizeY)
+        self.__updateMapCoverageValues(mainData)
 
 
     def __triggerAddingBrushOnMap(self, event=None):
