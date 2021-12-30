@@ -1,5 +1,5 @@
 import tkinter as tk
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageColor
 
 H1TITLEFONT = ("Arial", 20)
 H2TITLEFONT = ("Arial", 18)
@@ -8,6 +8,7 @@ H4TITLEFONT = ("Arial", 14)
 
 class DangerPaintingMenu:
     def __init__(self,applicationGUI, menusTabs, width, height):
+        self.brushColor = "orange"
         self.dangerPaintingFrame = tk.Frame(menusTabs,
                                             width=width,
                                             height=height)
@@ -15,118 +16,218 @@ class DangerPaintingMenu:
         self.dangerPaintingFrame.grid_rowconfigure(0, weight=1)
         self.dangerPaintingFrame.grid_rowconfigure(1, weight=1)
         self.dangerPaintingFrame.grid_rowconfigure(2, weight=1)
+        self.dangerPaintingFrame.grid_columnconfigure(0, weight=1)
         self.__createBrushSelectionFrame()
-        self.__createBrushSizeFrame(applicationGUI)
-        self.__createDangerCoverageFrame()
+        self.__createMapCoverageFrame()
+        self.__createDonePaintingFrame()
         self.mouseX = 0
         self.mouseY = 0
         self.currHoveringPosition = [0, 0]
         self.prevHoveringPosition = [0, 0]
 
-    def __createBrushSizeFrame(self, applicationGUI):
-        self.brushSizeFrame = tk.LabelFrame(self.dangerPaintingFrame,
-                         text=" Brush size ",
-                         font=H2TITLEFONT,
+
+    def __donePaintingDangerZones(self, event=None):
+        self.donePainting = True
+
+    def __createDonePaintingFrame(self):
+        self.donePainting = False
+        self.donePaintingFrame = tk.LabelFrame(self.dangerPaintingFrame,
+                         width=self.dangerPaintingFrame.winfo_reqwidth(),
+                         height=int(self.dangerPaintingFrame.winfo_reqheight() / 3))
+        self.donePaintingFrame.grid_propagate(False)
+        self.donePaintingFrame.grid_columnconfigure(0, weight=1)
+        self.donePaintingFrame.grid_columnconfigure(1, weight=1)
+        self.donePaintingFrame.grid_columnconfigure(2, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(0, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(1, weight=1)
+        self.donePaintingFrame.grid_rowconfigure(2, weight=1)
+        self.donePaintingFrame.grid(column=0, row=2)
+        self.btnDonePainting = tk.Button(self.donePaintingFrame,
+                                         text="   Done   ",
+                                         font=("Arial", 64),
+                                         bg="green",
+                                         fg="white",
+                                         command=lambda: self.__donePaintingDangerZones())
+        self.btnDonePainting.grid(column=1, row=1)
+
+    def __createMapCoverageFrame(self):
+        self.mapCoverageFrame = tk.LabelFrame(self.dangerPaintingFrame,
+                         text=" Map coverage ",
+                         font=H1TITLEFONT,
                          labelanchor='n',
                          width=self.dangerPaintingFrame.winfo_reqwidth(),
-                         height=self.dangerPaintingFrame.winfo_reqheight() / 3)
+                         height=int(self.dangerPaintingFrame.winfo_reqheight() / 3))
+        self.mapCoverageFrame.grid_propagate(False)
+        self.mapCoverageFrame.grid_columnconfigure(0, weight=1)
+        self.mapCoverageFrame.grid_columnconfigure(1, weight=1)
+        self.mapCoverageFrame.grid_columnconfigure(2, weight=1)
+        self.mapCoverageFrame.grid_columnconfigure(3, weight=1)
+        self.mapCoverageFrame.grid_rowconfigure(0, weight=1)
+        self.mapCoverageFrame.grid(column=0, row=1)
+        self.populationCoverageFrame = \
+                self.__createMapCoverageSubFrames(" Population ", 0)
+        self.dangerCoverageFrame = \
+                self.__createMapCoverageSubFrames(" Danger ", 1)
+        self.obstacleCoverageFrame = \
+                self.__createMapCoverageSubFrames(" Obstacles ", 2)
+        self.foodCoverageFrame = \
+                self.__createMapCoverageSubFrames(" Food ", 3)
+
+
+    def __createMapCoverageSubFrames(self, frameText, frameColumn):
+        subFrame = tk.LabelFrame(self.mapCoverageFrame,
+                         text=frameText,
+                         font=H2TITLEFONT,
+                         labelanchor='n',
+                         width=int(self.mapCoverageFrame.winfo_reqwidth() / 4),
+                         height=self.mapCoverageFrame.winfo_reqheight())
+        subFrame.grid(column=frameColumn, row=0)
+        return subFrame
+
+    def __createBrushSelectionFrame(self):
+        self.brushSelectionFrame = tk.LabelFrame(self.dangerPaintingFrame,
+                         text=" Brush ",
+                         font=H1TITLEFONT,
+                         labelanchor='n',
+                         width=self.dangerPaintingFrame.winfo_reqwidth(),
+                         height=int(self.dangerPaintingFrame.winfo_reqheight() / 3))
+        self.brushSelectionFrame.grid_propagate(False)
+        self.brushSelectionFrame.grid_columnconfigure(0, weight=1)
+        self.brushSelectionFrame.grid_columnconfigure(1, weight=1)
+        self.brushSelectionFrame.grid_columnconfigure(2, weight=1)
+        self.brushSelectionFrame.grid_rowconfigure(0, weight=1)
+        self.brushSelectionFrame.grid(column=0, row=0)
+        self.__createBrushTypeFrame()
+        self.__createBrushStyleFrame()
+        self.__createBrushSizeFrame()
+
+    def __createBrushTypeFrame(self):
+        self.brushType = tk.StringVar(value="danger")
+        self.brushTypeFrame = tk.LabelFrame(self.brushSelectionFrame,
+                             text=" Type ",
+                             font=H2TITLEFONT,
+                             labelanchor='n',
+                             width=self.brushSelectionFrame.winfo_reqwidth() / 3,
+                             height=self.brushSelectionFrame.winfo_reqheight())
+        self.brushTypeFrame.grid_propagate(False)
+        self.brushTypeFrame.grid_columnconfigure(0, weight=1)
+        self.brushTypeFrame.grid_columnconfigure(1, weight=1)
+        self.brushTypeFrame.grid_columnconfigure(2, weight=1)
+        self.brushTypeFrame.grid_rowconfigure(0, weight=1)
+        self.brushTypeFrame.grid_rowconfigure(1, weight=1)
+        self.brushTypeFrame.grid_rowconfigure(2, weight=1)
+        self.brushTypeFrame.grid_rowconfigure(3, weight=1)
+        self.brushTypeFrame.grid_rowconfigure(4, weight=1)
+        self.brushTypeFrame.grid(column=0, row=0)
+        self.rdbPopulationPainting = tk.Radiobutton(self.brushTypeFrame,
+                                    text="Population",
+                                    font=H3TITLEFONT,
+                                    value="population",
+                                    variable=self.brushType,
+                                    highlightthickness=0)
+        self.rdbPopulationPainting.grid(column=1, row=0, sticky='w')
+        self.rdbDangerPainting = tk.Radiobutton(self.brushTypeFrame,
+                                    text="Danger",
+                                    font=H3TITLEFONT,
+                                    value="danger",
+                                    variable=self.brushType,
+                                    highlightthickness=0)
+        self.rdbDangerPainting.grid(column=1, row=1, sticky='w')
+        self.rdbObstaclePainting = tk.Radiobutton(self.brushTypeFrame,
+                                    text="Obstacle",
+                                    font=H3TITLEFONT,
+                                    value="obstacle",
+                                    variable=self.brushType,
+                                    highlightthickness=0)
+        self.rdbObstaclePainting.grid(column=1, row=2, sticky='w')
+        self.rdbFoodPainting = tk.Radiobutton(self.brushTypeFrame,
+                                    text="Food",
+                                    font=H3TITLEFONT,
+                                    value="food",
+                                    variable=self.brushType,
+                                    highlightthickness=0)
+        self.rdbFoodPainting.grid(column=1, row=3, sticky='w')
+        self.rdbEraserPainting = tk.Radiobutton(self.brushTypeFrame,
+                                    text="Eraser",
+                                    font=H3TITLEFONT,
+                                    value="eraser",
+                                    variable=self.brushType,
+                                    highlightthickness=0)
+        self.rdbEraserPainting.grid(column=1, row=4, sticky='w')
+
+
+
+    def __createBrushStyleFrame(self):
+        self.brushStyleFrame = tk.LabelFrame(self.brushSelectionFrame,
+                             text=" Style ",
+                             font=H2TITLEFONT,
+                             labelanchor='n',
+                             width=self.brushSelectionFrame.winfo_reqwidth() / 3,
+                             height=self.brushSelectionFrame.winfo_reqheight())
+        self.brushStyleFrame.grid_propagate(False)
+        self.brushStyleFrame.grid_columnconfigure(0, weight=1)
+        self.brushStyleFrame.grid_rowconfigure(0, weight=1)
+        self.brushStyleFrame.grid_rowconfigure(1, weight=1)
+        self.brushStyleFrame.grid(column=1, row=0)
+        self.__createSquareBrushFrame()
+        self.__createRoundBrushFrame()
+
+    def __createBrushSizeFrame(self):
+        self.brushSizeFrame = tk.LabelFrame(self.brushSelectionFrame,
+                             text=" Size ",
+                             font=H2TITLEFONT,
+                             labelanchor='n',
+                             width=self.brushSelectionFrame.winfo_reqwidth() / 3,
+                             height=self.brushSelectionFrame.winfo_reqheight())
         self.brushSizeFrame.grid_propagate(False)
         self.brushSizeFrame.grid_columnconfigure(0, weight=1)
         self.brushSizeFrame.grid_columnconfigure(1, weight=1)
         self.brushSizeFrame.grid_columnconfigure(2, weight=1)
-        self.brushSizeFrame.grid_columnconfigure(3, weight=1)
         self.brushSizeFrame.grid_rowconfigure(0, weight=1)
         self.brushSizeFrame.grid_rowconfigure(1, weight=1)
         self.brushSizeFrame.grid_rowconfigure(2, weight=1)
         self.brushSizeFrame.grid_rowconfigure(3, weight=1)
-        self.brushSizeFrame.grid(row=1)
-        self.lblBrushSizeX = tk.Label(self.brushSizeFrame,
-                                      text="Length:    ",
-                                      font=H3TITLEFONT)
-        self.lblBrushSizeX.grid(column=1, row=1, sticky='e')
+        self.brushSizeFrame.grid_rowconfigure(4, weight=1)
+        self.brushSizeFrame.grid_rowconfigure(5, weight=1)
+        self.brushSizeFrame.grid_rowconfigure(6, weight=1)
+        self.brushSizeFrame.grid(column=2, row=0)
         self.brushSizeX = tk.IntVar(value=3)
+        self.brushSizeY = tk.IntVar(value=3)
+        self.lblBrushSizeX = tk.Label(self.brushSizeFrame,
+                                      text="Length:",
+                                      font=H3TITLEFONT)
+        self.lblBrushSizeX.grid(column=1, row=1)
         self.spbBrushSizeX = tk.Spinbox(self.brushSizeFrame,
                                         from_=1,
                                         to=100,
                                         increment=1,
                                         textvariable=self.brushSizeX,
                                         font=H3TITLEFONT,
-                                        width=3)
-        self.spbBrushSizeX.grid(column=2, row=1, sticky='w')
+                                        width=4)
+        self.spbBrushSizeX.grid(column=1, row=2)
         self.lblBrushSizeY = tk.Label(self.brushSizeFrame,
-                                      text="Height:    ",
+                                      text="Height:",
                                       font=H3TITLEFONT)
-        self.lblBrushSizeY.grid(column=1, row=2, sticky='e')
-        self.brushSizeY = tk.IntVar(value=3)
+        self.lblBrushSizeY.grid(column=1, row=4)
         self.spbBrushSizeY = tk.Spinbox(self.brushSizeFrame,
                                         from_=1,
                                         to=100,
                                         increment=1,
                                         textvariable=self.brushSizeY,
                                         font=H3TITLEFONT,
-                                        width=3)
-        self.spbBrushSizeY.grid(column=2, row=2, sticky='w')
+                                        width=4)
+        self.spbBrushSizeY.grid(column=1, row=5)
 
-
-
-    def __createDangerCoverageFrame(self):
-        self.dangerCoverageFrame = tk.LabelFrame(self.dangerPaintingFrame,
-                         text=" Danger map coverage ",
-                         font=H2TITLEFONT,
-                         labelanchor='n',
-                         width=self.dangerPaintingFrame.winfo_reqwidth(),
-                         height=self.dangerPaintingFrame.winfo_reqheight() / 3)
-        self.dangerCoverageFrame.grid_propagate(False)
-        self.dangerCoverageFrame.grid_columnconfigure((0, 2), weight=1)
-        self.dangerCoverageFrame.grid_rowconfigure((0, 2), weight=1)
-        self.dangerCoverageFrame.grid(row=2)
-        self.lblPlaceHolderDangerCoverage = tk.Label(self.dangerCoverageFrame,
-                         text="Paint on map to add"
-                             + " danger zones",
-                         font=H3TITLEFONT)
-        self.lblPlaceHolderDangerCoverage.grid_propagate(False)
-        self.lblPlaceHolderDangerCoverage.grid(column=1, row=0)
-        self.donePainting = False
-        self.btnDonePainting = tk.Button(self.dangerCoverageFrame,
-                                         text=" Done ",
-                                         font=("Arial", 32),
-                                         bg="green",
-                                         fg="white",
-                                         command=lambda: self.__donePaintingDangerZones())
-        self.btnDonePainting.grid(column=1, row=1)
-
-    def __donePaintingDangerZones(self, event=None):
-        print("LA")
-        self.donePainting = True
-
-
-    def __createBrushSelectionFrame(self):
-        self.brushSelectionFrame = tk.LabelFrame(self.dangerPaintingFrame,
-                         text=" Brush selection ",
-                         font=H2TITLEFONT,
-                         labelanchor='n',
-                         width=self.dangerPaintingFrame.winfo_reqwidth(),
-                         height=self.dangerPaintingFrame.winfo_reqheight() / 3)
-        self.brushSelectionFrame.grid_propagate(False)
-        self.brushSelectionFrame.grid_columnconfigure(0, weight=1)
-        self.brushSelectionFrame.grid_columnconfigure(1, weight=1)
-        self.brushSelectionFrame.grid_columnconfigure(2, weight=1)
-        self.brushSelectionFrame.grid_columnconfigure(3, weight=1)
-        self.brushSelectionFrame.grid_columnconfigure(4, weight=1)
-        self.brushSelectionFrame.grid_rowconfigure((0, 4), weight=1)
-        self.brushSelectionFrame.grid(row=0)
-        self.__createSquareBrushFrame()
-        self.__createRoundBrushFrame()
 
     def __createRoundBrushFrame(self):
-        self.roundBrushFrame = tk.Frame(self.brushSelectionFrame,
-                    width=int(self.brushSelectionFrame.winfo_reqwidth() / 5),
-                    height=int((self.brushSelectionFrame.winfo_reqheight() / 5) * 3))
+        self.roundBrushFrame = tk.Frame(self.brushStyleFrame,
+                    width=self.brushSelectionFrame.winfo_reqwidth(),
+                    height=int(self.brushSelectionFrame.winfo_reqheight() / 3))
         self.roundBrushFrame.grid_propagate(False)
         self.roundBrushFrame.grid_columnconfigure(0, weight=1)
         self.roundBrushFrame.grid_rowconfigure(0, weight=1)
         self.roundBrushFrame.grid_rowconfigure(1, weight=1)
-        self.roundBrushFrame.grid(column=3, columnspan=1, row=1, rowspan=3)
+        self.roundBrushFrame.grid(column=0, row=1)
         self.roundBrushCanvas = tk.Canvas(self.roundBrushFrame,
                     bg="white",
                     highlightthickness=1,
@@ -137,24 +238,23 @@ class DangerPaintingMenu:
         self.rdbRoundBrush = tk.Radiobutton(self.roundBrushFrame,
                                             text="Round",
                                             value="round",
-                                            variable=self.brushType,
+                                            variable=self.brushStyle,
                                              highlightthickness=0,
-                                             width=self.brushCanvasSize,
                                             font=H3TITLEFONT)
         self.__fillRoundBrushCanvas()
         self.rdbRoundBrush.grid(row=1)
 
 
     def __createSquareBrushFrame(self):
-        self.brushType = tk.StringVar(value="line")
-        self.squareBrushFrame = tk.Frame(self.brushSelectionFrame,
-                width=int(self.brushSelectionFrame.winfo_reqwidth() / 5),
-                height=int((self.brushSelectionFrame.winfo_reqheight() / 5) * 3))
+        self.brushStyle = tk.StringVar(value="line")
+        self.squareBrushFrame = tk.Frame(self.brushStyleFrame,
+                width=self.brushStyleFrame.winfo_reqwidth(),
+                height=int(self.brushStyleFrame.winfo_reqheight() / 3))
         self.squareBrushFrame.grid_propagate(False)
         self.squareBrushFrame.grid_columnconfigure(0, weight=1)
         self.squareBrushFrame.grid_rowconfigure(0, weight=1)
         self.squareBrushFrame.grid_rowconfigure(1, weight=1)
-        self.squareBrushFrame.grid(column=1, columnspan=1, row=1, rowspan=3)
+        self.squareBrushFrame.grid(column=0, row=0)
         self.__determineBrushCanvasSize()
         self.squareBrushCanvas = tk.Canvas(self.squareBrushFrame,
                                    bg="white",
@@ -167,9 +267,8 @@ class DangerPaintingMenu:
         self.rdbSquareBrush = tk.Radiobutton(self.squareBrushFrame,
                                              text="Line",
                                              value="line",
-                                             variable=self.brushType,
+                                             variable=self.brushStyle,
                                              highlightthickness=0,
-                                             width=self.brushCanvasSize,
                                              font=H3TITLEFONT)
         self.rdbSquareBrush.grid(row=1)
 
@@ -189,7 +288,7 @@ class DangerPaintingMenu:
                                      YCellSize * startY,
                                      XCellSize * endX,
                                      YCellSize * endY,
-                                     fill="orange")
+                                     fill=self.brushColor)
     def __fillRoundBrushCanvas(self):
         self.__drawOnBrushCanvas(self.roundBrushCanvas, 3, 3, 7, 7)
         self.__drawOnBrushCanvas(self.roundBrushCanvas, 2, 4, 8, 6)
@@ -251,7 +350,16 @@ class DangerPaintingMenu:
         if ("alpha" in options):
             alpha = int(options.pop("alpha") * 255)
             fill = options.pop("fill")
-            fill = applicationGUI.mainWindow.winfo_rgb(fill) + (alpha,)
+            if (fill == "orange"):
+                fill = (255, 165, 0, 127)
+            elif (fill == "black"):
+                fill = (0, 0, 0, 127)
+            elif (fill == "chocolate"):
+                fill = (165, 42, 42, 127)
+            elif (fill == "green"):
+                fill = (0, 128, 0, 127)
+            elif (fill == "grey"):
+                fill = (128, 128, 128, 127)
             try:
                 image = Image.new("RGBA", (int(self.brushEndX) - int(self.brushStartX),
                             int(self.brushEndY) - int(self.brushStartY)), fill)
@@ -264,7 +372,7 @@ class DangerPaintingMenu:
         focusX, focusY = self.__retreiveFocusPointForHoveringBrush()
         self.__retreiveHoveringRectangleExtremities(applicationGUI, focusX, focusY)
         self.images = []
-        self.__createHoveringRectangleOnMap(applicationGUI,fill="orange", alpha=.5)
+        self.__createHoveringRectangleOnMap(applicationGUI,fill=self.brushColor, alpha=.5)
 
     def __registerCircleHoveringLines(self, startX, endX, startY, endY,
                                       applicationGUI):
@@ -311,7 +419,7 @@ class DangerPaintingMenu:
             self.brushEndX = line["endX"]
             self.brushStartY = line["startY"]
             self.brushEndY = line["endY"]
-            self.__createHoveringRectangleOnMap(applicationGUI, fill="orange", alpha=.5)
+            self.__createHoveringRectangleOnMap(applicationGUI, fill=self.brushColor, alpha=.5)
 
     def __createHoveringCircleOnMap(self, applicationGUI, circleCenterX, circleCenterY,
                                     circleRadius):
@@ -348,31 +456,54 @@ class DangerPaintingMenu:
 
     def __printHoveringBrushOnMap(self, applicationGUI):
         applicationGUI.map.delete("hoveringBrush")
-        if (self.brushType.get() == "line"):
+        if (self.brushStyle.get() == "line"):
             self.__printHoveringLineBrushOnMap(applicationGUI)
-        elif (self.brushType.get() == "round"):
+        elif (self.brushStyle.get() == "round"):
             self.__printHoveringRoundBrushOnMap(applicationGUI)
 
-    def __clickDrawRectangleDangerZone(self, applicationGUI):
+
+    def __clickDrawRectangleZone(self, applicationGUI):
+        brushType = self.brushType.get()
         newDangerZone = {
                 "startX": self.brushStartX,
                 "startY": self.brushStartY,
                 "endX": self.brushEndX,
                 "endY": self.brushEndY
                 }
-        self.addedDangerZones.append(newDangerZone)
+        if (brushType == "danger"):
+            self.addedDangerZones.append(newDangerZone)
+        elif (brushType == "population"):
+            self.addedPopulationZones.append(newDangerZone)
+        elif (brushType == "obstacle"):
+            self.addedObstacleZones.append(newDangerZone)
+        elif (brushType == "food"):
+            self.addedFoodZones.append(newDangerZone)
+        elif (brushType == "eraser"):
+            self.addedEraserZones.append(newDangerZone)
+        self.__updateMapRepresentation(newDangerZone, brushType, applicationGUI)
 
-    def __clickDrawCircleDangerZone(self, applicationGUI):
+    def __clickDrawCircleZone(self, applicationGUI):
+        brushType = self.brushType.get()
         for line in self.registeredCircleLines:
-            self.addedDangerZones.append(line)
+            if (brushType == "danger"):
+                self.addedDangerZones.append(line)
+            elif (brushType == "population"):
+                self.addedPopulationZones.append(line)
+            elif (brushType == "obstacle"):
+                self.addedObstacleZones.append(line)
+            elif (brushType == "food"):
+                self.addedFoodZones.append(line)
+            elif (brushType == "eraser"):
+                self.addedEraserZones.append(line)
+            self.__updateMapRepresentation(line, brushType, applicationGUI)
 
 
 
     def __clickInsertBrushOnMap(self, applicationGUI, mainData):
-        if (self.brushType.get() == "line"):
-            self.__clickDrawRectangleDangerZone(applicationGUI)
-        elif (self.brushType.get() == "round"):
-            self.__clickDrawCircleDangerZone(applicationGUI)
+        if (self.brushStyle.get() == "line"):
+            self.__clickDrawRectangleZone(applicationGUI)
+        elif (self.brushStyle.get() == "round"):
+            self.__clickDrawCircleZone(applicationGUI)
         applicationGUI.map.delete("all")
         for rectangle in self.addedDangerZones:
             applicationGUI.map.create_rectangle(rectangle["startX"],
@@ -381,6 +512,34 @@ class DangerPaintingMenu:
                                                 rectangle["endY"],
                                                 fill="orange",
                                                 tag="dangerZone")
+        for rectangle in self.addedPopulationZones:
+            applicationGUI.map.create_rectangle(rectangle["startX"],
+                                                rectangle["startY"],
+                                                rectangle["endX"],
+                                                rectangle["endY"],
+                                                fill="black",
+                                                tag="populationZone")
+        for rectangle in self.addedObstacleZones:
+            applicationGUI.map.create_rectangle(rectangle["startX"],
+                                                rectangle["startY"],
+                                                rectangle["endX"],
+                                                rectangle["endY"],
+                                                fill="chocolate",
+                                                tag="obstacleZone")
+        for rectangle in self.addedFoodZones:
+            applicationGUI.map.create_rectangle(rectangle["startX"],
+                                                rectangle["startY"],
+                                                rectangle["endX"],
+                                                rectangle["endY"],
+                                                fill="green",
+                                                tag="foodZone")
+        for rectangle in self.addedEraserZones:
+            applicationGUI.map.create_rectangle(rectangle["startX"],
+                                                rectangle["startY"],
+                                                rectangle["endX"],
+                                                rectangle["endY"],
+                                                fill="white",
+                                                tag="eraserZone")
         applicationGUI.createMapGrid(mainData.mapSizeX, mainData.mapSizeY)
 
 
@@ -390,10 +549,59 @@ class DangerPaintingMenu:
     def __triggerStopAddingBrushOnMap(self, event=None):
         self.mouseButtonPressed = False
 
+    def __changeCurrentBrushTypeStyle(self):
+        currBrushType = self.brushType.get()
+        if (currBrushType == "population"):
+            self.brushColor = "black"
+            self.__fillSquareBrushCanvas()
+            self.__fillRoundBrushCanvas()
+        elif (currBrushType == "danger"):
+            self.brushColor = "orange"
+            self.__fillSquareBrushCanvas()
+            self.__fillRoundBrushCanvas()
+        elif (currBrushType == "obstacle"):
+            self.brushColor = "chocolate"
+            self.__fillSquareBrushCanvas()
+            self.__fillRoundBrushCanvas()
+        elif (currBrushType == "food"):
+            self.brushColor = "green"
+            self.__fillSquareBrushCanvas()
+            self.__fillRoundBrushCanvas()
+        elif (currBrushType == "eraser"):
+            self.brushColor = "grey"
+            self.__fillSquareBrushCanvas()
+            self.__fillRoundBrushCanvas()
+
+    def __updateMapRepresentation(self, newZone, brushType, applicationGUI):
+        currBrushType = brushType
+        if (brushType == "eraser"):
+            currBrushType = "empty"
+        startX = int(newZone["startX"] / applicationGUI.XCellSize)
+        endX = int(newZone["endX"] / applicationGUI.XCellSize)
+        startY = int(newZone["startY"] / applicationGUI.YCellSize)
+        endY = int(newZone["endY"] / applicationGUI.YCellSize)
+        while (startY < endY):
+            tmpStartX = startX
+            while (tmpStartX < endX):
+                if (startY >= 0 and startY < len(self.mapZonesRepresentation)
+                        and tmpStartX >= 0 and tmpStartX < len(self.mapZonesRepresentation[0])):
+                    self.mapZonesRepresentation[startY][tmpStartX] = currBrushType
+                tmpStartX += 1
+            startY += 1
+
+    def __createMapZonesRepresentation(self, mainData):
+        self.mapZonesRepresentation = [["empty" for x in range(mainData.mapSizeX)]\
+                for y in range(mainData.mapSizeY)]
+
     def addDangerZonesToMap(self, applicationGUI, mainData):
         self.mouseButtonPressed = False
         self.dangerPaintingFrame.grid()
         self.addedDangerZones = []
+        self.addedPopulationZones = []
+        self.addedObstacleZones = []
+        self.addedFoodZones = []
+        self.addedEraserZones = []
+        self.__createMapZonesRepresentation(mainData)
         applicationGUI.menus.enableDangerPaintingTab()
         applicationGUI.menus.menusTabs.select(self.dangerPaintingFrame)
         self.spbBrushSizeY["to"] = mainData.mapSizeY
@@ -402,20 +610,22 @@ class DangerPaintingMenu:
         applicationGUI.mainWindow.update()
         applicationGUI.map.bind("<Motion>",
             lambda event, arg=applicationGUI: self.__drawBrushOnMapCursorPosition(arg, event))
-        applicationGUI.map.bind("<ButtonPress-1>",
-                self.__triggerAddingBrushOnMap)
-            # lambda event, arg=applicationGUI, arg2=mainData: self.__clickInsertBrushOnMap(arg, arg2, event))
-        applicationGUI.map.bind("<ButtonRelease-1>",
-                self.__triggerStopAddingBrushOnMap)
+        applicationGUI.map.bind("<ButtonPress-1>", self.__triggerAddingBrushOnMap)
+        applicationGUI.map.bind("<ButtonRelease-1>", self.__triggerStopAddingBrushOnMap)
+        currBrushType = self.brushType.get()
         while (True):
+            if (currBrushType != self.brushType.get()):
+                self.__changeCurrentBrushTypeStyle()
+                currBrushType = self.brushType.get()
             if (self.mouseButtonPressed is True):
                 self.__clickInsertBrushOnMap(applicationGUI,mainData)
             if (self.prevHoveringPosition != self.currHoveringPosition):
                 self.__printHoveringBrushOnMap(applicationGUI)
                 self.prevHoveringPosition = self.currHoveringPosition
             if (self.donePainting is True):
-                print("breaaak")
                 break
+            if (applicationGUI.exiting == True):
+                exit()
             applicationGUI.mainWindow.update()
 
 
