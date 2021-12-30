@@ -247,25 +247,6 @@ class DangerPaintingMenu:
         if (self.brushEndY > applicationGUI.frameHeight):
             self.brushEndY = applicationGUI.frameHeight
 
-    def __createHoveringRectangleForRoundOnMap(self, applicationGUI, **options):
-        startX = self.brushStartX
-        while (startX <= self.brushEndX):
-            newPaintedLine = {
-                    "startX": startX,
-                    "endX": startX + applicationGUI.XCellSize,
-                    "startY": self.brushStartY,
-                    "endY": self.brushEndY
-                    }
-            if (newPaintedLine not in self.paintedCircleLines):
-                print("la")
-                applicationGUI.map.create_rectangle(startX, self.brushStartY,
-                                                    startX + applicationGUI.XCellSize,
-                                                    self.brushEndY,
-                                                    tag="hoveringBrush",
-                                                    **options)
-                self.paintedCircleLines.append(newPaintedLine)
-            startX += applicationGUI.XCellSize
-
     def __createHoveringRectangleOnMap(self, applicationGUI, **options):
         if ("alpha" in options):
             alpha = int(options.pop("alpha") * 255)
@@ -274,18 +255,10 @@ class DangerPaintingMenu:
             try:
                 image = Image.new("RGBA", (int(self.brushEndX) - int(self.brushStartX),
                             int(self.brushEndY) - int(self.brushStartY)), fill)
+                self.images.append(ImageTk.PhotoImage(image))
             except:
                 return
-            self.images.append(ImageTk.PhotoImage(image))
             applicationGUI.map.create_image(self.brushStartX, self.brushStartY, image=self.images[-1], anchor='nw')
-            if (self.brushType.get() == "round"):
-                self.__createHoveringRectangleForRoundOnMap(applicationGUI, **options)
-            else:
-                print("laaaa")
-                applicationGUI.map.create_rectangle(self.brushStartX, self.brushStartY,
-                                                    self.brushEndX, self.brushEndY,
-                                                    tag="hoveringBrush",
-                                                    **options)
 
     def __printHoveringLineBrushOnMap(self, applicationGUI):
         focusX, focusY = self.__retreiveFocusPointForHoveringBrush()
@@ -293,34 +266,62 @@ class DangerPaintingMenu:
         self.images = []
         self.__createHoveringRectangleOnMap(applicationGUI,fill="orange", alpha=.5)
 
+    def __registerCircleHoveringLines(self, startX, endX, startY, endY,
+                                      applicationGUI):
+        newLine = {
+                "startX": startX,
+                "endX": endX,
+                "startY":startY,
+                "endY":endY
+                }
+        lineRegisterUpdated = False
+        for line in self.registeredCircleLines:
+            if (line["startY"] == newLine["startY"] and
+                    line["endY"] == newLine["endY"]):
+                lineRegisterUpdated = True
+                if (newLine["startX"] < line["startX"]):
+                    line["startX"] = newLine["startX"]
+                if (newLine["endX"] > line["endX"]):
+                    line["endX"] = newLine["endX"]
+        if (lineRegisterUpdated is False):
+            self.registeredCircleLines.append(newLine)
 
-    def __printCircleOnMap(self, applicationGUI, circleCenterX, circleCenterY,
+    def __constructCircleLines(self, applicationGUI, circleCenterX, circleCenterY,
                             currX, currY):
-        self.brushStartX = (circleCenterX - currX - 1) * applicationGUI.XCellSize
-        self.brushEndX = (circleCenterX + currX + 1) * applicationGUI.XCellSize
-        self.brushStartY = (circleCenterY + currY) * applicationGUI.YCellSize
-        self.brushEndY = (circleCenterY + currY + 1) * applicationGUI.YCellSize
-        self.__createHoveringRectangleOnMap(applicationGUI, fill="orange", alpha=.5)
-        self.brushStartY = (circleCenterY - currY - 1) * applicationGUI.YCellSize
-        self.brushEndY = (circleCenterY - currY) * applicationGUI.YCellSize
-        self.__createHoveringRectangleOnMap(applicationGUI, fill="orange", alpha=.5)
-        self.brushStartX = (circleCenterX - currY - 1) * applicationGUI.XCellSize
-        self.brushEndX = (circleCenterX + currY + 1) * applicationGUI.XCellSize
-        self.brushStartY = (circleCenterY + currX) * applicationGUI.YCellSize
-        self.brushEndY = (circleCenterY + currX + 1) * applicationGUI.YCellSize
-        self.__createHoveringRectangleOnMap(applicationGUI, fill="orange", alpha=.5)
-        self.brushStartY = (circleCenterY - currX - 1) * applicationGUI.YCellSize
-        self.brushEndY = (circleCenterY - currX) * applicationGUI.YCellSize
-        self.__createHoveringRectangleOnMap(applicationGUI, fill="orange", alpha=.5)
+        startX = (circleCenterX - currX - 1) * applicationGUI.XCellSize
+        endX = (circleCenterX + currX + 1) * applicationGUI.XCellSize
+        startY = (circleCenterY + currY) * applicationGUI.YCellSize
+        endY = (circleCenterY + currY + 1) * applicationGUI.YCellSize
+        self.__registerCircleHoveringLines(startX, endX, startY, endY, applicationGUI)
+        startY = (circleCenterY - currY - 1) * applicationGUI.YCellSize
+        endY = (circleCenterY - currY) * applicationGUI.YCellSize
+        self.__registerCircleHoveringLines(startX, endX, startY, endY, applicationGUI)
+        startX = (circleCenterX - currY - 1) * applicationGUI.XCellSize
+        endX = (circleCenterX + currY + 1) * applicationGUI.XCellSize
+        startY = (circleCenterY + currX) * applicationGUI.YCellSize
+        endY = (circleCenterY + currX + 1) * applicationGUI.YCellSize
+        self.__registerCircleHoveringLines(startX, endX, startY, endY, applicationGUI)
+        startY = (circleCenterY - currX - 1) * applicationGUI.YCellSize
+        endY = (circleCenterY - currX) * applicationGUI.YCellSize
+        self.__registerCircleHoveringLines(startX, endX, startY, endY, applicationGUI)
+
+    def __printHoveringCircleOnMap(self, applicationGUI):
+        for line in self.registeredCircleLines:
+            self.brushStartX = line["startX"]
+            self.brushEndX = line["endX"]
+            self.brushStartY = line["startY"]
+            self.brushEndY = line["endY"]
+            self.__createHoveringRectangleOnMap(applicationGUI, fill="orange", alpha=.5)
 
     def __createHoveringCircleOnMap(self, applicationGUI, circleCenterX, circleCenterY,
                                     circleRadius):
         self.images = []
-        self.paintedCircleLines = []
+        self.alreadyPrintedCells = []
+        self.registeredCircleLines = []
         currX = 0
         currY = circleRadius
         currD = 3 - 2 * circleRadius
-        self.__printCircleOnMap(applicationGUI, circleCenterX, circleCenterY,
+        self.__constructCircleLines(applicationGUI, circleCenterX, circleCenterY,
                                 currX, currY)
         while (currY >= currX):
             if (currD >= 0):
@@ -329,9 +330,9 @@ class DangerPaintingMenu:
             else:
                 currD = currD + 4 * currX + 6
             currX += 1
-            self.__printCircleOnMap(applicationGUI, circleCenterX, circleCenterY,
+            self.__constructCircleLines(applicationGUI, circleCenterX, circleCenterY,
                                     currX, currY)
-        print(self.paintedCircleLines)
+        self.__printHoveringCircleOnMap(applicationGUI)
 
 
     # bresenham-s circle algorithm
@@ -352,7 +353,7 @@ class DangerPaintingMenu:
         elif (self.brushType.get() == "round"):
             self.__printHoveringRoundBrushOnMap(applicationGUI)
 
-    def __clickInsertBrushOnMap(self, applicationGUI, mainData):
+    def __clickDrawRectangleDangerZone(self, applicationGUI):
         newDangerZone = {
                 "startX": self.brushStartX,
                 "startY": self.brushStartY,
@@ -360,6 +361,18 @@ class DangerPaintingMenu:
                 "endY": self.brushEndY
                 }
         self.addedDangerZones.append(newDangerZone)
+
+    def __clickDrawCircleDangerZone(self, applicationGUI):
+        for line in self.registeredCircleLines:
+            self.addedDangerZones.append(line)
+
+
+
+    def __clickInsertBrushOnMap(self, applicationGUI, mainData):
+        if (self.brushType.get() == "line"):
+            self.__clickDrawRectangleDangerZone(applicationGUI)
+        elif (self.brushType.get() == "round"):
+            self.__clickDrawCircleDangerZone(applicationGUI)
         applicationGUI.map.delete("all")
         for rectangle in self.addedDangerZones:
             applicationGUI.map.create_rectangle(rectangle["startX"],
