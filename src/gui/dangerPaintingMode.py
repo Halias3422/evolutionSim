@@ -464,39 +464,28 @@ class DangerPaintingMenu:
 
     def __clickDrawRectangleZone(self, applicationGUI):
         brushType = self.brushType.get()
-        newDangerZone = {
+        newZone = {
                 "startX": self.brushStartX,
                 "startY": self.brushStartY,
                 "endX": self.brushEndX,
-                "endY": self.brushEndY
+                "endY": self.brushEndY,
+                "type": brushType
                 }
-        if (brushType == "danger"):
-            self.addedDangerZones.append(newDangerZone)
-        elif (brushType == "population"):
-            self.addedPopulationZones.append(newDangerZone)
-        elif (brushType == "obstacle"):
-            self.addedObstacleZones.append(newDangerZone)
-        elif (brushType == "food"):
-            self.addedFoodZones.append(newDangerZone)
-        elif (brushType == "eraser"):
-            self.addedEraserZones.append(newDangerZone)
-        self.__updateMapRepresentation(newDangerZone, brushType, applicationGUI)
+        self.addedZones.append(newZone)
+        self.__updateMapRepresentation(newZone, brushType, applicationGUI)
 
     def __clickDrawCircleZone(self, applicationGUI):
         brushType = self.brushType.get()
         for line in self.registeredCircleLines:
-            if (brushType == "danger"):
-                self.addedDangerZones.append(line)
-            elif (brushType == "population"):
-                self.addedPopulationZones.append(line)
-            elif (brushType == "obstacle"):
-                self.addedObstacleZones.append(line)
-            elif (brushType == "food"):
-                self.addedFoodZones.append(line)
-            elif (brushType == "eraser"):
-                self.addedEraserZones.append(line)
-            self.__updateMapRepresentation(line, brushType, applicationGUI)
-
+            newZone = {
+                    "startX": line["startX"],
+                    "startY": line["startY"],
+                    "endX": line["endX"],
+                    "endY": line["endY"],
+                    "type": brushType
+                    }
+            self.addedZones.append(newZone)
+            self.__updateMapRepresentation(newZone, brushType, applicationGUI)
 
 
     def __clickInsertBrushOnMap(self, applicationGUI, mainData):
@@ -505,41 +494,22 @@ class DangerPaintingMenu:
         elif (self.brushStyle.get() == "round"):
             self.__clickDrawCircleZone(applicationGUI)
         applicationGUI.map.delete("all")
-        for rectangle in self.addedDangerZones:
-            applicationGUI.map.create_rectangle(rectangle["startX"],
-                                                rectangle["startY"],
-                                                rectangle["endX"],
-                                                rectangle["endY"],
-                                                fill="orange",
-                                                tag="dangerZone")
-        for rectangle in self.addedPopulationZones:
-            applicationGUI.map.create_rectangle(rectangle["startX"],
-                                                rectangle["startY"],
-                                                rectangle["endX"],
-                                                rectangle["endY"],
-                                                fill="black",
-                                                tag="populationZone")
-        for rectangle in self.addedObstacleZones:
-            applicationGUI.map.create_rectangle(rectangle["startX"],
-                                                rectangle["startY"],
-                                                rectangle["endX"],
-                                                rectangle["endY"],
-                                                fill="chocolate",
-                                                tag="obstacleZone")
-        for rectangle in self.addedFoodZones:
-            applicationGUI.map.create_rectangle(rectangle["startX"],
-                                                rectangle["startY"],
-                                                rectangle["endX"],
-                                                rectangle["endY"],
-                                                fill="green",
-                                                tag="foodZone")
-        for rectangle in self.addedEraserZones:
-            applicationGUI.map.create_rectangle(rectangle["startX"],
-                                                rectangle["startY"],
-                                                rectangle["endX"],
-                                                rectangle["endY"],
-                                                fill="white",
-                                                tag="eraserZone")
+        for zone in self.addedZones:
+            color = "white"
+            if (zone["type"] == "danger"):
+                color = "orange"
+            elif (zone["type"] == "population"):
+                color = "black"
+            elif (zone["type"] == "obstacle"):
+                color = "chocolate"
+            elif (zone["type"] == "food"):
+                color = "green"
+            applicationGUI.map.create_rectangle(zone["startX"],
+                                                zone["startY"],
+                                                zone["endX"],
+                                                zone["endY"],
+                                                fill=color,
+                                                tag=zone["type"] + "Zone")
         applicationGUI.createMapGrid(mainData.mapSizeX, mainData.mapSizeY)
 
 
@@ -596,11 +566,7 @@ class DangerPaintingMenu:
     def addDangerZonesToMap(self, applicationGUI, mainData):
         self.mouseButtonPressed = False
         self.dangerPaintingFrame.grid()
-        self.addedDangerZones = []
-        self.addedPopulationZones = []
-        self.addedObstacleZones = []
-        self.addedFoodZones = []
-        self.addedEraserZones = []
+        self.addedZones = []
         self.__createMapZonesRepresentation(mainData)
         applicationGUI.menus.enableDangerPaintingTab()
         applicationGUI.menus.menusTabs.select(self.dangerPaintingFrame)
