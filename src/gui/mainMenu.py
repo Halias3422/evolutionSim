@@ -9,6 +9,8 @@ DEFAULTFOODNB = 10
 DEFAULTMAPSIZE=5
 DEFAULTGENLIFE=100
 DEFAULTGENNB=2
+DEFAULTDANGERNB=0
+DEFAULTOBSTACLENB=0
 DEFAULTMUTATION=100
 
 class MainMenu:
@@ -68,7 +70,7 @@ class MainMenu:
                                     font=H2TITLEFONT,
                                     labelanchor="n",
                                     width=self.menusFrame.winfo_reqwidth() / 2,
-                                    height=self.menusFrame.winfo_reqheight() / 2)
+                                    height=int((self.menusFrame.winfo_reqheight() / 3) * 2))
         self.optionsFrame.grid_propagate(False)
         self.optionsFrame.grid_columnconfigure(0, weight=1)
         self.optionsFrame.grid_rowconfigure(0, weight=1)
@@ -93,16 +95,16 @@ class MainMenu:
                                      font=H2TITLEFONT,
                                      labelanchor="n",
                                      width=self.menusFrame.winfo_reqwidth() / 2,
-                                     height=self.menusFrame.winfo_reqheight() / 2)
+                                     height=int((self.menusFrame.winfo_reqheight() / 3) * 2))
         self.runDataFrame.pack_propagate(False)
         self.runDataFrame.grid(column=0, row=0, sticky='N')
         self.__createRunDataFrameContent()
 
     def __createOptionsFrameContent(self, applicationGUI):
         self.populationGenFrame = self.__createOptionsSubFrames(" Population generation: ", 0, 4)
-        self.dangerGenFrame = self.__createOptionsSubFrames(" Danger zones generation: ", 1, 3)
-        self.foodGenFrame = self.__createOptionsSubFrames(" Food generation: ", 2, 4)
-        self.obstacleGenFrame = self.__createOptionsSubFrames(" Obstacles generation: ", 3, 3)
+        self.dangerGenFrame = self.__createOptionsSubFrames(" Danger zones generation: ", 1, 4)
+        self.foodGenFrame = self.__createOptionsSubFrames(" Food generation: ", 2, 5)
+        self.obstacleGenFrame = self.__createOptionsSubFrames(" Obstacles generation: ", 3, 4)
         self.reproductionGenFrame = self.__createOptionsSubFrames(" Reproduction toggle: ", 4, 3)
         self.__createOptionsPopulationNumber()
         self.__createOptionsDangerGeneration()
@@ -138,25 +140,38 @@ class MainMenu:
         self.optionObstacleGen = tk.StringVar(value="random")
         self.rdbOptionPaintObstacle = self.__addPaintRadioButton(self.obstacleGenFrame,
                                                               self.optionObstacleGen)
-        self.rdbOptionFixedObstacle = self.__addFixedRadioButton(self.obstacleGenFrame,
-                                                             self.optionObstacleGen)
+        self.rdbOptionPaintObstacle["command"] = self.__disableObstacleTxt
         self.rdbOptionRandomObstacle = self.__addRandomRadioButton(self.obstacleGenFrame,
-                                                               self.optionFoodGen)
+                                                               self.optionObstacleGen)
+        self.rdbOptionRandomObstacle["command"] = self.__enableObstacleTxt
+
+    def __enableObstacleTxt(self):
+        self.txtObstacleNb["state"] = tk.NORMAL
+
+    def __disableObstacleTxt(self):
+        self.txtObstacleNb["state"] = tk.DISABLED
 
     def __createOptionsFoodGeneration(self):
         self.optionFoodGen = tk.StringVar(value="random")
         self.rdbOptionPaintFood = self.__addPaintRadioButton(self.foodGenFrame,
                                                               self.optionFoodGen)
-        self.rdbOptionFixedFood = self.__addFixedRadioButton(self.foodGenFrame,
-                                                             self.optionFoodGen)
+        self.rdbOptionPaintFood["command"] = self.__disableTxtFoodNb
         self.rdbOptionRandomFood = self.__addRandomRadioButton(self.foodGenFrame,
                                                                self.optionFoodGen)
+        self.rdbOptionRandomFood["command"] = self.__enableTxtFoodNb
         self.rdbOptionDisableFood = tk.Radiobutton(self.foodGenFrame,
                                                    text="Disable",
                                                    value="disable",
                                                    variable=self.optionFoodGen,
+                                                   command=self.__disableTxtFoodNb,
                                                    font=H4TITLEFONT)
         self.rdbOptionDisableFood.grid(column=3, row=0)
+
+    def __enableTxtFoodNb(self):
+        self.txtFoodNb["state"] = tk.NORMAL
+
+    def __disableTxtFoodNb(self):
+        self.txtFoodNb["state"] = tk.DISABLED
 
     def __addRandomRadioButton(self, motherFrame, motherVariable):
         rdbRandomOption = tk.Radiobutton(motherFrame,
@@ -166,15 +181,6 @@ class MainMenu:
                                         font=H4TITLEFONT)
         rdbRandomOption.grid(column=2, row=0)
         return rdbRandomOption
-    def __addFixedRadioButton(self, motherFrame, motherVariable):
-
-        rdbFixedOption = tk.Radiobutton(motherFrame,
-                                        text="Fixed",
-                                        value="fixed",
-                                        variable=motherVariable,
-                                        font=H4TITLEFONT)
-        rdbFixedOption.grid(column=1, row=0)
-        return rdbFixedOption
 
     def __addPaintRadioButton(self, motherFrame, motherVariable):
         rdbPaintOption = tk.Radiobutton(motherFrame,
@@ -182,18 +188,24 @@ class MainMenu:
                                              value="paint",
                                              variable=motherVariable,
                                              font=H4TITLEFONT)
-        rdbPaintOption.grid(column=0, row=0)
+        rdbPaintOption.grid(column=1, row=0)
         return rdbPaintOption
 
     def __createOptionsDangerGeneration(self):
-        self.optionDangerGen = tk.StringVar(value="paint")
+        self.optionDangerGen = tk.StringVar(value="random")
         self.rdbOptionPaintDanger = self.__addPaintRadioButton(self.dangerGenFrame,
                                                                self.optionDangerGen)
-        self.rdbOptionFixedDanger = self.__addFixedRadioButton(self.dangerGenFrame,
-                                                               self.optionDangerGen)
+        self.rdbOptionPaintDanger["command"] = self.__disableDangerNbInput
         self.rdbOptionRandomDanger = self.__addRandomRadioButton(self.dangerGenFrame,
                                                                  self.optionDangerGen)
+        self.rdbOptionRandomDanger["command"] = self.__enableDangerNbInput
+        self.rdbOptionRandomDanger.select()
 
+    def __enableDangerNbInput(self):
+        self.txtDangerNb["state"] = tk.NORMAL
+
+    def __disableDangerNbInput(self):
+        self.txtDangerNb["state"] = tk.DISABLED
 
     def __createOptionsPopulationNumber(self):
         self.optionPopulationGen = tk.StringVar(value="fixed")
@@ -249,6 +261,20 @@ class MainMenu:
         self.txtGenerationNb = tk.Entry(self.runDataFrame, font=H3TITLEFONT)
         self.txtGenerationNb.insert(0, str(DEFAULTGENNB))
         self.txtGenerationNb.pack()
+
+        lblDangerNb = tk.Label(self.runDataFrame, font=H3TITLEFONT,
+                               text="Danger Zones Tiles : ")
+        lblDangerNb.pack()
+        self.txtDangerNb = tk.Entry(self.runDataFrame, font=H3TITLEFONT)
+        self.txtDangerNb.insert(0, str(DEFAULTDANGERNB))
+        self.txtDangerNb.pack()
+
+        lblObstacleNb = tk.Label(self.runDataFrame, font=H3TITLEFONT,
+                                 text="Obstacles Tiles : ")
+        lblObstacleNb.pack()
+        self.txtObstacleNb = tk.Entry(self.runDataFrame, font=H3TITLEFONT)
+        self.txtObstacleNb.insert(0, str(DEFAULTOBSTACLENB))
+        self.txtObstacleNb.pack()
 
         lblMutationProb = tk.Label(self.runDataFrame, font=H3TITLEFONT,
                                     text="Mutation Probability (%) : ")

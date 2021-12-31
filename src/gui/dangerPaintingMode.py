@@ -17,7 +17,7 @@ class DangerPaintingMenu:
         self.dangerPaintingFrame.grid_rowconfigure(1, weight=1)
         self.dangerPaintingFrame.grid_rowconfigure(2, weight=1)
         self.dangerPaintingFrame.grid_columnconfigure(0, weight=1)
-        self.__createBrushSelectionFrame()
+        self.__createBrushSelectionFrame(applicationGUI)
         self.__createMapCoverageFrame()
         self.__createDonePaintingFrame()
         self.mouseX = 0
@@ -164,7 +164,7 @@ class DangerPaintingMenu:
         self.lblCoverage.grid(column=1, row=4)
         return subFrame
 
-    def __createBrushSelectionFrame(self):
+    def __createBrushSelectionFrame(self, applicationGUI):
         self.brushSelectionFrame = tk.LabelFrame(self.dangerPaintingFrame,
                          text=" Brush ",
                          font=H1TITLEFONT,
@@ -177,12 +177,12 @@ class DangerPaintingMenu:
         self.brushSelectionFrame.grid_columnconfigure(2, weight=1)
         self.brushSelectionFrame.grid_rowconfigure(0, weight=1)
         self.brushSelectionFrame.grid(column=0, row=0)
-        self.__createBrushTypeFrame()
+        self.__createBrushTypeFrame(applicationGUI)
         self.__createBrushStyleFrame()
         self.__createBrushSizeFrame()
 
-    def __createBrushTypeFrame(self):
-        self.brushType = tk.StringVar(value="danger")
+    def __createBrushTypeFrame(self, applicationGUI):
+        self.brushType = tk.StringVar(value="population")
         self.brushTypeFrame = tk.LabelFrame(self.brushSelectionFrame,
                              text=" Type ",
                              font=H2TITLEFONT,
@@ -199,6 +199,7 @@ class DangerPaintingMenu:
         self.brushTypeFrame.grid_rowconfigure(3, weight=1)
         self.brushTypeFrame.grid_rowconfigure(4, weight=1)
         self.brushTypeFrame.grid(column=0, row=0)
+        mainMenu = applicationGUI.menus.mainMenu
         self.rdbPopulationPainting = tk.Radiobutton(self.brushTypeFrame,
                                     text="Population",
                                     font=H3TITLEFONT,
@@ -212,6 +213,8 @@ class DangerPaintingMenu:
                                     value="danger",
                                     variable=self.brushType,
                                     highlightthickness=0)
+        if (mainMenu.optionDangerGen.get() == "random"):
+            self.rdbDangerPainting["state"] = tk.DISABLED
         self.rdbDangerPainting.grid(column=1, row=1, sticky='w')
         self.rdbObstaclePainting = tk.Radiobutton(self.brushTypeFrame,
                                     text="Obstacle",
@@ -226,6 +229,8 @@ class DangerPaintingMenu:
                                     value="food",
                                     variable=self.brushType,
                                     highlightthickness=0)
+        if (mainMenu.optionFoodGen.get() == "disable"):
+            self.rdbFoodPainting["state"] = tk.DISABLED
         self.rdbFoodPainting.grid(column=1, row=3, sticky='w')
         self.rdbEraserPainting = tk.Radiobutton(self.brushTypeFrame,
                                     text="Eraser",
@@ -601,7 +606,6 @@ class DangerPaintingMenu:
         self.lblFoodCoverage["text"] = str(100 * coverage["food"] / mapSize) + "%"
         coverage["total"] = coverage["population"] + coverage["danger"]\
                 + coverage["obstacle"] + coverage["food"]
-        print(coverage["total"])
         self.lblTotalMapNumber["text"] = coverage["total"]
         self.lblTotalMapCoverage["text"] = str(100 * coverage["total"] / mapSize) + "%"
 
@@ -697,6 +701,7 @@ class DangerPaintingMenu:
         applicationGUI.map.bind("<ButtonPress-1>", self.__triggerAddingBrushOnMap)
         applicationGUI.map.bind("<ButtonRelease-1>", self.__triggerStopAddingBrushOnMap)
         currBrushType = self.brushType.get()
+        self.__changeCurrentBrushTypeStyle()
         while (True):
             if (currBrushType != self.brushType.get()):
                 self.__changeCurrentBrushTypeStyle()

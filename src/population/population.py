@@ -11,21 +11,26 @@ def checkIfCoordinateNotOccupied(populationList, individual):
             return False
     return True
 
-def createMapFreeSpaceList(mapSizeX, mapSizeY):
+def createMapFreeSpaceList(mainData):
+    mapSizeX = mainData.mapSizeX
+    mapSizeY = mainData.mapSizeY
+    zonesMap = mainData.mapRepresentation
     mapFreeSpaceList = []
     mapSizeY -= 1
     while (mapSizeY >= 0):
         tmpSizeX = mapSizeX - 1
         while (tmpSizeX >= 0):
-            freePos = [mapSizeY, tmpSizeX]
-            mapFreeSpaceList.append(freePos)
+            if (zonesMap[mapSizeY][tmpSizeX] == "empty"
+                    or zonesMap[mapSizeY][tmpSizeX] == "danger"):
+                freePos = [mapSizeY, tmpSizeX]
+                mapFreeSpaceList.append(freePos)
             tmpSizeX -= 1
         mapSizeY -= 1
     return mapFreeSpaceList
 
 def spawnNewGeneration(applicationGUI, mainData):
     populationList = []
-    mapFreeSpaceList = createMapFreeSpaceList(mainData.mapSizeX, mainData.mapSizeY)
+    mapFreeSpaceList = createMapFreeSpaceList(mainData)
     if (mainData.parentGeneration is None):
         while (mainData.populationNb > 0):
             while True:

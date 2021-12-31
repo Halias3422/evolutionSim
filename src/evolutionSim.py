@@ -14,22 +14,17 @@ winHeight = 1000
 
 def runGenerationsLife(applicationGUI, event=None):
     mainData = RunMainDatas(applicationGUI)
-    if (neededMapPainting(applicationGUI) is True):
-        applicationGUI.menus.dangerPaintingMenu.addDangerZonesToMap(applicationGUI,
-                                                                    mainData)
-    applicationGUI.map.bind("<Button-1>", applicationGUI.focusOnMap())
-    applicationGUI.mainWindow.focus_set()
-    applicationGUI.defineMapSize(mainData.mapSizeX, mainData.mapSizeY)
-    applicationGUI.menus.mainMenu.printLoadingInit(applicationGUI.mainWindow)
+    handleMapZonePainting (applicationGUI, mainData)
+    initApplicationState(applicationGUI, mainData)
     while (mainData.generationLoop < mainData.generationsNb):
-        mapRepresentation = createMapRepresentation(mainData.mapSizeX, mainData.mapSizeY)
         populationList = spawnCurrentLoopGeneration(applicationGUI, mainData)
-        mapRepresentation = addPopulationListToMapRepresentation(populationList,
-                                                                 mapRepresentation)
-        foodList = spawnCurrentLoopFood(mainData, mapRepresentation)
-        mapRepresentation = addFoodListToMapRepresentation(foodList[0], mapRepresentation)
+        mainData.mapRepresentation = addPopulationListToMapRepresentation(populationList,
+                                                     mainData.mapRepresentation)
+        foodList = spawnCurrentLoopFood(mainData, mainData.mapRepresentation)
+        mainData.mapRepresentation = addFoodListToMapRepresentation(foodList[0],
+                                                    mainData.mapRepresentation)
         populationList = storeCurrentLoopData(populationList, foodList, mainData,
-                                              mapRepresentation)
+                                              mainData.mapRepresentation)
         mainData.parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
         printLoadingStateToUI(mainData, applicationGUI, "running")
         mainData.generationLoop += 1
@@ -37,6 +32,20 @@ def runGenerationsLife(applicationGUI, event=None):
                 is False):
             break
     PrintRunResult(mainData, applicationGUI)
+
+def initApplicationState(applicationGUI, mainData):
+    applicationGUI.map.bind("<Button-1>", applicationGUI.focusOnMap())
+    applicationGUI.mainWindow.focus_set()
+    applicationGUI.defineMapSize(mainData.mapSizeX, mainData.mapSizeY)
+    applicationGUI.menus.mainMenu.printLoadingInit(applicationGUI.mainWindow)
+
+def handleMapZonePainting(applicationGUI, mainData):
+    if (neededMapPainting(applicationGUI) is True):
+        applicationGUI.menus.createPaintingMenu(applicationGUI)
+        applicationGUI.menus.dangerPaintingMenu.addDangerZonesToMap(applicationGUI,
+                                                                    mainData)
+        mainData.updateMapRepresentationWithZones(applicationGUI)
+
 
 def neededMapPainting(applicationGUI):
     menu = applicationGUI.menus.mainMenu

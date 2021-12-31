@@ -1,3 +1,5 @@
+from environment.mapRepresentation import createMapRepresentation
+
 class RunMainDatas:
 
     def __init__(self, applicationGUI):
@@ -16,4 +18,9 @@ class RunMainDatas:
         self.allGenerationsPopulationList = []
         self.allGenerationsFoodList = []
         self.populationInfoPerLoop = []
+        self.mapRepresentation = createMapRepresentation(self.mapSizeX, self.mapSizeY)
+
+    def updateMapRepresentationWithZones(self, applicationGUI):
+        self.mapRepresentation = applicationGUI.menus.dangerPaintingMenu.mapZonesRepresentation
+        print(self.mapRepresentation)
 
