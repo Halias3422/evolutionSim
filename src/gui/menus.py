@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from .mainMenu import MainMenu
 from .runInfoMenu import RunInfoMenu
-from .dangerPaintingMode import DangerPaintingMenu
+from .zonesPaintingMode import ZonesPaintingMenu
 
 class Menus:
 
@@ -38,12 +38,12 @@ class Menus:
     def enableRunInfoTab(self):
         self.menusTabs.add(self.runInfoMenu.runInfoFrame, text="Run Info")
 
-    def enableDangerPaintingTab(self):
-        self.menusTabs.add(self.dangerPaintingMenu.dangerPaintingFrame, text="Painting")
+    def enableZonesPaintingTab(self):
+        self.menusTabs.add(self.dangerPaintingMenu.zonesPaintingFrame, text="Painting")
 
     def createPaintingMenu(self, applicationGUI):
-        self.dangerPaintingMenu = DangerPaintingMenu(applicationGUI,
+        self.dangerPaintingMenu = ZonesPaintingMenu(applicationGUI,
                                                      self.menusTabs,
                                                      self.menusFrame.winfo_width(),
                                                      self.menusFrame.winfo_height())
-        self.menusTabs.add(self.dangerPaintingMenu.dangerPaintingFrame, text="Painting")
+        self.menusTabs.add(self.dangerPaintingMenu.zonesPaintingFrame, text="Painting")

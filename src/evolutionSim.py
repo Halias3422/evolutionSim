@@ -17,6 +17,7 @@ def runGenerationsLife(applicationGUI, event=None):
     handleMapZonePainting (applicationGUI, mainData)
     initApplicationState(applicationGUI, mainData)
     while (mainData.generationLoop < mainData.generationsNb):
+        mainData.mapRepresentation = addZonesToMapRepresentationCurrGen(mainData)
         populationList = spawnCurrentLoopGeneration(applicationGUI, mainData)
         mainData.mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                      mainData.mapRepresentation)
@@ -42,9 +43,10 @@ def initApplicationState(applicationGUI, mainData):
 def handleMapZonePainting(applicationGUI, mainData):
     if (neededMapPainting(applicationGUI) is True):
         applicationGUI.menus.createPaintingMenu(applicationGUI)
-        applicationGUI.menus.dangerPaintingMenu.addDangerZonesToMap(applicationGUI,
+        applicationGUI.menus.dangerPaintingMenu.addZonesToMap(applicationGUI,
                                                                     mainData)
-        mainData.updateMapRepresentationWithZones(applicationGUI)
+        mainData.initZonesMapRepresentation(applicationGUI)
+        mainData = mainData.updateMainDataAfterPainting(applicationGUI, mainData)
 
 
 def neededMapPainting(applicationGUI):

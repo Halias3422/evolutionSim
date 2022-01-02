@@ -28,3 +28,6 @@ def addFoodListToMapRepresentation(foodList, mapRepresentation):
     for food in foodList:
         mapRepresentation[food[0]][food[1]] = "food"
     return mapRepresentation
+
+def addZonesToMapRepresentationCurrGen(mainData):
+    pass

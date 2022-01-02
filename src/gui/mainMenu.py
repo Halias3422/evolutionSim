@@ -101,7 +101,7 @@ class MainMenu:
         self.__createRunDataFrameContent()
 
     def __createOptionsFrameContent(self, applicationGUI):
-        self.populationGenFrame = self.__createOptionsSubFrames(" Population generation: ", 0, 4)
+        self.populationGenFrame = self.__createOptionsSubFrames(" Population generation: ", 0, 5)
         self.dangerGenFrame = self.__createOptionsSubFrames(" Danger zones generation: ", 1, 4)
         self.foodGenFrame = self.__createOptionsSubFrames(" Food generation: ", 2, 5)
         self.obstacleGenFrame = self.__createOptionsSubFrames(" Obstacles generation: ", 3, 4)
@@ -209,20 +209,29 @@ class MainMenu:
 
     def __createOptionsPopulationNumber(self):
         self.optionPopulationGen = tk.StringVar(value="fixed")
+        self.optionPopulationReproduction = tk.BooleanVar(value=False)
+        self.rdbOptionPaintPopulationNb = self.__addPaintRadioButton(self.populationGenFrame, self.optionPopulationGen)
+        self.rdbOptionPaintPopulationNb["command"] = self.__disablePopulationNbInput
         self.rdbOptionFixedPopulationNb = tk.Radiobutton(self.populationGenFrame,
-                                                 text="Fixed",
-                                                 value="fixed",
+                                                 text="Random",
+                                                 value="random",
                                                  variable=self.optionPopulationGen,
+                                                 command=self.__enablePopulationNbInput,
                                                  font=H4TITLEFONT)
-        self.rdbOptionFixedPopulationNb.grid(column=1, row=0, sticky='w')
+        self.rdbOptionFixedPopulationNb.grid(column=2, row=0, sticky='w')
 
-        self.rdbOptionChildrenPopulationNb = tk.Radiobutton(self.populationGenFrame,
-                                                text="Survivors Children",
-                                                value="children",
+        self.rdbOptionChildrenPopulationNb = tk.Checkbutton(self.populationGenFrame,
+                                                text="Children",
                                                 variable=self.optionPopulationGen,
                                                 font=H4TITLEFONT)
-        self.rdbOptionChildrenPopulationNb.grid(column=2, row=0, sticky='w')
+        self.rdbOptionChildrenPopulationNb.grid(column=3, row=0, sticky='w')
         self.rdbOptionFixedPopulationNb.select()
+
+    def __enablePopulationNbInput(self):
+        self.txtPopulationSize["state"] = tk.NORMAL
+
+    def __disablePopulationNbInput(self):
+        self.txtPopulationSize["state"] = tk.DISABLED
 
     def __createRunDataFrameContent(self):
         lblPopulationSize = tk.Label(self.runDataFrame,
