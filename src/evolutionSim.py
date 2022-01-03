@@ -3,6 +3,7 @@ from population.population import spawnNewGeneration
 from population.population import runCurrentGenerationLife
 from population.population import removeAllUnsuccessfullIndividuals
 from environment.food import spawnGenerationFood
+from environment.food import getFoodListFromMapRepresentation
 from debug.print import *
 from environment.mapRepresentation import *
 from dataCollection.dataCollection import DataCollection
@@ -16,14 +17,13 @@ def runGenerationsLife(applicationGUI, event=None):
     mainData = RunMainDatas(applicationGUI)
     handleMapZonePainting (applicationGUI, mainData)
     initApplicationState(applicationGUI, mainData)
+    handleRandomZonesGeneration(applicationGUI, mainData)
     while (mainData.generationLoop < mainData.generationsNb):
         mainData.mapRepresentation = addZonesToMapRepresentationCurrGen(mainData)
         populationList = spawnCurrentLoopGeneration(applicationGUI, mainData)
         mainData.mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                      mainData.mapRepresentation)
         foodList = spawnCurrentLoopFood(mainData, mainData.mapRepresentation)
-        mainData.mapRepresentation = addFoodListToMapRepresentation(foodList[0],
-                                                    mainData.mapRepresentation)
         populationList = storeCurrentLoopData(populationList, foodList, mainData,
                                               mainData.mapRepresentation)
         mainData.parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
@@ -34,6 +34,18 @@ def runGenerationsLife(applicationGUI, event=None):
             break
     PrintRunResult(mainData, applicationGUI)
 
+
+def handleRandomZonesGeneration(applicationGUI, mainData):
+    mainMenu = applicationGUI.menus.mainMenu
+    if (mainMenu.optionDangerGen.get() == "random"):
+        mainData.dangerZoneMapRepresentation = generateDangerZoneMap(mainData)
+    if (mainMenu.optionFoodGen.get() == "random"):
+        mainData.zonesMapRepresentation = addRandomZoneToZoneMap(mainData, "food",
+                                                             mainData.foodNb)
+    if (mainMenu.optionObstacleGen.get() == "random"):
+        mainData.zonesMapRepresentation = addRandomZoneToZoneMap(mainData, "obstacle",
+                                                                 mainData.obstacleNb)
+
 def initApplicationState(applicationGUI, mainData):
     applicationGUI.map.bind("<Button-1>", applicationGUI.focusOnMap())
     applicationGUI.mainWindow.focus_set()
@@ -43,15 +55,16 @@ def initApplicationState(applicationGUI, mainData):
 def handleMapZonePainting(applicationGUI, mainData):
     if (neededMapPainting(applicationGUI) is True):
         applicationGUI.menus.createPaintingMenu(applicationGUI)
-        applicationGUI.menus.dangerPaintingMenu.addZonesToMap(applicationGUI,
+        applicationGUI.menus.zonePaintingMenu.addZonesToMap(applicationGUI,
                                                                     mainData)
-        mainData.initZonesMapRepresentation(applicationGUI)
         mainData = mainData.updateMainDataAfterPainting(applicationGUI, mainData)
 
 
 def neededMapPainting(applicationGUI):
     menu = applicationGUI.menus.mainMenu
-    if (menu.optionDangerGen.get() == "paint"):
+    if (menu.optionPopulationGen.get() == "paint"):
+        return True
+    elif (menu.optionDangerGen.get() == "paint"):
         return True
     elif (menu.optionFoodGen.get() == "paint"):
         return True
@@ -69,8 +82,11 @@ def checkIfThereAreSurvivors(mainData, parentGeneration, applicationGUI):
     return True
 
 def printLoadingStateToUI(mainData, applicationGUI, currentState):
+    menus = applicationGUI.menus
     if (currentState == "running"):
-        applicationGUI.menus.mainMenu.printCurrentLoadingDatas(mainData.dataCollection[mainData.generationLoop],
+        menus.menusTabs.select(menus.mainMenu.menusFrame)
+        menus.mainMenu.runButton.grid_remove()
+        menus.mainMenu.printCurrentLoadingDatas(mainData.dataCollection[mainData.generationLoop],
                                                             mainData.generationLoop,
                                                             applicationGUI.mainWindow,
                                                             mainData.generationsNb)
@@ -79,9 +95,10 @@ def printLoadingStateToUI(mainData, applicationGUI, currentState):
 
 def spawnCurrentLoopFood(mainData, mapRepresentation):
     foodList = []
-    foodList.append(spawnGenerationFood(mainData.foodNb,
-                                        mainData.mapSizeX, mainData.mapSizeY,
-                                        mapRepresentation))
+    foodList.append(getFoodListFromMapRepresentation(mainData))
+    # foodList.append(spawnGenerationFood(mainData.foodNb,
+    #                                     mainData.mapSizeX, mainData.mapSizeY,
+    #                                     mapRepresentation))
     return foodList
 
 def spawnCurrentLoopGeneration(applicationGUI, mainData):

@@ -206,6 +206,8 @@ class ZonesPaintingMenu:
                                     value="population",
                                     variable=self.brushType,
                                     highlightthickness=0)
+        if (mainMenu.optionPopulationGen.get() == "random"):
+            self.rdbPopulationPainting["state"] = tk.DISABLED
         self.rdbPopulationPainting.grid(column=1, row=0, sticky='w')
         self.rdbDangerPainting = tk.Radiobutton(self.brushTypeFrame,
                                     text="Danger",
@@ -222,6 +224,8 @@ class ZonesPaintingMenu:
                                     value="obstacle",
                                     variable=self.brushType,
                                     highlightthickness=0)
+        if (mainMenu.optionObstacleGen.get() == "random"):
+            self.rdbObstaclePainting["state"] = tk.DISABLED
         self.rdbObstaclePainting.grid(column=1, row=2, sticky='w')
         self.rdbFoodPainting = tk.Radiobutton(self.brushTypeFrame,
                                     text="Food",
@@ -229,7 +233,8 @@ class ZonesPaintingMenu:
                                     value="food",
                                     variable=self.brushType,
                                     highlightthickness=0)
-        if (mainMenu.optionFoodGen.get() == "disable"):
+        if (mainMenu.optionFoodGen.get() == "disable" or
+                mainMenu.optionFoodGen.get() == "random"):
             self.rdbFoodPainting["state"] = tk.DISABLED
         self.rdbFoodPainting.grid(column=1, row=3, sticky='w')
         self.rdbEraserPainting = tk.Radiobutton(self.brushTypeFrame,
@@ -239,6 +244,19 @@ class ZonesPaintingMenu:
                                     variable=self.brushType,
                                     highlightthickness=0)
         self.rdbEraserPainting.grid(column=1, row=4, sticky='w')
+        self.__selectEnabledRdbPaintingOption()
+
+    def __selectEnabledRdbPaintingOption(self):
+        if (self.rdbPopulationPainting["state"] == tk.NORMAL):
+            self.rdbPopulationPainting.select()
+        elif (self.rdbDangerPainting["state"] == tk.NORMAL):
+            self.rdbDangerPainting.select()
+        elif (self.rdbObstaclePainting["state"] == tk.NORMAL):
+            self.rdbObstaclePainting.select()
+        elif (self.rdbFoodPainting["state"] == tk.NORMAL):
+            self.rdbFoodPainting.select()
+        else:
+            self.rdbEraserPainting.select()
 
 
 
@@ -581,7 +599,6 @@ class ZonesPaintingMenu:
             startY += applicationGUI.YCellSize
 
     def __eraseDangerZone(self, newZone, applicationGUI):
-        print("ici")
         startY = newZone["startY"]
         endY = newZone["endY"]
         while (startY < endY):
@@ -595,7 +612,6 @@ class ZonesPaintingMenu:
                         "type": "danger"
                         }
                 if (eraserTile in self.addedDangerZones):
-                    print("j'erase")
                     self.addedDangerZones.remove(eraserTile)
                 startX += applicationGUI.XCellSize
             startY += applicationGUI.YCellSize

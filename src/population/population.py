@@ -20,35 +20,42 @@ def createMapFreeSpaceList(mainData):
     while (mapSizeY >= 0):
         tmpSizeX = mapSizeX - 1
         while (tmpSizeX >= 0):
-            if (zonesMap[mapSizeY][tmpSizeX] == "empty"
-                    or zonesMap[mapSizeY][tmpSizeX] == "danger"):
+            if (zonesMap[mapSizeY][tmpSizeX] == "empty"):
                 freePos = [mapSizeY, tmpSizeX]
                 mapFreeSpaceList.append(freePos)
             tmpSizeX -= 1
         mapSizeY -= 1
     return mapFreeSpaceList
 
+def spawnRunFirstGeneration(applicationGUI, mainData, mapFreeSpaceList):
+    populationList = []
+    while (mainData.populationNb > 0):
+        while True:
+            if (len(mapFreeSpaceList) == 0):
+                return populationList
+            individual = Individual(mainData, applicationGUI, mapFreeSpaceList,
+                        applicationGUI.menus.mainMenu.optionPopulationGen.get())
+            if (individual.mapPosition[0] in mapFreeSpaceList):
+                mapFreeSpaceList.remove(individual.mapPosition[0])
+            populationList.append(individual)
+            mainData.populationNb -= 1
+            if (mainData.populationReproductionGen == False):
+                mainData.fixedPopulationPos.append(individual.mapPosition[0])
+            break
+    return populationList
+
 def spawnNewGeneration(applicationGUI, mainData):
     populationList = []
     mapFreeSpaceList = createMapFreeSpaceList(mainData)
     if (mainData.parentGeneration is None):
-        while (mainData.populationNb > 0):
-            while True:
-                individual = Individual(mainData.mapSizeX, mainData.mapSizeY, 0,
-                                        mainData.generationLifeSpan, mainData.populationNb,
-                                        mapFreeSpaceList)
-                mapFreeSpaceList.remove(individual.mapPosition[0])
-                populationList.append(individual)
-                mainData.populationNb -= 1
-                if (len(mapFreeSpaceList) == 0):
-                    return populationList
-                break
+        populationList = spawnRunFirstGeneration(applicationGUI, mainData,
+                                                  mapFreeSpaceList)
     elif (mainData.parentGeneration is not None
-            and applicationGUI.menus.mainMenu.optionPopulationGen.get() == "children"):
+            and mainData.populationReproductionGen == True):
         populationList = spawnNewGenerationChildrenRule(mainData, populationList,
                                                         mapFreeSpaceList)
     elif (mainData.parentGeneration is not None
-            and applicationGUI.menus.mainMenu.optionPopulationGen.get() == "fixed"):
+            and mainData.populationReproductionGen == False):
         populationList = spawnNewGenerationFixedRule(mainData, populationList,
                                                      mapFreeSpaceList)
 
@@ -58,14 +65,13 @@ def spawnNewGenerationFixedRule(mainData, populationList, mapFreeSpaceList):
     newPopulationNb = 0
     newGenerationAttributesList = NewFixedGenerationAttributes(mainData)
     while (newPopulationNb < mainData.beginningPopulationNb):
-        individual = FixedChild(mainData.generationLoop, mainData.generationLifeSpan,
-                                newPopulationNb, mainData.mutationProb,
-                                mapFreeSpaceList, newGenerationAttributesList)
-        mapFreeSpaceList.remove(individual.mapPosition[0])
+        if (len(mapFreeSpaceList) == 0
+                or newPopulationNb >= len(mainData.fixedPopulationPos)):
+            break
+        individual = FixedChild(mainData, newPopulationNb, newGenerationAttributesList,
+                                mapFreeSpaceList)
         populationList.append(individual)
         newPopulationNb += 1
-        if (len(mapFreeSpaceList) == 0):
-            return populationList
     return populationList
 
 
@@ -122,7 +128,7 @@ def runCurrentGenerationLife(populationList, mainData, mapRepresentation,
         foodList.append(initialFoodList)
         mapRepresentation = updateMapRepresentation(mapRepresentation,
                                                     populationList, foodList,
-                                                    loopIndex)
+                                                    loopIndex, mainData)
         populationInfo["popNb"] = len(populationList)
         currGenInfo.append(populationInfo)
         loopIndex += 1

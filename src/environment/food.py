@@ -14,6 +14,19 @@ def createMapFreeSpaceListForFood(mapRepresentation, mapSizeX, mapSizeY):
         mapSizeY -= 1
     return mapFreeSpaceList
 
+def getFoodListFromMapRepresentation(mainData):
+    foodList = []
+    currY = mainData.mapSizeY - 1
+
+    while (currY >= 0):
+        currX = mainData.mapSizeX - 1
+        while (currX >= 0):
+            if (mainData.mapRepresentation[currY][currX] == "food"):
+                foodList.append([currY, currX])
+            currX -= 1
+        currY -= 1
+    return foodList
+
 def spawnGenerationFood(foodNb, mapSizeX, mapSizeY,
                         mapRepresentation):
     foodQuantity = random.randint(foodNb - foodNb , foodNb + foodNb)

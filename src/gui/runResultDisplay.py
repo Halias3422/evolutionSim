@@ -1,4 +1,6 @@
 import sys
+import tkinter as tk
+from PIL import Image, ImageTk, ImageColor
 
 class PrintRunResult:
     loopIndex = 0
@@ -15,6 +17,7 @@ class PrintRunResult:
         self.generationsPopulationList = mainData.allGenerationsPopulationList
         self.generationsFoodList = mainData.allGenerationsFoodList
         self.generationsNb = mainData.generationsNb
+        applicationGUI.menus.mainMenu.runButton.grid()
         applicationGUI.map.bind("<Button-1>", self.__mouseClick)
         applicationGUI.menus.enableRunInfoTab()
         applicationGUI.menus.menusTabs.select(applicationGUI.menus.runInfoMenu.runInfoFrame)
@@ -83,6 +86,24 @@ class PrintRunResult:
                                       startY + applicationGUI.YCellSize,
                                       fill=color)
 
+    def __printObstaclesOnMap(self, mainData, mapContent, applicationGUI):
+        for obstacle in mainData.obstacleList:
+            startX = obstacle[1] * applicationGUI.XCellSize
+            startY = obstacle[0] * applicationGUI.YCellSize
+            mapContent.append({
+                "type": "obstacle",
+                "startX": startX,
+                "startY": startY,
+                "posX": startX / applicationGUI.XCellSize,
+                "posY": startY / applicationGUI.YCellSize,
+                "endX": startX + applicationGUI.XCellSize,
+                "endY": startY + applicationGUI.YCellSize})
+            applicationGUI.map.create_rectangle(startX,
+                                      startY,
+                                      startX + applicationGUI.XCellSize,
+                                      startY + applicationGUI.YCellSize,
+                                      fill="chocolate")
+
     def __printFoodOnMap(self, foodList, mapContent, applicationGUI):
         for food in foodList:
             startX = food[1] * applicationGUI.XCellSize
@@ -100,6 +121,38 @@ class PrintRunResult:
                                       startX + applicationGUI.XCellSize,
                                       startY + applicationGUI.YCellSize,
                                       fill="green")
+
+    def __createHoveringDangerZoneOnMap(self, applicationGUI, dangerZone, **options):
+        if ("alpha" in options):
+            alpha = int(options.pop("alpha") * 255)
+            fill = options.pop("fill")
+            if (fill == "grey"):
+                fill = (128, 128, 128, 96)
+            try:
+                image = Image.new("RGBA", (int(dangerZone["endX"]) -
+                                  int(dangerZone["startX"]),
+                                  int(dangerZone["endY"]) -
+                                  int(dangerZone["startY"])), fill)
+                self.dangerImages.append(ImageTk.PhotoImage(image))
+            except:
+                return
+            applicationGUI.map.create_image(dangerZone["startX"], dangerZone["startY"],
+                    image=self.dangerImages[-1], anchor='nw')
+
+    def __printDangerOnMap(self, mainData, applicationGUI):
+        self.dangerImages = []
+        for danger in mainData.dangerList:
+            startX = danger[1] * applicationGUI.XCellSize
+            startY = danger[0] * applicationGUI.YCellSize
+            dangerZone = {
+                    "startX": startX,
+                    "startY": startY,
+                    "endX": startX + applicationGUI.XCellSize,
+                    "endY": startY + applicationGUI.YCellSize
+                    }
+            self.__createHoveringDangerZoneOnMap(applicationGUI, dangerZone,
+                                                 fill="grey", alpha=.5)
+
 
     def __printSurvivingIndividuals(self, populationList, mapContent, applicationGUI):
         for individual in populationList:
@@ -131,12 +184,14 @@ class PrintRunResult:
                     })
 
     def __addContentForCurrentFrameToMap(self, applicationGUI, populationList,
-                                         foodList, mapContent):
+                                         foodList, mapContent, mainData):
         applicationGUI.map.delete("all")
         # self.__createMapGrid()
         if (self.loopIndex < self.generationLifeSpan):
             self.__printPopulationOnMap(populationList, mapContent, applicationGUI)
             self.__printFoodOnMap(foodList[self.loopIndex], mapContent, applicationGUI)
+            self.__printObstaclesOnMap(mainData, mapContent, applicationGUI)
+            self.__printDangerOnMap(mainData, applicationGUI)
         else:
             self.__printSurvivingIndividuals(populationList, mapContent, applicationGUI)
         applicationGUI.map.pack()
@@ -207,7 +262,8 @@ class PrintRunResult:
                 self.__addContentForCurrentFrameToMap(applicationGUI,
                             self.generationsPopulationList[self.currGeneration],
                             self.generationsFoodList[self.currGeneration],
-                            mapContent)
+                            mapContent,
+                            mainData)
                 print("\rGen (" + str(self.currGeneration)
                       + ") loop " + str(self.loopIndex), end='\r')
             if ('mapContent' in locals() and (self.prevMouseXClick != self.mouseXClick

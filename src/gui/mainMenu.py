@@ -221,9 +221,9 @@ class MainMenu:
         self.rdbOptionFixedPopulationNb.grid(column=2, row=0, sticky='w')
 
         self.rdbOptionChildrenPopulationNb = tk.Checkbutton(self.populationGenFrame,
-                                                text="Children",
-                                                variable=self.optionPopulationGen,
-                                                font=H4TITLEFONT)
+                                        text="Children",
+                                        variable=self.optionPopulationReproduction,
+                                        font=H4TITLEFONT)
         self.rdbOptionChildrenPopulationNb.grid(column=3, row=0, sticky='w')
         self.rdbOptionFixedPopulationNb.select()
 

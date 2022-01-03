@@ -39,11 +39,11 @@ class Menus:
         self.menusTabs.add(self.runInfoMenu.runInfoFrame, text="Run Info")
 
     def enableZonesPaintingTab(self):
-        self.menusTabs.add(self.dangerPaintingMenu.zonesPaintingFrame, text="Painting")
+        self.menusTabs.add(self.zonePaintingMenu.zonesPaintingFrame, text="Painting")
 
     def createPaintingMenu(self, applicationGUI):
-        self.dangerPaintingMenu = ZonesPaintingMenu(applicationGUI,
+        self.zonePaintingMenu = ZonesPaintingMenu(applicationGUI,
                                                      self.menusTabs,
                                                      self.menusFrame.winfo_width(),
                                                      self.menusFrame.winfo_height())
-        self.menusTabs.add(self.dangerPaintingMenu.zonesPaintingFrame, text="Painting")
+        self.menusTabs.add(self.zonePaintingMenu.zonesPaintingFrame, text="Painting")

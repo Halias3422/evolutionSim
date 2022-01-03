@@ -4,10 +4,14 @@ from .fixedGenePool import FixedGenePool
 
 class FixedChild(Individual):
 
-    def __init__(self, generation, generationLifeSpan, populationNb, mutationProb,
-                 mapFreeSpaceList, AttributesList):
+    def __init__(self, mainData, populationNb, AttributesList, mapFreeSpaceList):
+        generation = mainData.generationLoop
+        generationLifeSpan = mainData.generationLifeSpan
+        mutationProb = mainData.mutationProb
         self.mapPosition = []
-        initMapPos = random.choice(mapFreeSpaceList)
+
+        print("popNb = {} lenList = {}".format(populationNb, len(mainData.fixedPopulationPos)))
+        initMapPos = mainData.fixedPopulationPos[populationNb]
         self.mapPosition.append([initMapPos[0], initMapPos[1]])
         self.genePool = FixedGenePool(AttributesList.newGenerationAttributesList,
                                       mutationProb)

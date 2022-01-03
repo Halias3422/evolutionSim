@@ -4,14 +4,40 @@ from .genePool import GenePool
 
 class Individual:
 
-    def __init__(self, mapSizeX, mapSizeY, generation, generationLifeSpan,
-            populationNb, mapFreeSpaceList):
+    def __init__(self, mainData, applicationGUI, mapFreeSpaceList, spawnRule):
         self.mapPosition = []
-        initMapPos = random.choice(mapFreeSpaceList)
+        initMapPos = self.__determineMapPositionFromSpawnRule(mainData,
+                                                    applicationGUI, spawnRule,
+                                                    mapFreeSpaceList)
         self.mapPosition.append([initMapPos[0], initMapPos[1]])
         self.genePool = GenePool(None, None, None)
         self.parents = None
-        self.setStarterBasicAttributes(generation, generationLifeSpan, populationNb)
+        self.setStarterBasicAttributes(0, mainData.generationLifeSpan,
+                                       mainData.populationNb)
+
+    def __determineMapPositionFromSpawnRule(self, mainData, applicationGUI,
+                                            spawnRule, mapFreeSpaceList):
+        initMapPos = []
+        if (spawnRule == "paint"):
+            initMapPos = self.__getIndividualPosFromMap(mainData, applicationGUI)
+        elif (spawnRule == "random"):
+            initMapPos = random.choice(mapFreeSpaceList)
+        return initMapPos
+
+
+
+    def __getIndividualPosFromMap(self, mainData, applicationGUI):
+        currY = 0
+        spottedPopNb = 0
+        while (currY < applicationGUI.mapSizeY):
+            currX = 0
+            while (currX < applicationGUI.mapSizeX):
+                if (mainData.mapRepresentation[currY][currX] == "population"):
+                    spottedPopNb += 1
+                    if (spottedPopNb == mainData.populationNb):
+                        return ([currY, currX])
+                currX += 1
+            currY += 1
 
 
     def setStarterBasicAttributes(self, generation, generationLifeSpan,

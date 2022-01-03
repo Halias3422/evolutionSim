@@ -20,23 +20,34 @@ class RunMainDatas:
         self.dataCollection = []
         self.allGenerationsPopulationList = []
         self.allGenerationsFoodList = []
+        self.obstacleList = []
+        self.dangerList = []
         self.populationInfoPerLoop = []
         self.mapRepresentation = createMapRepresentation(self.mapSizeX, self.mapSizeY)
-        self.zonesMapRepresentation = []
+        self.dangerZoneMapRepresentation = createMapRepresentation(self.mapSizeX,
+                                                                   self.mapSizeY)
+        self.zonesMapRepresentation = createMapRepresentation(self.mapSizeX,
+                                                              self.mapSizeY)
 
         self.dangerGen = mainMenu.optionDangerGen.get()
         self.populationGen = mainMenu.optionPopulationGen.get()
+        self.populationReproductionGen = mainMenu.optionPopulationReproduction.get()
         self.foodGen = mainMenu.optionFoodGen.get()
         self.obstacleGen = mainMenu.optionObstacleGen.get()
         self.reproductionToggle = mainMenu.optionReproductionGen.get()
 
-    def initZonesMapRepresentation(self, applicationGUI):
-        self.zonesMapRepresentation = applicationGUI.menus.dangerPaintingMenu.mapZonesRepresentation
+        self.fixedPopulationPos = []
+
+    def __initZonesMapsRepresentation(self, applicationGUI):
+        self.zonesMapRepresentation = applicationGUI.menus.zonePaintingMenu.mapZonesRepresentation
+        self.dangerZoneMapRepresentation = applicationGUI.menus.zonePaintingMenu.mapDangerZonesRepresentation
 
     def updateMainDataAfterPainting(self, applicationGUI, mainData):
+        self.__initZonesMapsRepresentation(applicationGUI)
         mapSizeY = mainData.mapSizeY - 1
         mapSizeX = mainData.mapSizeX - 1
         zoneMap = mainData.zonesMapRepresentation
+        dangerZoneMap = mainData.dangerZoneMapRepresentation
         environment = {
                 "population": 0,
                 "danger": 0,
@@ -48,22 +59,25 @@ class RunMainDatas:
             while (tmpSizeX >= 0):
                 if (zoneMap[mapSizeY][tmpSizeX] == "population"):
                     environment["population"] += 1
-                elif (zoneMap[mapSizeY][tmpSizeX] == "danger"):
-                    environment["danger"] += 1
                 elif (zoneMap[mapSizeY][tmpSizeX] == "food"):
                     environment["food"] += 1
                 elif (zoneMap[mapSizeY][tmpSizeX] == "obstacle"):
                     environment["obstacle"] += 1
+                if (dangerZoneMap[mapSizeY][tmpSizeX] == "danger"):
+                    environment["danger"] += 1
                 tmpSizeX -= 1
             mapSizeY -= 1
         if (self.populationGen == "paint"):
             self.populationNb = environment["population"]
+            self.beginningPopulationNb = environment["population"]
         if (self.dangerGen == "paint"):
             self.dangerNb = environment["danger"]
         if (self.foodGen == "paint"):
             self.foodNb = environment["food"]
         if (self.obstacleGen == "paint"):
             self.obstacleNb = environment["obstacle"]
-        print("popNb = {} dangNb = {} foodNb = {} obstNb = {}".format(self.populationNb,
+        print("popNb = {} dangNb = {} foodNb = {} ObstNb = {}".format(self.populationNb,
             self.dangerNb, self.foodNb, self.obstacleNb))
+
+
 
