@@ -44,9 +44,11 @@ def addZonesToMapRepresentationCurrGen(mainData):
         while (currX >= 0):
             mainData.mapRepresentation[currY][currX] = \
                 mainData.zonesMapRepresentation[currY][currX]
-            if (mainData.zonesMapRepresentation[currY][currX] == "obstacle"):
+            if (mainData.zonesMapRepresentation[currY][currX] == "obstacle"
+                    and ([currY, currX]) not in mainData.obstacleList):
                 mainData.obstacleList.append([currY, currX])
-            if (mainData.dangerZoneMapRepresentation[currY][currX] == "danger"):
+            if (mainData.dangerZoneMapRepresentation[currY][currX] == "danger"
+                    and ([currY, currX]) not in mainData.dangerList):
                 mainData.dangerList.append([currY, currX])
             currX -= 1
         currY -= 1

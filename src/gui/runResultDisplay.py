@@ -84,7 +84,8 @@ class PrintRunResult:
                                       startY,
                                       startX + applicationGUI.XCellSize,
                                       startY + applicationGUI.YCellSize,
-                                      fill=color)
+                                      fill=color,
+                                      tag="individual")
 
     def __printObstaclesOnMap(self, mainData, mapContent, applicationGUI):
         for obstacle in mainData.obstacleList:
@@ -102,7 +103,8 @@ class PrintRunResult:
                                       startY,
                                       startX + applicationGUI.XCellSize,
                                       startY + applicationGUI.YCellSize,
-                                      fill="chocolate")
+                                      fill="chocolate",
+                                      tag="obstacle")
 
     def __printFoodOnMap(self, foodList, mapContent, applicationGUI):
         for food in foodList:
@@ -120,39 +122,8 @@ class PrintRunResult:
                                       startY,
                                       startX + applicationGUI.XCellSize,
                                       startY + applicationGUI.YCellSize,
-                                      fill="green")
-
-    def __createHoveringDangerZoneOnMap(self, applicationGUI, dangerZone, **options):
-        if ("alpha" in options):
-            alpha = int(options.pop("alpha") * 255)
-            fill = options.pop("fill")
-            if (fill == "grey"):
-                fill = (128, 128, 128, 96)
-            try:
-                image = Image.new("RGBA", (int(dangerZone["endX"]) -
-                                  int(dangerZone["startX"]),
-                                  int(dangerZone["endY"]) -
-                                  int(dangerZone["startY"])), fill)
-                self.dangerImages.append(ImageTk.PhotoImage(image))
-            except:
-                return
-            applicationGUI.map.create_image(dangerZone["startX"], dangerZone["startY"],
-                    image=self.dangerImages[-1], anchor='nw')
-
-    def __printDangerOnMap(self, mainData, applicationGUI):
-        self.dangerImages = []
-        for danger in mainData.dangerList:
-            startX = danger[1] * applicationGUI.XCellSize
-            startY = danger[0] * applicationGUI.YCellSize
-            dangerZone = {
-                    "startX": startX,
-                    "startY": startY,
-                    "endX": startX + applicationGUI.XCellSize,
-                    "endY": startY + applicationGUI.YCellSize
-                    }
-            self.__createHoveringDangerZoneOnMap(applicationGUI, dangerZone,
-                                                 fill="grey", alpha=.5)
-
+                                      fill="green",
+                                      tag="food")
 
     def __printSurvivingIndividuals(self, populationList, mapContent, applicationGUI):
         for individual in populationList:
@@ -165,7 +136,8 @@ class PrintRunResult:
                                           startY,
                                           startX + applicationGUI.XCellSize,
                                           startY + applicationGUI.YCellSize,
-                                          fill="yellow")
+                                          fill="yellow",
+                                          tag="individual")
                 mapContent.append({
                     "type": "individual",
                     "name": individual.name,
@@ -184,15 +156,20 @@ class PrintRunResult:
                     "currentGoalPos": "None"
                     })
 
+    def __clearMapBeforeRedraw(self, applicationGUI):
+        applicationGUI.map.delete("individual")
+        applicationGUI.map.delete("food")
+        applicationGUI.map.delete("obstacle")
+
     def __addContentForCurrentFrameToMap(self, applicationGUI, populationList,
                                          foodList, mapContent, mainData):
-        applicationGUI.map.delete("all")
+        self.__clearMapBeforeRedraw(applicationGUI)
         applicationGUI.createMapGrid(applicationGUI.mapSizeX, applicationGUI.mapSizeY)
         if (self.loopIndex < self.generationLifeSpan):
             self.__printPopulationOnMap(populationList, mapContent, applicationGUI)
             self.__printFoodOnMap(foodList[self.loopIndex], mapContent, applicationGUI)
             self.__printObstaclesOnMap(mainData, mapContent, applicationGUI)
-            self.__printDangerOnMap(mainData, applicationGUI)
+            # applicationGUI.map.tag_raise("danger")
         else:
             self.__printSurvivingIndividuals(populationList, mapContent, applicationGUI)
         applicationGUI.map.pack()
@@ -249,8 +226,41 @@ class PrintRunResult:
                                                                    self.loopIndex)
             return True
 
+    def __createHoveringDangerZoneOnMap(self, applicationGUI, dangerZone, **options):
+        if ("alpha" in options):
+            alpha = int(options.pop("alpha") * 255)
+            fill = options.pop("fill")
+            if (fill == "grey"):
+                fill = (128, 128, 128, 96)
+            try:
+                image = Image.new("RGBA", (int(dangerZone["endX"]) -
+                                  int(dangerZone["startX"]),
+                                  int(dangerZone["endY"]) -
+                                  int(dangerZone["startY"])), fill)
+                self.dangerImages.append(ImageTk.PhotoImage(image))
+            except:
+                return
+            applicationGUI.map.create_image(dangerZone["startX"], dangerZone["startY"],
+                    image=self.dangerImages[-1], anchor='nw', tag="danger")
+
+    def __printDangerZonesOnMap(self, mainData, applicationGUI):
+        applicationGUI.map.delete("all")
+        self.dangerImages = []
+        for danger in mainData.dangerList:
+            startX = danger[1] * applicationGUI.XCellSize
+            startY = danger[0] * applicationGUI.YCellSize
+            dangerZone = {
+                    "startX": startX,
+                    "startY": startY,
+                    "endX": startX + applicationGUI.XCellSize,
+                    "endY": startY + applicationGUI.YCellSize
+                    }
+            self.__createHoveringDangerZoneOnMap(applicationGUI, dangerZone,
+                                                 fill="grey", alpha=.5)
+
     def __launchDisplayLoop(self, applicationGUI, mainData):
         applicationGUI.mainWindow.bind("<Key>", self.__keyPressedDuringReplay)
+        self.__printDangerZonesOnMap(mainData, applicationGUI)
         while True:
             if (applicationGUI.exiting is True):
                 break
