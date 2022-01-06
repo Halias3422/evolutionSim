@@ -157,7 +157,8 @@ class PrintRunResult:
     def __printSurvivingIndividuals(self, populationList, mapContent, applicationGUI):
         for individual in populationList:
             if (individual.hasEaten is True
-                and individual.hasReproduced is True):
+                and individual.hasReproduced is True
+                and individual.escapedDanger is True):
                 startX = individual.currMapPosition[1] * applicationGUI.XCellSize
                 startY = individual.currMapPosition[0] * applicationGUI.YCellSize
                 applicationGUI.map.create_rectangle(startX,
@@ -186,7 +187,7 @@ class PrintRunResult:
     def __addContentForCurrentFrameToMap(self, applicationGUI, populationList,
                                          foodList, mapContent, mainData):
         applicationGUI.map.delete("all")
-        # self.__createMapGrid()
+        applicationGUI.createMapGrid(applicationGUI.mapSizeX, applicationGUI.mapSizeY)
         if (self.loopIndex < self.generationLifeSpan):
             self.__printPopulationOnMap(populationList, mapContent, applicationGUI)
             self.__printFoodOnMap(foodList[self.loopIndex], mapContent, applicationGUI)
@@ -270,7 +271,7 @@ class PrintRunResult:
                 or self.prevMouseYClick != self.mouseYClick)):
                 clickedOnObject = self.__checkWhatIsUnderClickPosition(mapContent)
                 if (clickedOnObject and clickedOnObject["type"] == "individual"):
-                    applicationGUI.menus.runInfoMenu.printCurrentlySelectedIndividualInfo(clickedOnObject, applicationGUI.menus.menusTabs)
+                    applicationGUI.menus.runInfoMenu.printCurrentlySelectedIndividualInfo(clickedOnObject, applicationGUI.menus.menusTabs, self.loopIndex)
                 elif (clickedOnObject and clickedOnObject["type"] == "food"):
                     applicationGUI.menus.runInfoMenu.printCurrentlySelectedFoodInfo(\
                             clickedOnObject, applicationGUI.menus.menusTabs)

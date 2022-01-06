@@ -26,7 +26,8 @@ def runGenerationsLife(applicationGUI, event=None):
         foodList = spawnCurrentLoopFood(mainData, mainData.mapRepresentation)
         populationList = storeCurrentLoopData(populationList, foodList, mainData,
                                               mainData.mapRepresentation)
-        mainData.parentGeneration = removeAllUnsuccessfullIndividuals(populationList)
+        mainData.parentGeneration = removeAllUnsuccessfullIndividuals(populationList,
+                                                                      mainData)
         printLoadingStateToUI(mainData, applicationGUI, "running")
         mainData.generationLoop += 1
         if (checkIfThereAreSurvivors(mainData, mainData.parentGeneration, applicationGUI)
@@ -45,6 +46,8 @@ def handleRandomZonesGeneration(applicationGUI, mainData):
     if (mainMenu.optionObstacleGen.get() == "random"):
         mainData.zonesMapRepresentation = addRandomZoneToZoneMap(mainData, "obstacle",
                                                                  mainData.obstacleNb)
+    mainData.dangerLevelMapRepresentation = generateDangerLevelMap(mainData,
+                                                                   applicationGUI)
 
 def initApplicationState(applicationGUI, mainData):
     applicationGUI.map.bind("<Button-1>", applicationGUI.focusOnMap())

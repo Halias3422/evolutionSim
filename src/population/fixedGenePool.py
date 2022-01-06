@@ -15,7 +15,6 @@ class FixedGenePool:
         self.__registerGeneLevels()
         self.__initMovementGene(attributesList)
         self.__initPreferenceGene(attributesList)
-        self.__initFearGene(attributesList)
 
     def __registerGeneLevels(self):
         self.movement = self.geneLevels["movement"]
@@ -79,9 +78,6 @@ class FixedGenePool:
         self.preference = int(self.__getRandomValueFromAttributesList(attributesList,
                                                                   "preference"))
 
-    def __initFearGene(self, attributesList):
-        self.fear = int(self.__getRandomValueFromAttributesList(attributesList,
-                                                            "fear"))
 
     def __getRandomValueFromAttributesList(self, attributesList, geneKey):
         chosenValue = 0

@@ -18,7 +18,6 @@ class GenePool:
     #     reproductionRadar(starts between 1 and 2) - from 1 to 10
     #     fertility(starts between 1 and 2) - from 1 to 7
     #     preference - from 0 (food) to 9 (reproduction)
-    #     fear - from -10 to 10
 
     def __init__(self, parent, parentPartner, mutationProb):
         self.__initGeneLevels(parent, parentPartner, mutationProb)
@@ -28,7 +27,6 @@ class GenePool:
         self.__initReproductionRadarGene(self.__randParent(parent, parentPartner))
         self.__initFertilityGene(self.__randParent(parent, parentPartner))
         self.__initPreferenceGene(self.__randParent(parent, parentPartner))
-        self.__initFearGene(self.__randParent(parent, parentPartner))
 
     def __randParent(self, parent, parentPartner):
         genitor = random.choice([parent, parentPartner])
@@ -137,8 +135,3 @@ class GenePool:
         else:
             self.preference = parent.genePool.preference
 
-    def __initFearGene(self, parent):
-        if (parent is None):
-            self.fear = random.randint(-10, 10)
-        else:
-            self.fear = parent.genePool.fear

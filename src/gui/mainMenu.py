@@ -326,8 +326,8 @@ class MainMenu:
                                                 + str(dataCollection.hasReproducedNb))
         self.lblLoadingHasEaten["text"] = ("Individuals that have eaten : "
                                             + str(dataCollection.hasEatenNb))
-        self.lblLoadingHasReproducedAndEaten["text"] = ("Individual that have reproduced and eaten : "
-                                                         + str(dataCollection.hasReproducedAndEatenNb))
+        self.lblLoadingHasReproducedAndEaten["text"] = ("Individual that have survived: "
+                                                         + str(dataCollection.hasSurvived))
         self.loadingInfoFrame.grid()
         mainWindow.update()
 

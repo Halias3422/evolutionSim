@@ -26,6 +26,7 @@ class RunMainDatas:
         self.mapRepresentation = createMapRepresentation(self.mapSizeX, self.mapSizeY)
         self.dangerZoneMapRepresentation = createMapRepresentation(self.mapSizeX,
                                                                    self.mapSizeY)
+        self.dangerLevelsMapRepresentation = []
         self.zonesMapRepresentation = createMapRepresentation(self.mapSizeX,
                                                               self.mapSizeY)
 
@@ -76,8 +77,6 @@ class RunMainDatas:
             self.foodNb = environment["food"]
         if (self.obstacleGen == "paint"):
             self.obstacleNb = environment["obstacle"]
-        print("popNb = {} dangNb = {} foodNb = {} ObstNb = {}".format(self.populationNb,
-            self.dangerNb, self.foodNb, self.obstacleNb))
 
 
 

@@ -47,6 +47,7 @@ class Individual:
         self.hasEaten = False
         self.hasEatenLoop = generationLifeSpan + 1
         self.hasReproduced = False
+        self.escapedDanger = False
         self.hasReproducedLoop = generationLifeSpan + 1
         self.currentGoal = "none"
         self.currGoalPos = "none"

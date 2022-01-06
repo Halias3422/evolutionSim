@@ -65,6 +65,57 @@ def generateDangerZoneMap(mainData):
                 break
     return dangerMap
 
+def registerDangerTileLevel(tileX, tileY, dangerMap, applicationGUI):
+    amplitude = 1
+    while (True):
+        currY = tileY - amplitude
+        while (currY <= tileY + amplitude):
+            currX = tileX - amplitude
+            while (currX <= tileX + amplitude):
+                if (currY >= 0 and currY < applicationGUI.mapSizeY
+                        and currX >= 0 and currX < applicationGUI.mapSizeX):
+                    if (dangerMap[currY][currX] == "empty"):
+                        return (amplitude)
+                currX += 1
+            currY += 1
+        amplitude += 1
+
+
+
+def allTilesAreDanger(mainData, applicationGUI):
+    currY = applicationGUI.mapSizeY - 1
+    while (currY >= 0):
+        currX = applicationGUI.mapSizeX - 1
+        while (currX >= 0):
+            if (mainData.dangerZoneMapRepresentation[currY][currX] == "empty"):
+                return False
+            currX -= 1
+        currY -= 1
+    return True
+
+
+def generateDangerLevelMap(mainData, applicationGUI):
+    dangerMap = mainData.dangerZoneMapRepresentation
+    if (allTilesAreDanger(mainData, applicationGUI) is True):
+        dangerLvlMap = [[1 for x in range(applicationGUI.mapSizeX)]
+                for y in range(applicationGUI.mapSizeY)]
+        return dangerLvlMap
+    else:
+        dangerLvlMap = [[0 for x in range(applicationGUI.mapSizeX)]
+                for y in range(applicationGUI.mapSizeY)]
+    currY = applicationGUI.mapSizeY - 1
+    while (currY >= 0):
+        currX = applicationGUI.mapSizeX - 1
+        while (currX >= 0):
+            if (dangerMap[currY][currX] == "danger"):
+                dangerLvlMap[currY][currX] = registerDangerTileLevel(currX, currY,
+                                                                     dangerMap,
+                                                                     applicationGUI)
+            currX -= 1
+        currY -= 1
+    return dangerLvlMap
+
+
 def getMapFreeTilesNumber(map, sizeX, sizeY):
     currY = 0
     freeTilesNb = 0

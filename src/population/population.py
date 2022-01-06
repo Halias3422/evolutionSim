@@ -123,7 +123,7 @@ def runCurrentGenerationLife(populationList, mainData, mapRepresentation,
             for individual in populationList:
                 individual = decideIndividualCurrentAction(individual, mapRepresentation,
                                               populationList, mapSizeX, mapSizeY,
-                                              loopIndex, initialFoodList)
+                                              loopIndex, initialFoodList, mainData)
                 populationInfo = fillPopulationInfo(individual, populationInfo)
         foodList.append(initialFoodList)
         mapRepresentation = updateMapRepresentation(mapRepresentation,
@@ -133,10 +133,46 @@ def runCurrentGenerationLife(populationList, mainData, mapRepresentation,
         currGenInfo.append(populationInfo)
         loopIndex += 1
     mainData.populationInfoPerLoop.append(currGenInfo)
+    populationList = registerIndividualWhoEscapedDangerZone(populationList, mainData)
     return populationList
 
+def individualIsInDangerZone(individual, mainData):
+    if (mainData.dangerZoneMapRepresentation[individual.currMapPosition[0]]\
+            [individual.currMapPosition[1]] == "danger"):
+        return True
+    return False
+
+def individualGetOutOfDangerZone(individual, mainData, mapRepresentation):
+    #find lower danger Lvl and check if can go there
+    dangerLvlMap = mainData.dangerLevelMapRepresentation
+    currY = individual.currMapPosition[0]
+    currX = individual.currMapPosition[1]
+    currDangerTileLvl = dangerLvlMap[currY][currX]
+    amplitude = 1
+
+    while (amplitude <= individual.genePool.dangerRadar + 1):
+        checkY = currY - amplitude
+        while (checkY <= currY + amplitude):
+            checkX = currX - amplitude
+            while (checkX <= currX + amplitude):
+                if (checkY < mainData.mapSizeY and checkX < mainData.mapSizeX
+                        and dangerLvlMap[checkY][checkX] < currDangerTileLvl
+                        and mapRepresentation[checkY][checkX] == "empty"
+                        and compareIndividualMovementPoolToTargetPos(individual,
+                         ([checkY, checkX]), individual.currMapPosition) != None):
+                    individual.setCurrentGoal("escape danger", [checkY, checkX])
+                    return individual
+                checkX += 1
+            checkY += 1
+        amplitude += 1
+    return individual
+
 def decideIndividualCurrentAction(individual, mapRepresentation, populationList,
-                                  mapSizeX, mapSizeY, loopIndex, initialFoodList):
+                                  mapSizeX, mapSizeY, loopIndex, initialFoodList,
+                                  mainData):
+    if (individual.currentGoal == "escape danger"):
+        individual.currentGoal = "none"
+        individual.currGoalPos = "none"
     if (individual.hasEaten == False
             or individual.hasReproduced == False):
         individual = setIndividualCurrentGoal(individual,
@@ -144,6 +180,10 @@ def decideIndividualCurrentAction(individual, mapRepresentation, populationList,
                                                   populationList,
                                                   mapSizeX,
                                                   mapSizeY)
+    if (individual.currentGoal == "none"
+            and individualIsInDangerZone(individual, mainData) is True):
+        individual = individualGetOutOfDangerZone(individual, mainData,
+                                                  mapRepresentation)
     if (individual.currentGoal == "none"):
         individual = individualExecuteRandomMovement(individual,
                                                      mapRepresentation,
@@ -324,12 +364,7 @@ def setIndividualCurrentGoal(individual, mapRepresentation, populationList,
                            mapRepresentation, populationList, mapSizeX, mapSizeY)
     return individual
 
-def checkIfTargetIsReachable(individual, targetPos):
-    if (targetPos):
-        currPos = individual.currMapPosition
-        if (abs(targetPos[0] - currPos[0]) < 2
-                and abs(targetPos[1] - currPos[1]) < 2):
-            return targetPos
+def compareIndividualMovementPoolToTargetPos(individual, targetPos, currPos):
         movementPool = individual.genePool.movement
         if (targetPos[0] > currPos[0] and "diagDownLeft" not in movementPool
                 and "diagDownRight" not in movementPool
@@ -347,6 +382,16 @@ def checkIfTargetIsReachable(individual, targetPos):
                 and "diagDownRight" not in movementPool
                 and "right" not in movementPool):
             return None
+        return targetPos
+
+def checkIfTargetIsReachable(individual, targetPos):
+    if (targetPos):
+        currPos = individual.currMapPosition
+        if (abs(targetPos[0] - currPos[0]) < 2
+                and abs(targetPos[1] - currPos[1]) < 2):
+            return targetPos
+        targetPos = compareIndividualMovementPoolToTargetPos(individual, targetPos,
+                                                             currPos)
         return targetPos
     return None
 
@@ -389,9 +434,19 @@ def checkIfTargetPositionIsValid(individual, coordX, coordY,
         return False
     return True
 
-def removeAllUnsuccessfullIndividuals(populationList):
+def registerIndividualWhoEscapedDangerZone(populationList, mainData):
+    for individual in populationList:
+        if (mainData.dangerZoneMapRepresentation[individual.mapPosition[-1][0]]\
+                [individual.mapPosition[-1][1]] == "empty"):
+            individual.escapedDanger = True
+        else:
+            individual.escapedDanger = False
+    return populationList
+
+def removeAllUnsuccessfullIndividuals(populationList, mainData):
     successfullPopulationList = []
     for individual in populationList:
-        if (individual.hasEaten is True and individual.hasReproduced is True):
+        if (individual.hasEaten is True and individual.hasReproduced is True
+                and individual.escapedDanger is True):
             successfullPopulationList.append(individual)
     return successfullPopulationList

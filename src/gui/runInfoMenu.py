@@ -166,10 +166,11 @@ class RunInfoMenu():
                                           font=H3TITLEFONT)
         self.lblIndividualCurrGoalPos.grid(row=4)
         self.lblIndividualGeneMovement = tk.Label(self.individualGenePoolFrame,
-                                              font=H3TITLEFONT)
+                       wraplength=self.individualGenePoolFrame.winfo_reqwidth() - 10,
+                      font=H3TITLEFONT)
         self.lblIndividualGeneMovement.grid(row=0)
         self.lblIndividualGeneDanger = tk.Label(self.individualGenePoolFrame,
-                                              font=H3TITLEFONT)
+                                                font=H3TITLEFONT)
         self.lblIndividualGeneDanger.grid(row=1)
         self.lblIndividualGeneFood = tk.Label(self.individualGenePoolFrame,
                                               font=H3TITLEFONT)
@@ -183,9 +184,6 @@ class RunInfoMenu():
         self.lblIndividualGenePreference = tk.Label(self.individualGenePoolFrame,
                                               font=H3TITLEFONT)
         self.lblIndividualGenePreference.grid(row=5)
-        self.lblIndividualGeneFear = tk.Label(self.individualGenePoolFrame,
-                                              font=H3TITLEFONT)
-        self.lblIndividualGeneFear.grid(row=6)
 
 
     def __initGenerationsProgressBar(self):
@@ -310,15 +308,22 @@ class RunInfoMenu():
         menusTab.select(self.runInfoFrame)
 
 
-    def printCurrentlySelectedIndividualInfo(self, individual, menusTab):
+    def printCurrentlySelectedIndividualInfo(self, individual, menusTab, loopIndex):
         self.foodInfoFrame.grid_remove()
         self.placeHolderText.grid_remove()
         self.individualInfoFrame["text"] = "Individual " + individual["name"]
         self.lblIndividualPos["text"] = "Position: [" + str(individual["posX"])\
                                          + ", " + str(individual["posY"]) + "]"
-        self.lblIndividualHasEaten["text"] = "Has eaten: " + str(individual["hasEaten"])
-        self.lblIndividualHasReproduced["text"] = "Has reproduced: " +\
-                                                  str(individual["hasReproduced"])
+        if (individual["hasEatenLoop"] <= loopIndex):
+            self.lblIndividualHasEaten["text"] = "Has eaten: " + \
+            str(individual["hasEaten"])
+        else:
+            self.lblIndividualHasEaten["text"] = "Has eaten: False"
+        if (individual["hasReproducedLoop"] <= loopIndex):
+            self.lblIndividualHasReproduced["text"] = "Has reproduced: " +\
+                                                      str(individual["hasReproduced"])
+        else:
+            self.lblIndividualHasReproduced["text"] = "Has reproduced: False"
         self.lblIndividualCurrGoal["text"] = "Current goal: " +\
                                               str(individual["currentGoal"])
         self.lblIndividualCurrGoalPos["text"] = "Goal position: " +\
@@ -336,7 +341,6 @@ class RunInfoMenu():
                                                   str(genePool.fertility)
         self.lblIndividualGenePreference["text"] = "Preference: " +\
                                                     str(genePool.preference)
-        self.lblIndividualGeneFear["text"] = "Fear: " + str(genePool.fear)
         self.individualInfoFrame.grid()
         self.individualGenePoolFrame.grid()
         menusTab.select(self.runInfoFrame)
@@ -372,7 +376,7 @@ class RunInfoMenu():
                                                         + str(currInfo["hasReproduced"])
         else:
             currInfo = mainData.dataCollection[currGeneration]
-            self.totalPopulationInfo["text"] = str(currInfo.hasReproducedAndEatenNb)\
+            self.totalPopulationInfo["text"] = str(currInfo.hasSurvived)\
                                 + " survivors for a population of "\
                                 + str(currInfo.populationSize)
             self.populationHasEatenInfo["text"] = "Total that have eaten : "\

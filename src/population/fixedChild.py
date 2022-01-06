@@ -10,7 +10,6 @@ class FixedChild(Individual):
         mutationProb = mainData.mutationProb
         self.mapPosition = []
 
-        print("popNb = {} lenList = {}".format(populationNb, len(mainData.fixedPopulationPos)))
         initMapPos = mainData.fixedPopulationPos[populationNb]
         self.mapPosition.append([initMapPos[0], initMapPos[1]])
         self.genePool = FixedGenePool(AttributesList.newGenerationAttributesList,

@@ -24,9 +24,6 @@ class NewFixedGenerationAttributes:
                 },
             "preference": {"0": 0,"1": 0,"2":0,"3":0,"4":0,"5":0,"6":0,"7":0,
                             "8":0, "9":0},
-            "fear": {"-10": 0,"-9": 0,"-8": 0,"-7": 0,"-6": 0,"-5": 0,"-4": 0,
-                     "-3": 0, "-2":0, "-1": 0,"0": 0,"1": 0,"2":0,"3":0,"4":0,
-                     "5":0,"6":0,"7":0,"8":0, "9":0, "10":0},
 
             }
     def __init__(self, mainData):
@@ -35,14 +32,11 @@ class NewFixedGenerationAttributes:
             self.__updateDirectionAttribute(parent)
             self.__updateGeneLevelsAttribute(parent)
             self.__updatePreferenceAttribute(parent)
-            self.__updateFearAttribute(parent)
         self.__calculateDirectionPercentageForNewGeneration(\
                 mainData.beginningPopulationNb, parentGeneration)
         self.__calculateGeneLevelsPercentageForNewGeneration(\
                 mainData.beginningPopulationNb, parentGeneration)
         self.__calculatePreferencePercentageForNewGeneration(\
-                mainData.beginningPopulationNb, parentGeneration)
-        self.__calculateFearPercentageForNewGeneration(\
                 mainData.beginningPopulationNb, parentGeneration)
 
     def __calculatePreferencePercentageForNewGeneration(self, populationNb,
@@ -52,12 +46,6 @@ class NewFixedGenerationAttributes:
         self.__calculateSpecificGeneLevelAttribute(preference, parentGenLen,
                                                     populationNb)
 
-    def __calculateFearPercentageForNewGeneration(self, populationNb,
-                                                  parentGeneration):
-        parentGenLen = len(parentGeneration)
-        fear = self.newGenerationAttributesList["fear"]
-        self.__calculateSpecificGeneLevelAttribute(fear, parentGenLen,
-                                                   populationNb)
 
 
     def __calculateGeneLevelsPercentageForNewGeneration(self, populationNb,
@@ -132,8 +120,6 @@ class NewFixedGenerationAttributes:
         self.newGenerationAttributesList["preference"][str(parent.genePool.preference)]\
             += 1
 
-    def __updateFearAttribute(self, parent):
-        self.newGenerationAttributesList["fear"][str(parent.genePool.fear)] += 1
 
     def __updateGeneLevelsAttribute(self, parent):
         self.newGenerationAttributesList["geneLevels"]["movement"][str(parent.genePool.geneLevels["movement"])] += 1
