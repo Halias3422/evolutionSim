@@ -1,6 +1,6 @@
 import sys
 import tkinter as tk
-from PIL import Image, ImageTk, ImageColor
+from PIL import Image, ImageTk, ImageColor, ImageDraw
 
 class PrintRunResult:
     loopIndex = 0
@@ -17,6 +17,8 @@ class PrintRunResult:
         self.generationsPopulationList = mainData.allGenerationsPopulationList
         self.generationsFoodList = mainData.allGenerationsFoodList
         self.generationsNb = mainData.generationsNb
+        self.registeredLoopsMapContent = []
+        self.registeredLoopsImages = []
         applicationGUI.menus.mainMenu.runButton.grid()
         applicationGUI.map.bind("<Button-1>", self.__mouseClick)
         applicationGUI.menus.enableRunInfoTab()
@@ -24,7 +26,73 @@ class PrintRunResult:
         applicationGUI.menus.runInfoMenu.progressBarsFrame.grid()
         applicationGUI.menus.runInfoMenu.setBarsRunValues(mainData)
 
+        self.__registerLoopsDisplay(applicationGUI, mainData)
         self.__launchDisplayLoop(applicationGUI, mainData)
+
+    def __registerLoopsDisplay(self, applicationGUI, mainData):
+        self.__printDangerZonesOnMap(mainData, applicationGUI)
+        self.registerGenerationNb = 0
+        while (self.registerGenerationNb < self.generationsNb):
+            self.registerLoopIndex = 0
+            self.currGenerationImages = []
+            self.registerLoopMapContent = []
+            while (self.registerLoopIndex <= self.generationLifeSpan):
+                mapContent = []
+                self.__addContentForCurrentFrameToMap(applicationGUI,
+                        self.generationsPopulationList[self.registerGenerationNb],
+                        self.generationsFoodList[self.registerGenerationNb],
+                        mapContent,
+                        mainData)
+                self.currGenerationImages.append(ImageTk.PhotoImage(image=self.loopImage))
+                self.registerLoopMapContent.append(mapContent)
+                self.registerLoopIndex += 1
+            self.registeredLoopsMapContent.append(self.registerLoopMapContent)
+            self.registeredLoopsImages.append(self.currGenerationImages)
+            self.registerGenerationNb += 1
+
+    def __launchDisplayLoop(self, applicationGUI, mainData):
+        applicationGUI.mainWindow.bind("<Key>", self.__keyPressedDuringReplay)
+        while True:
+            if (applicationGUI.exiting is True):
+                break
+            if (self.__runInfoMenuBarsValuesUpdated(applicationGUI) is True):
+                self.prevLoopIndex = self.loopIndex
+                applicationGUI.menus.runInfoMenu.updatePopulationInfoFrame(mainData,
+                                                                self.loopIndex,
+                                                                self.currGeneration)
+                self.__printCurrentLoopToMap(applicationGUI)
+            if (self.prevMouseXClick != self.mouseXClick
+                or self.prevMouseYClick != self.mouseYClick):
+                clickedOnObject = self.__checkWhatIsUnderClickPosition(self.registeredLoopsMapContent[self.currGeneration][self.loopIndex])
+                if (clickedOnObject and clickedOnObject["type"] == "individual"):
+                    applicationGUI.menus.runInfoMenu.printCurrentlySelectedIndividualInfo(clickedOnObject, applicationGUI.menus.menusTabs, self.loopIndex)
+                elif (clickedOnObject and clickedOnObject["type"] == "food"):
+                    applicationGUI.menus.runInfoMenu.printCurrentlySelectedFoodInfo(\
+                            clickedOnObject, applicationGUI.menus.menusTabs)
+                self.prevMouseXClick = self.mouseXClick
+                self.prevMouseYClick = self.mouseYClick
+            applicationGUI.mainWindow.update()
+
+    def __createMapGrid(self, applicationGUI):
+        currPosY = applicationGUI.frameHeight
+        while (currPosY >= 0):
+            self.loopDraw.line([0, currPosY, applicationGUI.frameLength, currPosY],
+                    fill="black")
+            currPosY -= applicationGUI.YCellSize
+        currPosX = applicationGUI.frameLength
+        while (currPosX >= 0):
+            self.loopDraw.line([currPosX, 0, currPosX, applicationGUI.frameHeight],
+                    fill="black")
+            currPosX -= applicationGUI.XCellSize
+
+    def __printCurrentLoopToMap(self, applicationGUI):
+        applicationGUI.map.delete("all")
+        applicationGUI.map.create_image(0, 0,
+                image=self.registeredLoopsImages[self.currGeneration][self.loopIndex],
+                anchor='nw')
+        applicationGUI.map.create_image(0, 0,
+                image=self.dangerMapImage,
+                anchor='nw')
 
     def __mouseClick(self, event):
         self.mouseXClick = event.x
@@ -38,19 +106,16 @@ class PrintRunResult:
     def setLoopIndexFromMenu(self, value):
         self.loopIndex = value
 
-
     def __keyPressedDuringReplay(self, event):
         if (event.keysym == "Left"):
             self.__moveLoopIndex(-1)
         elif (event.keysym == "Right"):
             self.__moveLoopIndex(1)
-        # elif (event.keysym == "Return"):
-        #     self.loopIndex = self.generationLifeSpan
 
     def __printPopulationOnMap(self, populationList, mapContent, applicationGUI):
         for individual in populationList:
-            startX = individual.mapPosition[self.loopIndex][1] * applicationGUI.XCellSize
-            startY = individual.mapPosition[self.loopIndex][0] * applicationGUI.YCellSize
+            startX = individual.mapPosition[self.registerLoopIndex][1] * applicationGUI.XCellSize
+            startY = individual.mapPosition[self.registerLoopIndex][0] * applicationGUI.YCellSize
             mapContent.append({
                 "type": "individual",
                 "name": individual.name,
@@ -65,27 +130,23 @@ class PrintRunResult:
                 "hasEaten": individual.hasEaten,
                 "hasEatenLoop": individual.hasEatenLoop,
                 "genePool": individual.genePool,
-                "currentGoal": individual.currentGoalHistory[self.loopIndex - 1],
-                "currentGoalPos": individual.currGoalPosHistory[self.loopIndex - 1]
+                "currentGoal": individual.currentGoalHistory[self.registerLoopIndex - 1],
+                "currentGoalPos": individual.currGoalPosHistory[self.registerLoopIndex - 1]
                 })
             color = "black"
             if (individual.hasEaten is True
-                and individual.hasEatenLoop <= self.loopIndex
+                and individual.hasEatenLoop <= self.registerLoopIndex
                 and individual.hasReproduced is True
-                and individual.hasReproducedLoop <= self.loopIndex):
+                and individual.hasReproducedLoop <= self.registerLoopIndex):
                 color = "yellow"
             elif (individual.hasEaten is True
-                  and individual.hasEatenLoop <= self.loopIndex):
+                  and individual.hasEatenLoop <= self.registerLoopIndex):
                 color = "red"
             elif (individual.hasReproduced is True
-                  and individual.hasReproducedLoop <= self.loopIndex):
+                  and individual.hasReproducedLoop <= self.registerLoopIndex):
                 color = "pink"
-            applicationGUI.map.create_rectangle(startX,
-                                      startY,
-                                      startX + applicationGUI.XCellSize,
-                                      startY + applicationGUI.YCellSize,
-                                      fill=color,
-                                      tag="individual")
+            self.loopDraw.rectangle([startX, startY, startX + applicationGUI.XCellSize,
+                                     startY + applicationGUI.YCellSize], fill=color)
 
     def __printObstaclesOnMap(self, mainData, mapContent, applicationGUI):
         for obstacle in mainData.obstacleList:
@@ -99,12 +160,8 @@ class PrintRunResult:
                 "posY": startY / applicationGUI.YCellSize,
                 "endX": startX + applicationGUI.XCellSize,
                 "endY": startY + applicationGUI.YCellSize})
-            applicationGUI.map.create_rectangle(startX,
-                                      startY,
-                                      startX + applicationGUI.XCellSize,
-                                      startY + applicationGUI.YCellSize,
-                                      fill="chocolate",
-                                      tag="obstacle")
+            self.loopDraw.rectangle([startX, startY, startX + applicationGUI.XCellSize,
+                                     startY + applicationGUI.YCellSize], fill=chocolate)
 
     def __printFoodOnMap(self, foodList, mapContent, applicationGUI):
         for food in foodList:
@@ -118,12 +175,8 @@ class PrintRunResult:
                 "posY": startY / applicationGUI.YCellSize,
                 "endX": startX + applicationGUI.XCellSize,
                 "endY": startY + applicationGUI.YCellSize})
-            applicationGUI.map.create_rectangle(startX,
-                                      startY,
-                                      startX + applicationGUI.XCellSize,
-                                      startY + applicationGUI.YCellSize,
-                                      fill="green",
-                                      tag="food")
+            self.loopDraw.rectangle([startX, startY, startX + applicationGUI.XCellSize,
+                                     startY + applicationGUI.YCellSize], fill="green")
 
     def __printSurvivingIndividuals(self, populationList, mapContent, applicationGUI,
                                     mainData):
@@ -134,12 +187,10 @@ class PrintRunResult:
                 and individual.escapedDanger is True):
                 startX = individual.currMapPosition[1] * applicationGUI.XCellSize
                 startY = individual.currMapPosition[0] * applicationGUI.YCellSize
-                applicationGUI.map.create_rectangle(startX,
-                                          startY,
-                                          startX + applicationGUI.XCellSize,
-                                          startY + applicationGUI.YCellSize,
-                                          fill="yellow",
-                                          tag="individual")
+                self.loopDraw.rectangle([startX, startY,
+                                       startX + applicationGUI.XCellSize,
+                                       startY + applicationGUI.YCellSize],
+                                       fill="yellow")
                 mapContent.append({
                     "type": "individual",
                     "name": individual.name,
@@ -158,23 +209,19 @@ class PrintRunResult:
                     "currentGoalPos": "None"
                     })
 
-    def __clearMapBeforeRedraw(self, applicationGUI):
-        applicationGUI.map.delete("individual")
-        applicationGUI.map.delete("food")
-        applicationGUI.map.delete("obstacle")
-
     def __addContentForCurrentFrameToMap(self, applicationGUI, populationList,
                                          foodList, mapContent, mainData):
-        self.__clearMapBeforeRedraw(applicationGUI)
-        # applicationGUI.createMapGrid(applicationGUI.mapSizeX, applicationGUI.mapSizeY)
-        if (self.loopIndex < self.generationLifeSpan):
+        self.loopImage = Image.new("RGB", (applicationGUI.map.winfo_reqwidth(),
+                             applicationGUI.map.winfo_reqheight()), "white")
+        self.loopDraw = ImageDraw.Draw(self.loopImage)
+        if (self.registerLoopIndex < self.generationLifeSpan):
             self.__printPopulationOnMap(populationList, mapContent, applicationGUI)
-            self.__printFoodOnMap(foodList[self.loopIndex], mapContent, applicationGUI)
+            self.__printFoodOnMap(foodList[self.registerLoopIndex], mapContent, applicationGUI)
             self.__printObstaclesOnMap(mainData, mapContent, applicationGUI)
-            # applicationGUI.map.tag_raise("danger")
         else:
             self.__printSurvivingIndividuals(populationList, mapContent, applicationGUI,
                                              mainData)
+        self.__createMapGrid(applicationGUI)
         applicationGUI.map.pack()
         applicationGUI.mainWindow.update()
 
@@ -235,20 +282,17 @@ class PrintRunResult:
             fill = options.pop("fill")
             if (fill == "grey"):
                 fill = (128, 128, 128, 96)
-            try:
-                image = Image.new("RGBA", (int(dangerZone["endX"]) -
-                                  int(dangerZone["startX"]),
-                                  int(dangerZone["endY"]) -
-                                  int(dangerZone["startY"])), fill)
-                self.dangerImages.append(ImageTk.PhotoImage(image))
-            except:
-                return
-            applicationGUI.map.create_image(dangerZone["startX"], dangerZone["startY"],
-                    image=self.dangerImages[-1], anchor='nw', tag="danger")
+            self.dangerMapDraw.rectangle([int(dangerZone["startX"]),
+                                          int(dangerZone["startY"]),
+                                          int(dangerZone["endX"]),
+                                          int(dangerZone["endY"])],
+                                          fill)
 
     def __printDangerZonesOnMap(self, mainData, applicationGUI):
-        applicationGUI.map.delete("all")
-        self.dangerImages = []
+        self.dangerMapImage = Image.new("RGBA", (applicationGUI.map.winfo_reqwidth(),
+                                        applicationGUI.map.winfo_reqheight()),
+                                        (255, 255, 255, 0))
+        self.dangerMapDraw = ImageDraw.Draw(self.dangerMapImage)
         for danger in mainData.dangerList:
             startX = danger[1] * applicationGUI.XCellSize
             startY = danger[0] * applicationGUI.YCellSize
@@ -260,34 +304,4 @@ class PrintRunResult:
                     }
             self.__createHoveringDangerZoneOnMap(applicationGUI, dangerZone,
                                                  fill="grey", alpha=.5)
-
-    def __launchDisplayLoop(self, applicationGUI, mainData):
-        applicationGUI.mainWindow.bind("<Key>", self.__keyPressedDuringReplay)
-        self.__printDangerZonesOnMap(mainData, applicationGUI)
-        while True:
-            if (applicationGUI.exiting is True):
-                break
-            if (self.__runInfoMenuBarsValuesUpdated(applicationGUI) is True):
-                self.prevLoopIndex = self.loopIndex
-                applicationGUI.menus.runInfoMenu.updatePopulationInfoFrame(mainData,
-                                                                self.loopIndex,
-                                                                self.currGeneration)
-                mapContent = []
-                self.__addContentForCurrentFrameToMap(applicationGUI,
-                            self.generationsPopulationList[self.currGeneration],
-                            self.generationsFoodList[self.currGeneration],
-                            mapContent,
-                            mainData)
-            if ('mapContent' in locals() and (self.prevMouseXClick != self.mouseXClick
-                or self.prevMouseYClick != self.mouseYClick)):
-                clickedOnObject = self.__checkWhatIsUnderClickPosition(mapContent)
-                if (clickedOnObject and clickedOnObject["type"] == "individual"):
-                    applicationGUI.menus.runInfoMenu.printCurrentlySelectedIndividualInfo(clickedOnObject, applicationGUI.menus.menusTabs, self.loopIndex)
-                elif (clickedOnObject and clickedOnObject["type"] == "food"):
-                    applicationGUI.menus.runInfoMenu.printCurrentlySelectedFoodInfo(\
-                            clickedOnObject, applicationGUI.menus.menusTabs)
-                self.prevMouseXClick = self.mouseXClick
-                self.prevMouseYClick = self.mouseYClick
-            applicationGUI.mainWindow.update()
-
-
+        self.dangerMapImage = ImageTk.PhotoImage(image=self.dangerMapImage)
