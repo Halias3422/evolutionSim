@@ -99,9 +99,6 @@ def printLoadingStateToUI(mainData, applicationGUI, currentState):
 def spawnCurrentLoopFood(mainData, mapRepresentation):
     foodList = []
     foodList.append(getFoodListFromMapRepresentation(mainData))
-    # foodList.append(spawnGenerationFood(mainData.foodNb,
-    #                                     mainData.mapSizeX, mainData.mapSizeY,
-    #                                     mapRepresentation))
     return foodList
 
 def spawnCurrentLoopGeneration(applicationGUI, mainData):
@@ -113,7 +110,7 @@ def storeCurrentLoopData(populationList, foodList, mainData, mapRepresentation):
                                               mapRepresentation, foodList)
     mainData.allGenerationsPopulationList.append(populationList)
     mainData.allGenerationsFoodList.append(foodList)
-    mainData.dataCollection.append(DataCollection(populationList))
+    mainData.dataCollection.append(DataCollection(populationList, mainData))
     return populationList
 
 

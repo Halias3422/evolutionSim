@@ -1,6 +1,6 @@
 class DataCollection:
 
-    def __init__(self, populationList):
+    def __init__(self, populationList, mainData):
         self.populationSize = len(populationList)
         self.hasReproducedNb = 0
         self.hasEatenNb = 0
@@ -13,6 +13,7 @@ class DataCollection:
                 self.hasEatenNb += 1
             if (individual.escapedDanger):
                 self.hasEscapedDangerNb += 1
-            if (individual.hasReproduced and individual.hasEaten
+            if ((individual.hasReproduced or mainData.foodToggle is True)
+                    and (individual.hasEaten or mainData.reproductionToggle is True)
                     and individual.escapedDanger):
                 self.hasSurvived += 1

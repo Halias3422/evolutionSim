@@ -36,7 +36,9 @@ class RunMainDatas:
         self.foodGen = mainMenu.optionFoodGen.get()
         self.obstacleGen = mainMenu.optionObstacleGen.get()
         self.reproductionToggle = mainMenu.optionReproductionGen.get()
-
+        self.foodToggle = False
+        if (self.foodGen == "disable"):
+            self.foodToggle = True
         self.fixedPopulationPos = []
 
     def __initZonesMapsRepresentation(self, applicationGUI):

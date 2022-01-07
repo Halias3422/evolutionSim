@@ -125,10 +125,12 @@ class PrintRunResult:
                                       fill="green",
                                       tag="food")
 
-    def __printSurvivingIndividuals(self, populationList, mapContent, applicationGUI):
+    def __printSurvivingIndividuals(self, populationList, mapContent, applicationGUI,
+                                    mainData):
         for individual in populationList:
-            if (individual.hasEaten is True
-                and individual.hasReproduced is True
+            if ((individual.hasEaten is True or mainData.foodToggle is True)
+                and (individual.hasReproduced is True
+                    or mainData.reproductionToggle is True)
                 and individual.escapedDanger is True):
                 startX = individual.currMapPosition[1] * applicationGUI.XCellSize
                 startY = individual.currMapPosition[0] * applicationGUI.YCellSize
@@ -164,14 +166,15 @@ class PrintRunResult:
     def __addContentForCurrentFrameToMap(self, applicationGUI, populationList,
                                          foodList, mapContent, mainData):
         self.__clearMapBeforeRedraw(applicationGUI)
-        applicationGUI.createMapGrid(applicationGUI.mapSizeX, applicationGUI.mapSizeY)
+        # applicationGUI.createMapGrid(applicationGUI.mapSizeX, applicationGUI.mapSizeY)
         if (self.loopIndex < self.generationLifeSpan):
             self.__printPopulationOnMap(populationList, mapContent, applicationGUI)
             self.__printFoodOnMap(foodList[self.loopIndex], mapContent, applicationGUI)
             self.__printObstaclesOnMap(mainData, mapContent, applicationGUI)
             # applicationGUI.map.tag_raise("danger")
         else:
-            self.__printSurvivingIndividuals(populationList, mapContent, applicationGUI)
+            self.__printSurvivingIndividuals(populationList, mapContent, applicationGUI,
+                                             mainData)
         applicationGUI.map.pack()
         applicationGUI.mainWindow.update()
 
@@ -275,8 +278,6 @@ class PrintRunResult:
                             self.generationsFoodList[self.currGeneration],
                             mapContent,
                             mainData)
-                print("\rGen (" + str(self.currGeneration)
-                      + ") loop " + str(self.loopIndex), end='\r')
             if ('mapContent' in locals() and (self.prevMouseXClick != self.mouseXClick
                 or self.prevMouseYClick != self.mouseYClick)):
                 clickedOnObject = self.__checkWhatIsUnderClickPosition(mapContent)

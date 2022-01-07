@@ -179,7 +179,8 @@ def decideIndividualCurrentAction(individual, mapRepresentation, populationList,
                                                   mapRepresentation,
                                                   populationList,
                                                   mapSizeX,
-                                                  mapSizeY)
+                                                  mapSizeY,
+                                                  mainData)
     if (individual.currentGoal == "none"
             and individualIsInDangerZone(individual, mainData) is True):
         individual = individualGetOutOfDangerZone(individual, mainData,
@@ -345,21 +346,23 @@ def searchingForFoodTarget(individual, mapRepresentation, populationList,
     return foodTargetPos
 
 def setIndividualCurrentGoal(individual, mapRepresentation, populationList,
-                             mapSizeX, mapSizeY):
+                             mapSizeX, mapSizeY, mainData):
     partnerFound = None
     foodFound = None
     if ((individual.hasEaten is True or individual.genePool.preference >= 5)
-         and individual.hasReproduced is False):
+         and individual.hasReproduced is False
+         and mainData.reproductionToggle is False):
             partnerFound = searchingForReproductionTarget(individual,
                            mapRepresentation, populationList, mapSizeX, mapSizeY)
             if (partnerFound is None and individual.hasEaten is False):
                 foodFound = searchingForFoodTarget(individual, mapRepresentation,
                             populationList, mapSizeX, mapSizeY)
     else:
-        if (individual.hasEaten is False):
+        if (individual.hasEaten is False and mainData.foodToggle is False):
             foodFound = searchingForFoodTarget(individual, mapRepresentation,
                             populationList, mapSizeX, mapSizeY)
-        if (foodFound is None and individual.hasReproduced is False):
+        if (foodFound is None and individual.hasReproduced is False
+                and mainData.reproductionToggle is False):
             partnerFound = searchingForReproductionTarget(individual,
                            mapRepresentation, populationList, mapSizeX, mapSizeY)
     return individual
@@ -446,7 +449,9 @@ def registerIndividualWhoEscapedDangerZone(populationList, mainData):
 def removeAllUnsuccessfullIndividuals(populationList, mainData):
     successfullPopulationList = []
     for individual in populationList:
-        if (individual.hasEaten is True and individual.hasReproduced is True
+        if ((individual.hasEaten is True or mainData.foodToggle is True)
+                and (individual.hasReproduced is True
+                    or mainData.reproductionToggle is True)
                 and individual.escapedDanger is True):
             successfullPopulationList.append(individual)
     return successfullPopulationList
