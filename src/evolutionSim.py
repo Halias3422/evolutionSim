@@ -57,10 +57,13 @@ def initApplicationState(applicationGUI, mainData):
 
 def handleMapZonePainting(applicationGUI, mainData):
     if (neededMapPainting(applicationGUI) is True):
-        applicationGUI.menus.createPaintingMenu(applicationGUI)
-        applicationGUI.menus.zonePaintingMenu.addZonesToMap(applicationGUI,
+        applicationGUI.map.delete("all")
+        menus = applicationGUI.menus
+        menus.createPaintingMenu(applicationGUI)
+        menus.zonePaintingMenu.addZonesToMap(applicationGUI,
                                                                     mainData)
         mainData = mainData.updateMainDataAfterPainting(applicationGUI, mainData)
+        menus.menusTabs.hide(menus.zonePaintingMenu.zonesPaintingFrame)
 
 
 def neededMapPainting(applicationGUI):

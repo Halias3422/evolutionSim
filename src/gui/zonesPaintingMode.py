@@ -29,6 +29,7 @@ class ZonesPaintingMenu:
     def __donePaintingDangerZones(self, event=None):
         self.donePainting = True
 
+
     def __createDonePaintingFrame(self):
         self.donePainting = False
         self.donePaintingFrame = tk.LabelFrame(self.zonesPaintingFrame,
@@ -563,7 +564,7 @@ class ZonesPaintingMenu:
             self.__printHoveringRoundBrushOnMap(applicationGUI)
 
 
-    def __clickDrawRectangleZone(self, applicationGUI):
+    def __clickDrawRectangleZone(self, applicationGUI, mainData):
         brushType = self.brushType.get()
         newZone = {
                 "startX": self.brushStartX,
@@ -573,30 +574,48 @@ class ZonesPaintingMenu:
                 "type": brushType
                 }
         if (brushType == "danger"):
-            self.__registerNewDangerZone(newZone, applicationGUI)
+            self.__registerNewDangerZone(newZone, applicationGUI, mainData)
         else:
             self.addedZones.append(newZone)
         if (brushType == "eraser"):
             self.__eraseDangerZone(newZone, applicationGUI)
         self.__updateMapRepresentation(newZone, brushType, applicationGUI)
 
-    def __registerNewDangerZone(self, newZone, applicationGUI):
-        startY = newZone["startY"]
-        endY = newZone["endY"]
-        while (startY < endY):
-            startX = newZone["startX"]
-            while (startX < newZone["endX"]):
-                newDangerTile = {
-                        "startX": startX,
-                        "startY": startY,
-                        "endX": startX + applicationGUI.XCellSize,
-                        "endY": startY + applicationGUI.YCellSize,
-                        "type": newZone["type"]
-                        }
-                if (newDangerTile not in self.addedDangerZones):
-                    self.addedDangerZones.append(newDangerTile)
-                startX += applicationGUI.XCellSize
-            startY += applicationGUI.YCellSize
+    def __findNewDangerLineLength(self, applicationGUI, dangerMap, currY, currX,
+                                  lineEndX, mainData):
+
+        moveX = currX + applicationGUI.XCellSize
+        while (int(moveX / applicationGUI.XCellSize) < mainData.mapSizeX
+                and moveX < lineEndX
+                and dangerMap[int(currY / applicationGUI.YCellSize)]
+                             [int(moveX / applicationGUI.XCellSize)] == "empty"):
+            moveX += applicationGUI.XCellSize
+        newDangerLine = {
+                "startX": currX,
+                "startY": currY,
+                "endX": moveX,
+                "endY": currY + applicationGUI.YCellSize
+                }
+        return (newDangerLine)
+
+    def __registerNewDangerZone(self, newZone, applicationGUI, mainData):
+        dangerMap = self.mapDangerZonesRepresentation
+        newDangerLine = None
+        self.lastRegisteredX = 0
+        currY = newZone["startY"]
+        while (currY < newZone["endY"]):
+            currX = newZone["startX"]
+            while (currX < newZone["endX"]):
+                if (int(currY / applicationGUI.YCellSize) < mainData.mapSizeY
+                        and int(currX / applicationGUI.XCellSize) < mainData.mapSizeX
+                        and dangerMap[int(currY / applicationGUI.YCellSize)]
+                             [int(currX / applicationGUI.XCellSize)] == "empty"):
+                    newDangerLine = self.__findNewDangerLineLength(applicationGUI,
+                            dangerMap, currY, currX, newZone["endX"], mainData)
+                    self.addedDangerZones.append(newDangerLine)
+                    currX = newDangerLine["endX"]
+                currX += applicationGUI.XCellSize
+            currY += applicationGUI.YCellSize
 
     def __eraseDangerZone(self, newZone, applicationGUI):
         startY = newZone["startY"]
@@ -617,7 +636,7 @@ class ZonesPaintingMenu:
             startY += applicationGUI.YCellSize
 
 
-    def __clickDrawCircleZone(self, applicationGUI):
+    def __clickDrawCircleZone(self, applicationGUI, mainData):
         brushType = self.brushType.get()
         for line in self.registeredCircleLines:
             newZone = {
@@ -628,7 +647,7 @@ class ZonesPaintingMenu:
                     "type": brushType
                     }
             if (brushType == "danger"):
-                self.__registerNewDangerZone(newZone, applicationGUI)
+                self.__registerNewDangerZone(newZone, applicationGUI, mainData)
             else:
                 self.addedZones.append(newZone)
             if (brushType == "eraser"):
@@ -692,9 +711,9 @@ class ZonesPaintingMenu:
 
     def __clickInsertBrushOnMap(self, applicationGUI, mainData):
         if (self.brushStyle.get() == "line"):
-            self.__clickDrawRectangleZone(applicationGUI)
+            self.__clickDrawRectangleZone(applicationGUI, mainData)
         elif (self.brushStyle.get() == "round"):
-            self.__clickDrawCircleZone(applicationGUI)
+            self.__clickDrawCircleZone(applicationGUI, mainData)
         applicationGUI.map.delete("all")
         for zone in self.addedZones:
             color = "white"
@@ -718,8 +737,9 @@ class ZonesPaintingMenu:
         self.__updateMapCoverageValues(mainData)
 
 
-    def __triggerAddingBrushOnMap(self, event=None):
+    def __triggerAddingBrushOnMap(self, applicationGUI, mainData, event=None):
         self.mouseButtonPressed = True
+        self.__clickInsertBrushOnMap(applicationGUI,mainData)
 
     def __triggerStopAddingBrushOnMap(self, event=None):
         self.mouseButtonPressed = False
@@ -775,7 +795,7 @@ class ZonesPaintingMenu:
         self.mapDangerZonesRepresentation = [["empty" for x in range(mainData.mapSizeX)]\
                 for y in range(mainData.mapSizeY)]
 
-    def addZonesToMap(self, applicationGUI, mainData):
+    def __initPaintingMode(self, applicationGUI, mainData):
         self.mouseButtonPressed = False
         self.zonesPaintingFrame.grid()
         self.addedZones = []
@@ -789,8 +809,12 @@ class ZonesPaintingMenu:
         applicationGUI.mainWindow.update()
         applicationGUI.map.bind("<Motion>",
             lambda event, arg=applicationGUI: self.__drawBrushOnMapCursorPosition(arg, event))
-        applicationGUI.map.bind("<ButtonPress-1>", self.__triggerAddingBrushOnMap)
+        applicationGUI.map.bind("<ButtonPress-1>",
+                lambda event, a=applicationGUI, b=mainData: self.__triggerAddingBrushOnMap(a, b))
         applicationGUI.map.bind("<ButtonRelease-1>", self.__triggerStopAddingBrushOnMap)
+
+    def addZonesToMap(self, applicationGUI, mainData):
+        self.__initPaintingMode(applicationGUI, mainData)
         currBrushType = self.brushType.get()
         self.__changeCurrentBrushTypeStyle()
         while (True):
@@ -798,7 +822,8 @@ class ZonesPaintingMenu:
                 self.__changeCurrentBrushTypeStyle()
                 currBrushType = self.brushType.get()
             if (self.mouseButtonPressed is True):
-                self.__clickInsertBrushOnMap(applicationGUI,mainData)
+                pass
+                # self.__clickInsertBrushOnMap(applicationGUI,mainData)
             if (self.prevHoveringPosition != self.currHoveringPosition):
                 self.__printHoveringBrushOnMap(applicationGUI)
                 self.prevHoveringPosition = self.currHoveringPosition
