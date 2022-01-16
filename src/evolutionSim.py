@@ -17,9 +17,13 @@ def runGenerationsLife(applicationGUI, event=None):
     mainData = RunMainDatas(applicationGUI)
     handleMapZonePainting (applicationGUI, mainData)
     initApplicationState(applicationGUI, mainData)
+    #big slowup at handleRandomZones
     handleRandomZonesGeneration(applicationGUI, mainData)
+    initialMapRepresentation = addZonesToMapRepresentation(mainData)
     while (mainData.generationLoop < mainData.generationsNb):
-        mainData.mapRepresentation = addZonesToMapRepresentationCurrGen(mainData)
+        mainData.mapRepresentation = copyInitialMapRepresentation(\
+                                                        initialMapRepresentation,
+                                                        mainData)
         populationList = spawnCurrentLoopGeneration(applicationGUI, mainData)
         mainData.mapRepresentation = addPopulationListToMapRepresentation(populationList,
                                                      mainData.mapRepresentation)
@@ -35,6 +39,12 @@ def runGenerationsLife(applicationGUI, event=None):
             break
     PrintRunResult(mainData, applicationGUI)
 
+def copyInitialMapRepresentation(initialMapRepresentation, mainData):
+    newMap = createMapRepresentation(mainData.mapSizeX, mainData.mapSizeY)
+    for y in range(0, mainData.mapSizeY):
+        for x in range(0, mainData.mapSizeX):
+            newMap[y][x] = initialMapRepresentation[y][x]
+    return newMap
 
 def handleRandomZonesGeneration(applicationGUI, mainData):
     mainMenu = applicationGUI.menus.mainMenu
@@ -64,6 +74,7 @@ def handleMapZonePainting(applicationGUI, mainData):
                                                                     mainData)
         mainData = mainData.updateMainDataAfterPainting(applicationGUI, mainData)
         menus.menusTabs.hide(menus.zonePaintingMenu.zonesPaintingFrame)
+        applicationGUI.map.delete("all")
 
 
 def neededMapPainting(applicationGUI):

@@ -24,12 +24,9 @@ class RunMainDatas:
         self.dangerList = []
         self.populationInfoPerLoop = []
         self.mapRepresentation = createMapRepresentation(self.mapSizeX, self.mapSizeY)
-        self.dangerZoneMapRepresentation = createMapRepresentation(self.mapSizeX,
-                                                                   self.mapSizeY)
+        self.dangerZoneMapRepresentation = self.mapRepresentation[:]
         self.dangerLevelsMapRepresentation = []
-        self.zonesMapRepresentation = createMapRepresentation(self.mapSizeX,
-                                                              self.mapSizeY)
-
+        self.zonesMapRepresentation = self.mapRepresentation[:]
         self.dangerGen = mainMenu.optionDangerGen.get()
         self.populationGen = mainMenu.optionPopulationGen.get()
         self.populationReproductionGen = mainMenu.optionPopulationReproduction.get()

@@ -37,12 +37,13 @@ def addFoodListToMapRepresentation(foodList, mapRepresentation):
         mapRepresentation[food[0]][food[1]] = "food"
     return mapRepresentation
 
-def addZonesToMapRepresentationCurrGen(mainData):
+def addZonesToMapRepresentation(mainData):
+    zoneMap = mainData.mapRepresentation
     currY = mainData.mapSizeY - 1
     while (currY >= 0):
         currX = mainData.mapSizeX - 1
         while (currX >= 0):
-            mainData.mapRepresentation[currY][currX] = \
+            zoneMap[currY][currX] = \
                 mainData.zonesMapRepresentation[currY][currX]
             if (mainData.zonesMapRepresentation[currY][currX] == "obstacle"
                     and ([currY, currX]) not in mainData.obstacleList):
@@ -52,7 +53,7 @@ def addZonesToMapRepresentationCurrGen(mainData):
                 mainData.dangerList.append([currY, currX])
             currX -= 1
         currY -= 1
-    return mainData.mapRepresentation
+    return zoneMap
 
 def generateDangerZoneMap(mainData):
     dangerMap = createMapRepresentation(mainData.mapSizeX, mainData.mapSizeY)
