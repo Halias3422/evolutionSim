@@ -17,7 +17,6 @@ def runGenerationsLife(applicationGUI, event=None):
     mainData = RunMainDatas(applicationGUI)
     handleMapZonePainting (applicationGUI, mainData)
     initApplicationState(applicationGUI, mainData)
-    #big slowup at handleRandomZones
     handleRandomZonesGeneration(applicationGUI, mainData)
     initialMapRepresentation = addZonesToMapRepresentation(mainData)
     while (mainData.generationLoop < mainData.generationsNb):

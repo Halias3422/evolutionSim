@@ -68,38 +68,45 @@ def generateDangerZoneMap(mainData):
                 break
     return dangerMap
 
-def registerDangerTileLevel(tileX, tileY, dangerMap, applicationGUI):
-    amplitude = 1
-    while (True):
-        currY = tileY - amplitude
-        while (currY <= tileY + amplitude):
-            currX = tileX - amplitude
-            while (currX <= tileX + amplitude):
-                if (currY >= 0 and currY < applicationGUI.mapSizeY
-                        and currX >= 0 and currX < applicationGUI.mapSizeX):
-                    if (dangerMap[currY][currX] == "empty"):
-                        return (amplitude)
-                currX += 1
-            currY += 1
-        amplitude += 1
+def registerDangerTileLevel(tileX, tileY, dangerMap, applicationGUI, dangerFreeList):
+    amplitude = applicationGUI.mapSizeX - 1
+    for freeTile in dangerFreeList:
+        amplX = abs(freeTile[0] - tileY)
+        amplY = abs(freeTile[1] - tileX)
+        if (amplX >= amplY and amplX < amplitude):
+            amplitude = amplX
+        elif (amplY >= amplX and amplY < amplitude):
+            amplitude = amplY
+    return amplitude
 
 
+def dangerTileIsAround(mainData, tileY, tileX):
+    currY = tileY - 1
+    for currY in range(tileY - 1, tileY + 2):
+        for currX in range(tileX - 1, tileX + 2):
+            if (currX < mainData.mapSizeX and currY < mainData.mapSizeY):
+                if (mainData.dangerZoneMapRepresentation[currY][currX] == "danger"):
+                    return True
+    return False
 
-def allTilesAreDanger(mainData, applicationGUI):
+def registerDangerFreeTiles(mainData, applicationGUI):
+    dangerFreeList = []
     currY = applicationGUI.mapSizeY - 1
     while (currY >= 0):
         currX = applicationGUI.mapSizeX - 1
         while (currX >= 0):
             if (mainData.dangerZoneMapRepresentation[currY][currX] == "empty"):
-                return False
+                if (dangerTileIsAround(mainData, currY, currX) is True):
+                    dangerFreeList.append([currY, currX])
             currX -= 1
         currY -= 1
-    return True
+    return dangerFreeList
 
 
 def generateDangerLevelMap(mainData, applicationGUI):
     dangerMap = mainData.dangerZoneMapRepresentation
-    if (allTilesAreDanger(mainData, applicationGUI) is True):
+    dangerFreeList = registerDangerFreeTiles(mainData, applicationGUI)
+    if (len(dangerFreeList) == 0):
         dangerLvlMap = [[1 for x in range(applicationGUI.mapSizeX)]
                 for y in range(applicationGUI.mapSizeY)]
         return dangerLvlMap
@@ -113,9 +120,12 @@ def generateDangerLevelMap(mainData, applicationGUI):
             if (dangerMap[currY][currX] == "danger"):
                 dangerLvlMap[currY][currX] = registerDangerTileLevel(currX, currY,
                                                                      dangerMap,
-                                                                     applicationGUI)
+                                                                     applicationGUI,
+                                                                     dangerFreeList)
             currX -= 1
         currY -= 1
+    for y in range(0, applicationGUI.mapSizeY):
+        print(dangerLvlMap[y])
     return dangerLvlMap
 
 
